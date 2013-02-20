@@ -4,6 +4,7 @@ import psycopg2
 import sys
 import pickle
 import time
+import base64
 
 try:
     import openerp
@@ -91,6 +92,68 @@ def create_and_init_db(dbname, modules):
     cr.close()
 
     return ret
+
+def db_exist(c, dbname):
+    import psycopg2
+    import psycopg2.extras
+    conn_string = "host='%s' dbname='%s' port='%s' user='%s' password='%s'" % (c['db_host'],dbname,c['db_port'], c['db_user'],c['db_password'] )
+    try:
+        conn = psycopg2.connect(conn_string)
+        conn.commit()
+        return True
+    except psycopg2.OperationalError:
+        return False
+def load_csv(fn):
+    fp=open(os.path.join(fn))
+    data=[x for x in csv.DictReader(fp)]
+    fp.close()
+    return data
+
+def f64(header, data, fields64):
+    out=[]
+    for row in data:
+        for f64 in fields64:
+            i=header.index(f64)
+            fn=row[i]
+            row[i] = base64.encodestring(file(fn).read())
+    return data
+
+def load_data(pool, cr, uid, fn, model):
+    lines = [x for x in csv.reader( file(fn).readlines() )]
+    header = lines[0]
+    data=lines[1:]
+    fields = pool.get(model).fields_get(cr, uid)
+    binary_fields = [f for f in fields if fields[f]['type']=='binary']
+    fields64 = list( set(binary_fields).intersection( set(header) ) )
+    return pool.get(model).load(cr, uid, header, f64(header, data, fields64) )
+
+def generate_accounts_from_template(obj_pool, cr, uid):
+    wizard_obj = obj_pool.get('wizard.multi.charts.accounts')
+    install_obj = obj_pool.get('account.installer')
+    bank_wizard_obj = obj_pool.get('account.bank.accounts.wizard')
+
+    header = ['date_start', 'date_stop', 'period','company_id/id']
+    data_row = [time.strftime('%Y-01-01'), time.strftime('%Y-12-31'), 'month', 'base.main_company']
+    
+    ret = install_obj.load(cr, uid, header, [data_row] )
+    ids = ret['ids']
+    if ids:
+        install_obj.execute(cr, uid, ids)
+
+    header = ['company_id/id','code_digits', 'sale_tax/id','purchase_tax/id','sale_tax_rate','purchase_tax_rate','currency_id', 'chart_template_id/id']
+    row = ['base.main_company', 2, 'l10n_uk.ST11','l10n_uk.PT11', 0.2, 0.2, 'GBP', 'l10n_uk.l10n_uk']
+
+    ret = wizard_obj.load(cr, uid, header, [row] )
+    ids = ret['ids']
+    if ids:
+        wizard_obj.execute(cr, uid, ids)
+    return
+def set_product_pricelist(pool, cr, uid):
+    header = ['id', 'currency_id']
+    row = ['product.list0', 'GBP']
+    ret = pool.get('product.pricelist').load(cr, uid, header, [row] )
+    return
+
 
 if __name__ == '__main__':
     sys.path.append('/home/jan/openerp6/server/6.1/')
