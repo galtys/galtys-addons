@@ -126,6 +126,29 @@ def load_data(pool, cr, uid, fn, model):
     binary_fields = [f for f in fields if fields[f]['type']=='binary']
     fields64 = list( set(binary_fields).intersection( set(header) ) )
     return pool.get(model).load(cr, uid, header, f64(header, data, fields64) )
+def export_data(pool, cr, uid, model, fn):
+    fields = pool.get(model).fields_get(cr, uid)
+    ids = pool.get(model).search(cr, uid, [])
+    header = ['id']
+    for f, v in fields.items():
+        if 'function' not in v:
+            #pprint.pprint(v)
+            print f, v['type']
+            if v['type']=='many2one':
+                header.append( "%s/id" % f )
+            elif v['type']=='one2many':
+                pass
+            else:
+                header.append(f)
+                #print f, v['type']
+    data = pool.get(model).export_data(cr, uid, ids,  header)
+    import csv
+    fp = open(fn, 'wb')
+    csv_writer=csv.writer(fp)
+    csv_writer.writerows( [header] )
+    csv_writer.writerows( data['datas'] )
+    fp.close()
+    return data
 
 def generate_accounts_from_template(obj_pool, cr, uid):
     wizard_obj = obj_pool.get('wizard.multi.charts.accounts')
