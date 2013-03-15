@@ -129,26 +129,42 @@ def load_data(pool, cr, uid, fn, model):
 def export_data(pool, cr, uid, model, fn):
     fields = pool.get(model).fields_get(cr, uid)
     ids = pool.get(model).search(cr, uid, [])
-    header = ['id']
+    #header = ['id']
+    header=[]
+    header_export=['id']
     for f, v in fields.items():
         if 'function' not in v:
-            #pprint.pprint(v)
-            print f, v['type']
             if v['type']=='many2one':
-                header.append( "%s/id" % f )
+                header_export.append( "%s/id" % f )
+                header.append(f)
             elif v['type']=='one2many':
                 pass
             else:
                 header.append(f)
-                #print f, v['type']
-    data = pool.get(model).export_data(cr, uid, ids,  header)
+                header_export.append(f)
+    header_types = [fields[x]['type'] for x in header]
+    data = pool.get(model).export_data(cr, uid, ids,  header_export)
+    out=[]
+    #print header_export
+    #print header
+    #print header_types
+    for row in data['datas']:
+        out_row=[row[0]]
+        for i,h in enumerate(header):
+            v=row[i+1]
+            t=header_types[i]
+            if (v is False) and (t != 'boolean'):
+                out_row.append('')
+            else:
+                out_row.append(v)
+        out.append(out_row)
     import csv
     fp = open(fn, 'wb')
     csv_writer=csv.writer(fp)
-    csv_writer.writerows( [header] )
-    csv_writer.writerows( data['datas'] )
+    csv_writer.writerows( [header_export] )
+    csv_writer.writerows( out )
     fp.close()
-    return data
+    return out
 
 def generate_accounts_from_template(obj_pool, cr, uid):
     wizard_obj = obj_pool.get('wizard.multi.charts.accounts')
