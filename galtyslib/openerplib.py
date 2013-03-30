@@ -166,6 +166,29 @@ def export_data(pool, cr, uid, model, fn):
     fp.close()
     return out
 
+def generate_accounts_from_template_byname(obj_pool, cr, uid, name='l10n_uk_corrected.l10n_uk_corrected'):
+    wizard_obj = obj_pool.get('wizard.multi.charts.accounts')
+    install_obj = obj_pool.get('account.installer')
+    bank_wizard_obj = obj_pool.get('account.bank.accounts.wizard')
+
+    #header = ['date_start', 'date_stop', 'period','company_id/id']
+    #data_row = [time.strftime('%Y-01-01'), time.strftime('%Y-12-31'), 'month', 'base.main_company']
+    
+    #ret = install_obj.load(cr, uid, header, [data_row] )
+    #ids = ret['ids']
+    #if ids:
+    #    install_obj.execute(cr, uid, ids)
+
+    header = ['company_id/id','code_digits', 'sale_tax/id','purchase_tax/id','sale_tax_rate','purchase_tax_rate','currency_id', 'chart_template_id/id']
+    row = ['base.main_company', 2, 'l10n_uk_corrected.ST11','l10n_uk_corrected.PT11', 0.2, 0.2, 'GBP', name]
+
+    ret = wizard_obj.load(cr, uid, header, [row] )
+    print ret
+    ids = ret['ids']
+    if ids:
+        wizard_obj.execute(cr, uid, ids)
+    return
+
 def generate_accounts_from_template(obj_pool, cr, uid):
     wizard_obj = obj_pool.get('wizard.multi.charts.accounts')
     install_obj = obj_pool.get('account.installer')
@@ -192,6 +215,94 @@ def set_product_pricelist(pool, cr, uid):
     row = ['product.list0', 'GBP']
     ret = pool.get('product.pricelist').load(cr, uid, header, [row] )
     return
+
+
+def list_models(obj_pool, cr, uid, model_ids):
+    ir_model_obj=obj_pool.get('ir.model')
+    #model_ids = ir_model_obj.search(cr, uid, [])
+    #field_attrs=[]
+    import HTML
+    def get_row(header, data_map):
+        out=[]
+        for h in header:
+            if h in ['selection','help']:
+                out.append('')
+            else:
+                out.append( data_map.get(h,'') )
+        return out
+    def get_model_attrs(fields):
+        field_attrs=[]
+        for k,v in fields.items():
+            for fa in v.keys():
+                if fa not in field_attrs:
+                    field_attrs.append(fa)
+        return field_attrs
+    def get_model_html(fields):
+        rows=[]
+        headers = get_model_attrs(fields)
+        for k,v in sorted(fields.items(),key=lambda a:(a[1]['type'],a[0])):
+            row = [k]+get_row(headers, v)
+            rows.append(row)
+        headers = ['FieldName']+headers
+        return HTML.table(rows, header_row=headers)
+    def functional_fields(fields):
+        return dict( [(x,fields[x]) for x in fields if fields[x].get('function',False)] )
+    def nonfunctional_fields(fields):
+        return dict( [(x,fields[x]) for x in fields if not fields[x].get('function',False)] )
+
+    def simple_fields(fields):
+        SIMPLE_FIELDS=['binary','boolean','char','date','datetime','float','integer','integer_big','text']
+        return dict( [(x,fields[x]) for x in fields if fields[x]['type'] in SIMPLE_FIELDS] )
+    def nonsimple_fields(fields):
+        SIMPLE_FIELDS=['binary','boolean','char','date','datetime','float','integer','integer_big','text']
+        return dict( [(x,fields[x]) for x in fields if fields[x]['type'] not in SIMPLE_FIELDS] )
+
+    def many2one_rels(fields):
+        out=[]
+        for k,v in fields.items():
+            if v['type']=='many2one':
+                req=v.get('required',False)
+                if (v['relation'] not in out) and req:
+                    out.append(v['relation'])
+        return out
+    
+    fp=open('model2.html','wb')
+    rel_map={}
+    for model in sorted(ir_model_obj.browse(cr, uid, model_ids),key=lambda a:a.model):
+        obj=obj_pool.get(model.model)
+        all_fields = obj.fields_get(cr, uid)
+
+        fp.write('<h1> %s </h1>' % (model.model ))
+        fp.write('<h2> Nonfunctional Fields</h2>')
+        fields = nonfunctional_fields(all_fields)
+        fp.write('<h3> Simple fields </h3>')
+        s_fields = simple_fields(fields)
+        fp.write(get_model_html(s_fields))
+        fp.write('<p>')
+        fp.write('<h3> Relational fields </h3>')
+        ns_fields = nonsimple_fields(fields)
+        fp.write(get_model_html(ns_fields))
+        fp.write('<p>')
+        fp.write('<h2> Functional Fields</h2>')
+        fields = functional_fields(all_fields)
+        fp.write('<h3> Simple fields </h3>')
+        s_fields = simple_fields(fields)
+        fp.write(get_model_html(s_fields))
+        fp.write('<p>')
+        fp.write('<h3> Relational fields </h3>')
+        ns_fields = nonsimple_fields(fields)
+        fp.write(get_model_html(ns_fields))
+        fp.write('<p>')
+
+
+        rels = many2one_rels(nonfunctional_fields(all_fields))
+        rel_map[model.model] = rels
+        #rels_str  = ', '.join( rels )
+
+    fp.close()
+    return rel_map
+
+
 
 
 if __name__ == '__main__':
