@@ -156,7 +156,8 @@ def export_data(pool, cr, uid, model, fn):
             if (v is False) and (t != 'boolean'):
                 out_row.append('')
             else:
-                out_row.append(v)
+                out_row.append(v.encode('utf8'))
+        #print out_row
         out.append(out_row)
     import csv
     fp = open(fn, 'wb')
