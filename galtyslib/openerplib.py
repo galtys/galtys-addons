@@ -39,16 +39,9 @@ def install_modules(obj_pool, cr, uid,  modules):
     module_obj = obj_pool.get('ir.module.module')
     mod_upgrade_obj = obj_pool.get('base.module.upgrade')
     
-    user_obj.write(cr, uid, 1, {'in_group_5':True,
-                                'in_group_6':True,
-                                #'in_group_10':True,
-                                } )
-    #install_ids = module_obj.search(cr, uid, [('name','in',['account', 'account_accountant']) ] )
-    #modules = [x.strip() for x in file('modules.txt').readlines() ]
     install_ids = module_obj.search(cr, uid, [('name','in',modules) ] )
     
     ret=module_obj.button_install(cr, uid, install_ids)
-    #print ret
     ids = mod_upgrade_obj.get_module_list(cr, uid)
     ret=  mod_upgrade_obj.upgrade_module(cr, uid, ids)
     return ret
@@ -82,12 +75,13 @@ def load_ns(dbname):
     else:
         return False
 
-def create_and_init_db(dbname, modules):
+def create_and_init_db(dbname, modules=None):
 
 
     create_empty_db(dbname)
     obj_pool, cr, uid = get_connection(dbname)
-    ret = install_modules(obj_pool, cr, uid, modules)
+    if modules:
+        ret = install_modules(obj_pool, cr, uid, modules)
     cr.commit()
     cr.close()
 
