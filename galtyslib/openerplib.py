@@ -109,7 +109,14 @@ def f64(header, data, fields64):
         for f64 in fields64:
             i=header.index(f64)
             fn=row[i]
-            row[i] = base64.encodestring(file(fn).read())
+            if os.path.isfile(fn):
+                row[i] = base64.encodestring(file(fn).read())
+            else:
+                try:
+                    bin=base64.decodestring(fn)
+                    row[i]=fn
+                except:
+                    pass
     return data
 
 def load_data(pool, cr, uid, fn, model):
