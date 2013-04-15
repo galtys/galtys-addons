@@ -24,9 +24,9 @@
                 <field name="month" invisible="1"/>
                 <field name="year" invisible="1"/>
                 <field name="company_id" invisible="1" groups="base.group_multi_company"/>
-                <field name="account_id" invisible="1" groups="analytic.group_analytic_accounting"/>
-                <field name="crossovered_budget_id" invisible="1" groups="analytic.group_analytic_accounting"/>
-                <field name="general_budget_id" invisible="1" groups="analytic.group_analytic_accounting"/>
+                <field name="account_id" groups="analytic.group_analytic_accounting"/>
+                <field name="crossovered_budget_id" groups="analytic.group_analytic_accounting"/>
+                <field name="general_budget_id" groups="analytic.group_analytic_accounting"/>
 
                 <field name="nbr" sum="Entries"/>
                 <field name="amount" sum="Amount"/>
