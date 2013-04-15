@@ -26,7 +26,7 @@ class budget_entries_report(osv.osv):
         'crossovered_budget_id': fields.many2one('crossovered.budget', 'Budget', required=False),
         'general_budget_id': fields.many2one('account.budget.post', 'Budget Position', required=False),
         'amount': fields.float('Amount', readonly=True),
-        'planned_amount': fields.float('Amount', readonly=True),
+        'planned_amount': fields.float('Planned Amount', readonly=True),
         'unit_amount': fields.float('Quantity', readonly=True),
         'nbr': fields.integer('#Entries', readonly=True),
     }
