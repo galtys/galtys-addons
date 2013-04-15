@@ -102,6 +102,58 @@ def load_csv(fn):
     data=[x for x in csv.DictReader(fp)]
     fp.close()
     return data
+class TraversePreorder(dict):
+    def __init__(self, d=None, parent_field='parent_id'):
+        if d:
+            dict.__init__(self, d)
+        self._child_map = None
+        self._parent_field = parent_field
+    def _build_child_map(self):
+        _child_map = {}
+
+        for _id, row in self.items():
+            parent_id = row[self._parent_field]
+            #if parent_id:
+            #    parent_id=parent_id[0]
+            v = _child_map.setdefault(parent_id, [])
+            v.append(_id)
+        #print 50*'*'
+        #print _child_map
+        self._child_map = _child_map
+    def traverse_preorder(self, test_id=None, depth=0):
+
+        if not self._child_map:
+            self._build_child_map()
+        if test_id:
+            yield test_id, depth
+            children = self._child_map.get(test_id, [])
+            #key=lambda x:(self[x].get('name',0), x)
+            #children.sort(key=key)
+            
+            for ch in children:
+                for tt, dd in self.traverse_preorder(ch, depth + 1):
+                    yield tt, dd
+        else:
+            roots = [t for t in self.keys() if not self[t][self._parent_field] ]
+            #roots.sort(key=lambda x:(self[x].get('sort_order',0), x))
+
+            #  nt roots,len(roots)
+            for root in roots:
+                for tt, dd in self.traverse_preorder(root, depth):
+                    yield tt, dd
+
+def traverse_preorder(records, parent_field = 'parent_id'):
+    recs2_map = dict( [(x['id'],x) for x in records] )
+    #print len(recs2_map)
+    #print recs2_map.keys()
+    tp=TraversePreorder(d=recs2_map, parent_field=parent_field)
+    #print len(tp)
+
+    ret= [ recs2_map[tt] for tt,dd in tp.traverse_preorder() ]
+
+    #print len(ret)
+    return ret
+
 
 def f64(header, data, fields64):
     out=[]
