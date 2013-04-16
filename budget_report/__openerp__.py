@@ -6,7 +6,7 @@
     "website" : "http://www.galtys.com/",
     "category" : "Generic Modules/Others",
     "depends" : ['account_budget'],
-    "description" : "",
+    "description" : "budget entries analysis",
     "init_xml" : [],
     "demo_xml" : [],
     "data" : [],

@@ -28,24 +28,20 @@ class budget_entries_report(osv.osv):
         'amount': fields.float('Amount', readonly=True),
         'planned_amount': fields.float('Planned Amount', readonly=True),
         'unit_amount': fields.float('Quantity', readonly=True),
+        'variance': fields.float('Variance', readonly=True),
         'nbr': fields.integer('#Entries', readonly=True),
     }
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'budget_entries_report')
         cr.execute("""
-            CREATE OR REPLACE VIEW budget_entries_report AS 
-             SELECT min(a.id) AS id, count(DISTINCT a.id) AS nbr, to_char(a.date::timestamp with time zone, 'YYYY'::text) AS year,
-                    to_char(a.date::timestamp with time zone, 'MM'::text) AS month,
-                    a.company_id, a.currency_id,
-                    a.account_id, cbl.crossovered_budget_id, cbl.general_budget_id, sum(a.amount) AS amount, sum(a.unit_amount) AS unit_amount, round((sum(cbl.planned_amount) / count(DISTINCT a.id)),2) AS planned_amount
-               FROM account_analytic_line a, account_analytic_account analytic, crossovered_budget cb, crossovered_budget_lines cbl, account_budget_post abp
-              WHERE analytic.id = a.account_id
-                AND abp.id = cbl.general_budget_id
-                AND cb.id = cbl.crossovered_budget_id
-                AND cbl.analytic_account_id = a.account_id
-                AND a.date between cbl.date_from and cbl.date_to
-                AND exists (select 'X' from account_budget_rel abr where abr.budget_id = abp.id and a.general_account_id = abr.account_id)
-              GROUP BY year, month, a.company_id, a.currency_id, a.account_id, cbl.crossovered_budget_id, cbl.general_budget_id;
+CREATE OR REPLACE VIEW budget_entries_report AS 
+ SELECT min(a.id) AS id, count(DISTINCT a.id) AS nbr, to_char(a.date::timestamp with time zone, 'YYYY'::text) AS year, to_char(a.date::timestamp with time zone, 'MM'::text) AS month, a.company_id, a.currency_id, a.account_id, cbl.crossovered_budget_id, cbl.general_budget_id, sum(a.amount) AS amount, sum(a.unit_amount) AS unit_amount, round(sum(cbl.planned_amount) / count(DISTINCT a.id)::numeric, 2) AS planned_amount, round(sum(a.amount) / (round(sum(cbl.planned_amount) / count(DISTINCT a.id)::numeric, 2) / 100::numeric), 0) AS variance
+   FROM account_analytic_line a, account_analytic_account analytic, crossovered_budget cb, crossovered_budget_lines cbl, account_budget_post abp
+  WHERE analytic.id = a.account_id AND abp.id = cbl.general_budget_id AND cb.id = cbl.crossovered_budget_id AND cbl.analytic_account_id = a.account_id AND a.date >= cbl.date_from AND a.date <= cbl.date_to AND (EXISTS ( SELECT 'X'
+           FROM account_budget_rel abr
+          WHERE abr.budget_id = abp.id AND a.general_account_id = abr.account_id))
+  GROUP BY to_char(a.date::timestamp with time zone, 'YYYY'::text), to_char(a.date::timestamp with time zone, 'MM'::text), a.company_id, a.currency_id, a.account_id, cbl.crossovered_budget_id, cbl.general_budget_id;
             """)
+
 budget_entries_report()
 

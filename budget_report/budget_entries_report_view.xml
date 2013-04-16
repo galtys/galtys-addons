@@ -21,7 +21,7 @@
                 <field name="product_uom_id" invisible="1"/>
 -->
 
-                <field name="month" invisible="1"/>
+                <field name="month"/>
                 <field name="year" invisible="1"/>
                 <field name="company_id" invisible="1" groups="base.group_multi_company"/>
                 <field name="account_id" groups="analytic.group_analytic_accounting"/>
@@ -31,6 +31,7 @@
                 <field name="nbr" sum="Entries"/>
                 <field name="amount" sum="Amount"/>
                 <field name="planned_amount" sum="Planned Amount"/>
+                <field name="variance" sum="Variance"/>
             </tree>
         </field>
     </record>
@@ -50,7 +51,7 @@
                 <field name="account_id" groups="analytic.group_analytic_accounting"/>
                 <field name="crossovered_budget_id" groups="analytic.group_analytic_accounting"/>
                 <field name="general_budget_id" groups="analytic.group_analytic_accounting"/>
-                <group expand="0" string="Group By...">
+                <group expand="1" string="Group By...">
 		  <!--
                     <filter string="User" name="User" icon="terp-personal" context="{'group_by':'user_id'}"/>
                     <filter string="Partner" icon="terp-partner" context="{'group_by':'partner_id'}"/>
@@ -89,7 +90,7 @@
         <field name="res_model">budget.entries.report</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,graph</field>
-        <field name="context">{'search_default_year':1,'search_default_month':1, 'group_by_no_leaf':1, 'search_default_Account':1, 'search_default_Month':1, 'group_by':[]}</field>
+        <field name="context">{'group_by_no_leaf':1, 'search_default_Budget':1, 'search_default_Account':1, 'search_default_Month':1,'search_default_Position':1, 'group_by':[]}</field>
         <field name="search_view_id" ref="view_budget_entries_report_search"/>
         <field name="help">From this view, have an analysis of your different budget entries.</field>
     </record>
