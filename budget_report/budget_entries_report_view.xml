@@ -79,8 +79,7 @@
          <field name="arch" type="xml">
              <graph string="Budget Entries Analysis" type="bar">
 <!--                <field name="user_id"/> -->
-                <field name="account_id" operator="+"/>
-                <field name="unit_amount" operator="+"/>
+                <field name="month" operator="+"/>
                 <field name="amount" operator="+"/>
              </graph>
          </field>
