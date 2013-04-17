@@ -101,5 +101,30 @@
               parent="account.menu_finance_reporting" sequence="4"/>
 
 
+
+        <record model="ir.ui.view" id="view_form_budget_entries_wizard">
+            <field name="name">budget.entries.wizard_open</field>
+            <field name="model">budget.entries.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+	      <form string="budget.entries.wizard">
+                  <group colspan="4">
+                    <button  icon="terp-gtk-go-back-rtl" string="OK" name="action_open_entries" type="object"/>
+                  </group>
+               </form>
+	      
+            </field>
+        </record>
+
+        <act_window name="Budget Open Items"
+                res_model="budget.entries.wizard"
+                src_model="budget.entries.report"
+                view_mode="form"
+		multi="True"
+                target="new"
+		key2="client_action_multi"    
+                id="action_budget_entries_open_wizard"
+                />
+
 </data>
 </openerp>
