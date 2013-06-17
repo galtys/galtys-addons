@@ -220,6 +220,7 @@ def export_data(pool, cr, uid, model, fn):
     fp.close()
     return out
 
+
 def generate_accounts_from_template_byname(obj_pool, cr, uid, name='l10n_uk_corrected.l10n_uk_corrected'):
     wizard_obj = obj_pool.get('wizard.multi.charts.accounts')
     install_obj = obj_pool.get('account.installer')
@@ -241,6 +242,16 @@ def generate_accounts_from_template_byname(obj_pool, cr, uid, name='l10n_uk_corr
     ids = ret['ids']
     if ids:
         wizard_obj.execute(cr, uid, ids)
+    return
+def generate_periods(pool, cr, uid):
+    install_obj = pool.get('account.installer')
+    header = ['date_start', 'date_stop', 'period','company_id/id']
+    data_row = [time.strftime('%Y-01-01'), time.strftime('%Y-12-31'), 'month', 'base.main_company']
+    
+    ret = install_obj.load(cr, uid, header, [data_row] )
+    ids = ret['ids']
+    if ids:
+        install_obj.execute(cr, uid, ids)
     return
 
 def generate_accounts_from_template(obj_pool, cr, uid):
