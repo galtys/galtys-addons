@@ -136,21 +136,17 @@ class TraversePreorder(dict):
         else:
             roots = [t for t in self.keys() if not self[t][self._parent_field] ]
             #roots.sort(key=lambda x:(self[x].get('sort_order',0), x))
-
+            #print 'roots',roots,   [self[t][self._parent_field] for t in self.keys() ]
             #  nt roots,len(roots)
             for root in roots:
                 for tt, dd in self.traverse_preorder(root, depth):
                     yield tt, dd
 
-def traverse_preorder(records, parent_field = 'parent_id'):
-    recs2_map = dict( [(x['id'],x) for x in records] )
-    #print len(recs2_map)
-    #print recs2_map.keys()
+def traverse_preorder(records, parent_field = 'parent_id', key_field='id'):
+    recs2_map = dict( [(x[key_field],x) for x in records] )
     tp=TraversePreorder(d=recs2_map, parent_field=parent_field)
-    #print len(tp)
-
     ret= [ recs2_map[tt] for tt,dd in tp.traverse_preorder() ]
-
+    #print [x for x in tp.traverse_preorder()]
     #print len(ret)
     return ret
 
