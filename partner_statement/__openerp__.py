@@ -5,7 +5,7 @@
     'description': """
     
     """,
-    'author': 'Jan',
+    'author': 'Jan Troler',
     'website': 'http://www.galtys.com',
     'depends': ['sale'],
     'init_xml': [],

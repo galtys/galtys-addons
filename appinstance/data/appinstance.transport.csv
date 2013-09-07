@@ -1,0 +1,3 @@
+id,name,prot,user,host,port
+jetel_422,jetel_422,sftp,openerp,zeraxis.info,422
+jetel,jetel,sftp,openerp,jetel,422

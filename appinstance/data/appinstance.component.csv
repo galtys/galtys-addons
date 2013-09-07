@@ -1,0 +1,8 @@
+id,name,group_id/id,path,vcs,transport_id/id,transport_alt_id/id,location
+server_7.0,7,server,,bzr,jetel_422,jetel,/opt/openerp/server/7.0/
+addon_7.0,7,addons,,bzr,jetel_422,jetel,/opt/openerp/addons/7.0/
+web_7.0,7,addons,addons,bzr,jetel_422,jetel,/opt/openerp/web/7.0/
+galt70,galtysaddons,addons,,bzr,jetel_422,jetel,/opt/openerp/addons/galtysaddons
+bridgman_7.0,bridgman,bridgman,addons,bzr,jetel_422,jetel,/opt/openerp/bridgman
+am_7.0,analogue_micro,analogue_micro,addons,bzr,jetel_422,jetel,/opt/openerp/analogue_micro
+id_stronghold7,stronghold7,stronghold7,addons,bzr,jetel_422,jetel,/opt/openerp/stronghold7
