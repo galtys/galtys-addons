@@ -1,8 +1,4 @@
-﻿-- View: budget_entries_report
-
--- DROP VIEW budget_entries_report;
-
-CREATE OR REPLACE VIEW budget_entries_report AS 
+CREATE OR REPLACE VIEW budget_entries_report_noa AS 
  SELECT min(a.id) AS id,
         count(DISTINCT a.id) AS nbr,
         to_char(a.date::timestamp with time zone, 'YYYY'::text) AS year,
@@ -44,5 +40,3 @@ UNION
   GROUP BY to_char(cbl.date_from::timestamp with time zone, 'YYYY'::text), to_char(cbl.date_from::timestamp with time zone, 'MM'::text),
            cbl.company_id, rc.currency_id, cbl.crossovered_budget_id, cbl.general_budget_id;
 
-ALTER TABLE budget_entries_report
-  OWNER TO ???????;

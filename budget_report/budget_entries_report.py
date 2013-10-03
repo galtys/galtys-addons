@@ -57,10 +57,14 @@ class budget_entries_wizard(osv.osv_memory):
         }
 
 budget_entries_wizard()
+
+
+
 class budget_entries_report(osv.osv):
-    _name = "budget.entries.report"
+    _name = "budget.entries.report_noa"
     _description = "Budget Entries Statistics"
     _auto = False
+    _rec_name = 'month'
     _columns = {
         #'date': fields.date('Date', readonly=True),
         'year': fields.char('Year', size=4, readonly=True),
@@ -73,7 +77,7 @@ class budget_entries_report(osv.osv):
         #'partner_id': fields.many2one('res.partner', 'Partner'),
         'company_id': fields.many2one('res.company', 'Company', required=True),
         #'currency_id': fields.many2one('res.currency', 'Currency', required=True),
-        'account_id': fields.many2one('account.analytic.account', 'Account', required=False),
+#        'account_id': fields.many2one('account.analytic.account', 'Account', required=False),
         #'general_account_id': fields.many2one('account.account', 'General Account', required=True),
         #'journal_id': fields.many2one('account.analytic.journal', 'Journal', required=True),
         #'move_id': fields.many2one('account.move.line', 'Move', required=True),
@@ -90,8 +94,8 @@ class budget_entries_report(osv.osv):
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'budget_entries_report_noa')
         sql_fn='budget_entries_view_noanalytics.sql'
-        fp=file_open('addons/galtysaddons/budget_report/%s'%sql_fn)
-        query=fp.read()
+        fp=file_open('budget_report/%s'%sql_fn)
+        query=fp.read()       
         fp.close()
         cr.execute(query)
 budget_entries_report()

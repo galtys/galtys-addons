@@ -4,8 +4,8 @@
 
 
     <record id="view_budget_entries_report_tree" model="ir.ui.view">
-        <field name="name">budget.entries.report.tree</field>
-        <field name="model">budget.entries.report</field>
+        <field name="name">budget.entries.report_noa.tree</field>
+        <field name="model">budget.entries.report_noa</field>
         <field name="arch" type="xml">
             <tree string="Budget Entries Analysis" create="false">
 	      <!--
@@ -24,7 +24,7 @@
                 <field name="month"/>
                 <field name="year" invisible="1"/>
                 <field name="company_id" invisible="1" groups="base.group_multi_company"/>
-                <field name="account_id" groups="analytic.group_analytic_accounting"/>
+<!--                <field name="account_id" groups="analytic.group_analytic_accounting"/> -->
                 <field name="crossovered_budget_id" groups="analytic.group_analytic_accounting"/>
                 <field name="general_budget_id" groups="analytic.group_analytic_accounting"/>
 
@@ -37,8 +37,8 @@
     </record>
 
     <record id="view_budget_entries_report_search" model="ir.ui.view">
-        <field name="name">budget.entries.report.search</field>
-        <field name="model">budget.entries.report</field>
+        <field name="name">budget.entries.report_noa.search</field>
+        <field name="model">budget.entries.report_noa</field>
         <field name="arch" type="xml">
             <search string="Budget Entries Analysis">
 	      <!--
@@ -48,7 +48,7 @@
                 <field name="product_id" />
                 <field name="user_id"/>
   -->
-                <field name="account_id" groups="analytic.group_analytic_accounting"/>
+<!--                <field name="account_id" groups="analytic.group_analytic_accounting"/> -->
                 <field name="crossovered_budget_id" groups="analytic.group_analytic_accounting"/>
                 <field name="general_budget_id" groups="analytic.group_analytic_accounting"/>
                 <group expand="1" string="Group By...">
@@ -62,7 +62,7 @@
                     <filter string="Day" icon="terp-go-today" context="{'group_by':'day'}"/>
 		    -->
 
-                    <filter string="Account" name="Account" icon="terp-folder-green" context="{'group_by':'account_id'}" groups="analytic.group_analytic_accounting"/>
+<!--                    <filter string="Account" name="Account" icon="terp-folder-green" context="{'group_by':'account_id'}" groups="analytic.group_analytic_accounting"/> -->
                     <filter string="Position" name="Position" icon="terp-folder-green" context="{'group_by':'general_budget_id'}" groups="analytic.group_analytic_accounting"/>
                     <filter string="Budget" name="Budget" icon="terp-folder-green" context="{'group_by':'crossovered_budget_id'}" groups="analytic.group_analytic_accounting"/>
 
@@ -74,8 +74,8 @@
         </field>
     </record>
     <record id="view_account_analytic_entries_search" model="ir.ui.view">
-         <field name="name">budget.entries.report.graph</field>
-         <field name="model">budget.entries.report</field>
+         <field name="name">budget.entries.report_noa.graph</field>
+         <field name="model">budget.entries.report_noa</field>
          <field name="arch" type="xml">
              <graph string="Budget Entries Analysis" type="bar">
 <!--                <field name="user_id"/> -->
@@ -86,7 +86,7 @@
     </record>
     <record id="action_budget_entries_report" model="ir.actions.act_window">
         <field name="name">Budget Entries Analysis</field>
-        <field name="res_model">budget.entries.report</field>
+        <field name="res_model">budget.entries.report_noa</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,graph</field>
 	<field name="context">{}</field>
@@ -120,72 +120,13 @@
 
         <act_window name="Budget Open Items"
                 res_model="budget.entries.wizard"
-                src_model="budget.entries.report"
+                src_model="budget.entries.report_noa"
                 view_mode="form"
 		multi="True"
                 target="new"
 		key2="client_action_multi"    
                 id="action_budget_entries_open_wizard"
                 />
-
-
-
-        <record model="ir.ui.view" id="view_order_line_tree_cc">
-            <field name="name">sale.order.line.tree_cc</field>
-            <field name="model">sale.order.line</field>
-            <field name="inherit_id" ref="sale.view_order_line_tree"/>
-            <field name="type">tree</field>
-            <field name="arch" type="xml">
-                <field name="product_id" position="after">
-		  <field name="delivery_date"/>
-                  <field name="delivery_date2" invisible="1"/>
-                </field>
-
-            </field>
-        </record>
-
-        <record model="ir.ui.view" id="sale.view_sale_order_line_graph2">
-            <field name="name">sale.order.line.graph2</field>
-            <field name="model">sale.order.line</field>
-            <field name="arch" type="xml">
-                <graph string="Sales Order Lines" type="bar">
-                    <field name="order_id"/>
-                    <field name="product_uom_qty" operator="+"/>
-                </graph>
-            </field>
-        </record>
-
-        <record id="sale.view_sales_order_line_filter" model="ir.ui.view">
-            <field name="name">sale.order.line.list.select</field>
-            <field name="model">sale.order.line</field>
-            <field name="type">search</field>
-            <field name="arch" type="xml">
-                <search string="Search Sales Order Lines">
-		  <field name="product_id"/>
-		  <field name="delivery_date"/>
-		  <newline/>
-                    <group expand="0" string="Group By...">
-                        <filter string="Product" domain="[]" context="{'group_by':'product_id'}"/>
-                        <filter string="Delivery Date" domain="[]" context="{'group_by':'delivery_date'}"/> 
-                    </group>
-               </search>
-            </field>
-        </record>
-
-
-
-
-
-    <record id="action_order_line_form" model="ir.actions.act_window">
-      <field name="name">Sales Order Lines</field>
-      <field name="type">ir.actions.act_window</field>
-      <field name="res_model">sale.order.line</field>
-      <field name="domain">[('state','in',['done','confirmed'])]</field> 
-      <field name="view_type">form</field>
-      <field name="view_mode">tree,form</field>
-    </record>
-
-    <menuitem action="action_order_line_form" id="menu_sale_order_line" parent="base.menu_sales" sequence="4" groups="base.group_sale_salesman,base.group_sale_manager"/>
 
 
 </data>
