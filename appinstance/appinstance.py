@@ -2,14 +2,6 @@ from osv import fields, osv
 from openerp import netsvc
 import openerp.addons.decimal_precision as dp
 
-class component_group(osv.osv):
-    _order = "name"
-    _name = "appinstance.component_group"
-    _columns = {
-        'name':fields.char('Name', size=444),
-        'type':fields.selection([('openerp_server','OpenERP Server'),('openerp_addons','OpenERP Addons'), ('project', 'Project')],'Type'),
-        }
-component_group()
 
 class host(osv.osv):
     _order = "name"
@@ -19,6 +11,14 @@ class host(osv.osv):
         'app_ids':fields.many2many('appinstance.app', 'appinstance_app_host_rel', 'host_id', 'app_id', 'Apps'),
 }
 host()
+class component_group(osv.osv):
+    _order = "name"
+    _name = "appinstance.component_group"
+    _columns = {
+        'name':fields.char('Name', size=444),
+        'type':fields.selection([('openerp_server','OpenERP Server'),('openerp_addons','OpenERP Addons'), ('project', 'Project')],'Type'),
+        }
+component_group()
 
 class app(osv.osv):
     _order = "name"

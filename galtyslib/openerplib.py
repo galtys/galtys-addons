@@ -175,15 +175,29 @@ def load_data(pool, cr, uid, fn, model):
     binary_fields = [f for f in fields if fields[f]['type']=='binary']
     fields64 = list( set(binary_fields).intersection( set(header) ) )
     return pool.get(model).load(cr, uid, header, f64(header, data, fields64) )
-def export_data(pool, cr, uid, model, fn):
-    fields = pool.get(model).fields_get(cr, uid)
+def export_data(pool, cr, uid, model, fn, db_only=False, ext_ref=None):
+    obj=pool.get(model)
+    if db_only:
+        fields = dict([x for x in obj.fields_get(cr, uid).items() if (x[0] in obj._columns)])
+    else:
+        fields = obj.fields_get(cr, uid)
+    id_ref_ids = pool.get('ir.model.data').search(cr, uid, [('model','=',model)])   
+    ref_ids = [x.res_id for x in pool.get('ir.model.data').browse(cr, uid, id_ref_ids)]
+
     ids = pool.get(model).search(cr, uid, [])
-    #header = ['id']
+    if ext_ref is None:
+        pass
+    elif ext_ref is 'ref_only':
+        ids=ref_ids
+    elif ext_ref is 'noref':
+        ids=list( set(ids) - set(ref_ids) )
+    #if len(ids)>100:
+    #    ids=ids[0:90]
     header=[]
     header_export=['id']
     for f, v in fields.items():
         if 'function' not in v:
-            if v['type']=='many2one':
+            if v['type'] in ['many2one', 'many2many']:
                 header_export.append( "%s/id" % f )
                 header.append(f)
             elif v['type']=='one2many':
@@ -194,9 +208,6 @@ def export_data(pool, cr, uid, model, fn):
     header_types = [fields[x]['type'] for x in header]
     data = pool.get(model).export_data(cr, uid, ids,  header_export)
     out=[]
-    #print header_export
-    #print header
-    #print header_types
     for row in data['datas']:
         out_row=[row[0]]
         for i,h in enumerate(header):
@@ -206,7 +217,6 @@ def export_data(pool, cr, uid, model, fn):
                 out_row.append('')
             else:
                 out_row.append(v.encode('utf8'))
-        #print out_row
         out.append(out_row)
     import csv
     fp = open(fn, 'wb')
@@ -239,6 +249,22 @@ def generate_accounts_from_template_byname(obj_pool, cr, uid, name='l10n_uk_corr
     if ids:
         wizard_obj.execute(cr, uid, ids)
     return
+def dict2row(PCMRP,rec):
+    out=[]
+    for p in PCMRP:
+        out.append(rec[p])
+    return out
+
+def save_csv(fn, data, HEADER=None):
+    if len(data)>0:
+        if HEADER is None:
+            HEADER=data[0].keys()
+    fp = open(fn, 'wb')
+    out=[dict2row(HEADER, x) for x in data]
+    csv_writer=csv.writer(fp)
+    csv_writer.writerows( [HEADER]+out )
+    fp.close()
+
 def generate_periods(pool, cr, uid):
     install_obj = pool.get('account.installer')
     header = ['date_start', 'date_stop', 'period','company_id/id']
@@ -277,12 +303,105 @@ def set_product_pricelist(pool, cr, uid):
     ret = pool.get('product.pricelist').load(cr, uid, header, [row] )
     return
 
+def module_dep(dbname):
+    pool, cr, uid = get_connection(dbname)
+    dbname2=dbname+'_analyse2'
+    import openerp.tools.config
+    if db_exist(openerp.tools.config, dbname2):
+        drop_db(dbname2)
+    cr.execute("select name,id from ir_module_module")
+    module_name_id_map=dict([x for x in cr.fetchall()])
+    module_id_name_map=dict([ (x[1],x[0]) for x in module_name_id_map.items()])
+    mod_dep_sql = "select name,module_id from ir_module_module_dependency"
 
-def list_models(obj_pool, cr, uid, model_ids):
+    cr.execute(mod_dep_sql)
+    recs2=cr.fetchall()
+    #recs2_dicts=[{'id':x[0], 'name':x[1], 'module_id':x[2], 'parent':x[3]} for x in recs2]
+    dep_map={}
+    for name,module_id in recs2:
+        v=dep_map.setdefault(name, [])
+        v.append(module_id)
+    dep_map2={}
+    for name,module_id in recs2:
+        v=dep_map2.setdefault(module_id, [])
+        name_id=module_name_id_map[name]
+        v.append(name_id)
+    import galtyslib.topological_sorting as topological_sorting
+    mod_dep_ids=topological_sorting.topological_sorting(dep_map2)
+    mod_dep=[ x for x in pool.get('ir.module.module').browse(cr, uid, mod_dep_ids) if x.state=='installed']
+    mod_dep_name=[(x.name,[module_id_name_map.get(y) for y in dep_map2.get(x.id,[]) ]) for x in mod_dep]
+    cr.commit()
+    cr.close()
+
+    print 'new db', dbname2
+    print 'to install %d modules.'% len(mod_dep_name)
+    print mod_dep_name
+    model_field_module_map = {}
+    model_transient_map={}
+    NEW_DB=True
+    module_model_fields_map={}
+    for module, deps in mod_dep_name:
+        model_fields_map = module_model_fields_map.setdefault(module, {})
+        if NEW_DB:
+            print [module]
+            ret  = create_and_init_db(dbname2, [module])
+            NEW_DB=False
+        #print 'installing module', module, deps
+        pool, cr, uid = get_connection(dbname2)           
+        ret = install_modules(pool,cr,uid, [module] )
+        cr.commit()
+        cr.close()
+
+        pool, cr, uid = get_connection(dbname2)           
+        #print 'getting new fields...'
+        model_ids = pool.get('ir.model').search(cr, uid, [])
+        
+        for model in pool.get('ir.model').browse(cr, uid, model_ids):
+            #print '   ',model.model
+            obj=pool.get(model.model)
+            if obj:
+                all_fields = obj.fields_get(cr, uid)
+                v=model_field_module_map.setdefault(model.model, {})
+                model_transient_map[model.model]=pool.get(model.model).is_transient()
+                if not model_transient_map[model.model]:
+                    model_fields_map[model.model] = all_fields
+                for kf in all_fields:
+                    #fmodules=v.setdefault(kf, [])
+                    if kf not in v:
+                        v[kf]=module
+                    #if mod not in fmodules:
+                    #    fmodules.append(module)
+            else:
+                print '   module not in pool', model.model
+        #print 
+        cr.commit()
+        cr.close()
+    return model_field_module_map, model_transient_map, mod_dep_name, module_model_fields_map
+def module_dep2(model_field_module_map, model_transient_map, mod_dep_name):
+    mod_sorted = [x[0] for x in mod_dep_name]
+#    if (not model_transient_map[ x[0] ] ) ]
+    module_model_map={}
+    for model,fields in model_field_module_map.items():
+        for f,mod in fields.items():
+            v=module_model_map.setdefault(mod, [])
+            v.append(model)
+    model_module_map={}
+    for model,fields in model_field_module_map.items():
+        for f,mod in fields.items():
+            v=model_module_map.setdefault(model, [])
+            v.append(mod)
+    models_sorted=[]
+    mm1_map=dict([(x[0],list(set(x[1]))) for x in module_model_map.items()])
+    mm2_map=dict([(x[0],list(set(x[1]))) for x in model_module_map.items()])
+    return mod_sorted, mm1_map, mm2_map
+
+def list_models(obj_pool, cr, uid, model_ids, fnout='model2.html',  mfm_map=None, ms=None, mt_map=None):
+    # mfm=model_field_module_map, ms=mod_sorted
     ir_model_obj=obj_pool.get('ir.model')
     #model_ids = ir_model_obj.search(cr, uid, [])
     #field_attrs=[]
-    import HTML
+    import galtyslib.HTML as HTML
+    #model_field_module_map = {}
     def get_row(header, data_map):
         out=[]
         for h in header:
@@ -326,14 +445,37 @@ def list_models(obj_pool, cr, uid, model_ids):
                 if (v['relation'] not in out) and req:
                     out.append(v['relation'])
         return out
-    
-    fp=open('model2.html','wb')
+    def add_module_to_fields(fields, model_field_module_map, model_name):
+        out={}
+        for k,v in fields.items():
+            v['module']=model_field_module_map.get(model_name, {}).get(k)
+            if model_name not in model_field_module_map:
+                print 'missing model', model_name
+            elif k not in model_field_module_map[model_name]:
+                print 'missing ', [model_name, k]
+            out[k]=v
+        return out
+    fp=open(fnout,'wb')
     rel_map={}
-    for model in sorted(ir_model_obj.browse(cr, uid, model_ids),key=lambda a:a.model):
+    #mt_map
+    transient_ids=[x.id for x in ir_model_obj.browse(cr, uid, model_ids) if mt_map.get(x.model)]
+    db_ids=[x.id for x in ir_model_obj.browse(cr, uid, model_ids) if not mt_map.get(x.model)]
+    tmodels= sorted(ir_model_obj.browse(cr, uid, transient_ids),key=lambda a:a.model)
+    dmodels= sorted(ir_model_obj.browse(cr, uid, db_ids),key=lambda a:a.model)
+    
+    for model in dmodels+tmodels:
+	#print 'model: ', model.model, model.name
         obj=obj_pool.get(model.model)
-        all_fields = obj.fields_get(cr, uid)
+	if not obj:
+	    #print "%s (%s)" % (model.model, model.name)
+            #fields = obj.fields_get(cr, uid)
+	    continue
+        #db_fields = nonfunctional_fields(fields)
+        #export_data(obj_pool, cr, uid, model.model, )
+        
+        all_fields = add_module_to_fields(obj.fields_get(cr, uid), mfm_map, model.model)
 
-        fp.write('<h1> %s </h1>' % (model.model ))
+        fp.write('<h1> Model %s </h1>' % (model.model ))
         fp.write('<h2> Nonfunctional Fields</h2>')
         fields = nonfunctional_fields(all_fields)
         fp.write('<h3> Simple fields </h3>')
@@ -362,9 +504,6 @@ def list_models(obj_pool, cr, uid, model_ids):
 
     fp.close()
     return rel_map
-
-
-
 
 if __name__ == '__main__':
     sys.path.append('/home/jan/openerp6/server/6.1/')

@@ -18,10 +18,10 @@ def topological_sorting(dep):
     marked=[]
     temporary=[]
     L=[]
-
+    print 'tp started'
     def visit(dep, n):
         if n in temporary:
-            raise ValueError
+            raise ValueError(n, temporary, marked)
         if n not in marked:
             temporary.append(n)
             for m in dep.get(n,[]):
@@ -31,11 +31,39 @@ def topological_sorting(dep):
             marked.append(n)
             L.append(n)
     nodes=dep.keys()
+    print marked, temporary
     while nodes:
         n=nodes.pop(0)
+        #print marked, temporary, n
         visit(dep, n)
 
     return L
+
+def topological_sorting_detect_cycle(dep):
+    marked=[]
+    temporary=[]
+    L=[]
+    print 'tp started'
+    def visit(dep, n):
+        if n in temporary:
+            #raise ValueError(n, temporary, marked)
+            return True, n, temporary, marked
+        if n not in marked:
+            temporary.append(n)
+            for m in dep.get(n,[]):
+                visit(dep, m)
+            t=temporary.index(n)
+            temporary.pop(t)
+            marked.append(n)
+            L.append(n)
+    nodes=dep.keys()
+    print marked, temporary
+    while nodes:
+        n=nodes.pop(0)
+        #print marked, temporary, n
+        visit(dep, n)
+
+    return False, L
 
 if __name__ == '__main__':
     dep={
