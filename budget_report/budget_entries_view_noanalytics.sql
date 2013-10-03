@@ -20,7 +20,7 @@ CREATE OR REPLACE VIEW budget_entries_report AS
     AND a.date >= cbl.date_from AND a.date <= cbl.date_to AND rc.id = cbl.company_id 
     AND (EXISTS ( SELECT 'X'
            FROM account_budget_rel abr
-          WHERE abr.budget_id = abp.id AND a.id = abr.account_id))
+          WHERE abr.budget_id = abp.id AND a.account_id = abr.account_id))
   GROUP BY to_char(a.date::timestamp with time zone, 'YYYY'::text), to_char(a.date::timestamp with time zone, 'MM'::text), a.company_id, rc.currency_id, a.account_id, cbl.crossovered_budget_id, cbl.general_budget_id
 
 UNION
