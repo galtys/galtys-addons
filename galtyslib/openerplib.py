@@ -110,7 +110,6 @@ class TraversePreorder(dict):
         self._parent_field = parent_field
     def _build_child_map(self):
         _child_map = {}
-
         for _id, row in self.items():
             parent_id = row[self._parent_field]
             #if parent_id:
@@ -121,7 +120,6 @@ class TraversePreorder(dict):
         #print _child_map
         self._child_map = _child_map
     def traverse_preorder(self, test_id=None, depth=0):
-
         if not self._child_map:
             self._build_child_map()
         if test_id:
@@ -149,7 +147,6 @@ def traverse_preorder(records, parent_field = 'parent_id', key_field='id'):
     #print [x for x in tp.traverse_preorder()]
     #print len(ret)
     return ret
-
 
 def f64(header, data, fields64):
     out=[]
@@ -227,24 +224,18 @@ def export_data(pool, cr, uid, model, fn, db_only=False, ext_ref=None):
     return out
 
 
-def generate_accounts_from_template_byname(obj_pool, cr, uid, name='l10n_uk_corrected.l10n_uk_corrected'):
+def generate_accounts_from_template_byname(obj_pool, cr, uid, name='corrected'):
+    #x='l10n_uk_%s.l10n_uk_%s' (name,name)
     wizard_obj = obj_pool.get('wizard.multi.charts.accounts')
     install_obj = obj_pool.get('account.installer')
     bank_wizard_obj = obj_pool.get('account.bank.accounts.wizard')
 
-    #header = ['date_start', 'date_stop', 'period','company_id/id']
-    #data_row = [time.strftime('%Y-01-01'), time.strftime('%Y-12-31'), 'month', 'base.main_company']
-    
-    #ret = install_obj.load(cr, uid, header, [data_row] )
-    #ids = ret['ids']
-    #if ids:
-    #    install_obj.execute(cr, uid, ids)
 
     header = ['company_id/id','code_digits', 'sale_tax/id','purchase_tax/id','sale_tax_rate','purchase_tax_rate','currency_id', 'chart_template_id/id']
-    row = ['base.main_company', 2, 'l10n_uk_corrected.ST11','l10n_uk_corrected.PT11', 0.2, 0.2, 'GBP', name]
-
+    row = ['base.main_company', 2, 'l10n_uk_%s.ST11'%name,'l10n_uk_%s.PT11'%name, 0.2, 0.2, 'GBP', 'l10n_uk_%s.l10n_uk_%s'% (name,name)]
+    
     ret = wizard_obj.load(cr, uid, header, [row] )
-    print ret
+    #print ret
     ids = ret['ids']
     if ids:
         wizard_obj.execute(cr, uid, ids)
@@ -265,11 +256,10 @@ def save_csv(fn, data, HEADER=None):
     csv_writer.writerows( [HEADER]+out )
     fp.close()
 
-def generate_periods(pool, cr, uid):
+def generate_periods(pool, cr, uid, year='2013'):
     install_obj = pool.get('account.installer')
     header = ['date_start', 'date_stop', 'period','company_id/id']
-    data_row = [time.strftime('%Y-01-01'), time.strftime('%Y-12-31'), 'month', 'base.main_company']
-    
+    data_row = [time.strftime('%s-01-01'%year), time.strftime('%s-12-31'%year), 'month', 'base.main_company']
     ret = install_obj.load(cr, uid, header, [data_row] )
     ids = ret['ids']
     if ids:
