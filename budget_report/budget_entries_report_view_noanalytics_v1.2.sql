@@ -1,8 +1,4 @@
-﻿-- View: budget_entries_report
-
--- DROP VIEW budget_entries_report;
-
-CREATE OR REPLACE VIEW budget_entries_report AS 
+CREATE OR REPLACE VIEW budget_entries_report_noa AS 
  SELECT min(a.id) AS id,
         count(DISTINCT a.id) AS nbr,
         to_char(a.date::timestamp with time zone, 'YYYY'::text) AS year,

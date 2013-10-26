@@ -139,7 +139,7 @@ class budget_entries_report(osv.osv):
     }
     def init(self, cr):
         tools.drop_view_if_exists(cr, 'budget_entries_report_noa')
-        sql_fn='budget_entries_view_noanalytics_v1.2.sql'
+        sql_fn='budget_entries_report_view_noanalytics_v1.2.sql'                
         fp=file_open('budget_report/%s'%sql_fn)
         query=fp.read()       
         fp.close()
