@@ -10,7 +10,7 @@ CREATE OR REPLACE VIEW budget_entries_report_noa AS
         sum(a.debit - a.credit) AS amount,
         sum(a.quantity) AS unit_amount,
         round(sum(cbl.planned_amount) / count(DISTINCT a.id)::numeric, 2) AS planned_amount,
-        case when round(sum(cbl.planned_amount) / count(DISTINCT a.id)::numeric, 2) = 0 then 0 else round(sum(a.debit - a.credit) / (round(sum(cbl.planned_amount) / count(DISTINCT a.id)::numeric, 2) / 100::numeric), 0) end AS variance
+        sum(a.debit - a.credit) - round(sum(cbl.planned_amount) / count(DISTINCT a.id)::numeric, 2) AS variance
    FROM account_move_line a, crossovered_budget cb, crossovered_budget_lines cbl, account_budget_post abp, res_company rc
   WHERE abp.id = cbl.general_budget_id AND cb.id = cbl.crossovered_budget_id
     AND a.date >= cbl.date_from AND a.date <= cbl.date_to AND rc.id = cbl.company_id 
@@ -31,7 +31,7 @@ UNION
         0 AS amount,
         0 AS unit_amount,
         sum(cbl.planned_amount) AS planned_amount, 
-        0 AS variance
+        0 - sum(cbl.planned_amount) AS variance
    FROM crossovered_budget cb, crossovered_budget_lines cbl, account_budget_post abp, res_company rc
   WHERE abp.id = cbl.general_budget_id AND cb.id = cbl.crossovered_budget_id AND rc.id = cbl.company_id
     AND (not EXISTS ( SELECT 'X'
