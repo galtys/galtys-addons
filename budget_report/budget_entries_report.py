@@ -12,37 +12,27 @@ class budget_entries_wizard(osv.osv_memory):
     def action_open_entries(self, cr, uid, ids, context=None):
         print 'update pricelist', ids, context
         active_ids=context['active_ids']
+        assert len(active_ids)==1
         for w in self.browse(cr, uid, ids):
-            br_items=self.pool.get('budget.entries.report').browse(cr, uid, active_ids)
-            acc_ids=[br.account_id.id for br in br_items]
-            gen_ids=[[x.id for x in br.general_budget_id.account_ids] for br in br_items]
-            month_ids=[br.month for br in br_items]
-            print acc_ids, gen_ids
-            #['|',('create_date','>', self.delta),('write_date','>', self.delta),
+            br_item=self.pool.get('budget.entries.report').browse(cr, uid, active_ids)[0]
 
-            args=[('account_id','in',acc_ids),
-                  ('general_account_id','in',reduce(lambda x,y:x+y,gen_ids))]
-            
-            line_ids=self.pool.get('account.analytic.line').search(cr, uid, args)
-            line_str=','.join( map(str,line_ids))
-            if line_str:
-                cr.execute("select id,to_char(date::timestamp with time zone, 'MM'::text) AS month from account_analytic_line where id in (%s)"%(line_str))
-                item_id_month=[x for x in cr.fetchall()]
+            #acc_ids=[br.account_id.id for br in br_items]
+            #gen_ids=[[x.id for x in br.general_budget_id.account_ids] for br in br_items]
+            #month_ids=[br.month for br in br_items]
+            #years=[br.year for y in br_items]
+            year = br_item.year
+            month1 = br_item.month
+            month = int(month1)
+            if month==12:
+                month2='01'
+                year2=year
             else:
-                item_id_month=[]
-            print 'filter months', item_id_month, month_ids
-            out_ids=[]
-            for line_id, month in item_id_month:
-                print 'line, month', line_id, month
-                if month in month_ids:
-                    out_ids.append(line_id)
-                else:
-                    print 'not in selection', line_id, month, month_ids
-            print 'out_ids', out_ids
-            #open_lines= [x[0] for x in cr.fetchall() if x[1] in month_ids]
-            #print 'open lines', open_lines
-            #line_ids=self.pool.get('account.analytic.line').search(cr, uid, [])
-            #print 'account line items', line_ids
+                month2=str(month+1)
+                year2="%d" % (int(year)+1)
+            account_ids = [x.id for x in br.general_budget_id.account_ids]
+            account_str=','.join( map(str, account_ids) )
+            cr.execute("select id from account_move_line where date >= '%s-%s-01' and date < '%s-%s-01' and account_id in (%s)" % (year,month1,year2,month2,account_str) )
+            out_ids = [x[0] for x in cr.fetchall()]
         return {
             'domain': "[('id','in', [" + ','.join(map(str, out_ids)) + "])]",
             
@@ -93,10 +83,10 @@ class budget_entries_wizard(osv.osv_memory):
             'domain': "[('id','in', [" + ','.join(map(str, out_ids)) + "])]",
             
             #'domain': str(args),
-            'name': 'Analytic Items',
+            'name': 'Journal Items',
             'view_type': 'form',
             'view_mode': 'tree,form',
-            'res_model': 'account.analytic.line',
+            'res_model': 'account.move.line',
             #'view_id': False,
             'type': 'ir.actions.act_window',
             #'search_view_id': id['res_id']
