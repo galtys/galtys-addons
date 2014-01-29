@@ -179,6 +179,13 @@ def load_data(pool, cr, uid, fn, model, files=False):
     ret = pool.get(model).load(cr, uid, header, f64(header, data, fields64, files=files) )
     if ret['messages']:
         print ret
+    if ret['ids']:
+        ids_str = ','.join( map(str, ret['ids'] ) )
+#        if model not in ['account.fiscalyear','account.period']:
+        #print ids_str
+        cr.execute("update ir_model_data set noupdate=True where (module is Null or module='') and model='%s' and res_id in (%s)" % (model,ids_str) )
+        if model in ['stock.location']:
+            cr.execute("update ir_model_data set noupdate=True where model='stock.location'")
     return ret
 def export_data(pool, cr, uid, model, fn, db_only=False, ext_ref=None):
     obj=pool.get(model)
@@ -305,6 +312,12 @@ def set_product_pricelist(pool, cr, uid):
     row = ['product.list0', 'GBP']
     ret = pool.get('product.pricelist').load(cr, uid, header, [row] )
     return
+def use_filestore(pool, cr, uid, name=''):
+    print "Setting DB to use filestore"
+    ret = pool.get('ir.config_parameter').load(cr, uid, ['key','value'],[['ir_attachment.location','file:///filestore'+name]])
+    if ret['messages']:
+        print ret
+    return ret
 
 def module_dep(dbname):
     pool, cr, uid = get_connection(dbname)
@@ -507,6 +520,16 @@ def list_models(obj_pool, cr, uid, model_ids, fnout='model2.html',  mfm_map=None
 
     fp.close()
     return rel_map
+def run_sql_via_psql(sql, dbname, port='5432'):
+    import tempfile
+    import subprocess
+    import os
+    tmp_fn=tempfile.mktemp()
+    fp=file(tmp_fn,'wb').write(sql)
+    #fp.close()
+    ret=subprocess.call(["psql","-p",port,"-f",tmp_fn,dbname])
+    os.unlink(tmp_fn)
+    return ret
 
 if __name__ == '__main__':
     sys.path.append('/home/jan/openerp6/server/6.1/')
