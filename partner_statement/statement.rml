@@ -68,8 +68,9 @@
     <paraStyle name="P1" fontName="Helvetica" fontSize="9.0" leading="11" alignment="LEFT" spaceBefore="0.0" spaceAfter="6.0"/>
     <paraStyle name="P2" fontName="Helvetica" fontSize="9.0" leading="11" alignment="RIGHT" spaceBefore="0.0" spaceAfter="6.0"/>
     <paraStyle name="P3" fontName="Helvetica-Bold" fontSize="9.0" leading="11" alignment="LEFT" spaceBefore="0.0" spaceAfter="6.0"/>
-    <paraStyle name="P4" fontName="Helvetica-Bold" fontSize="16.0" leading="20" alignment="CENTER" spaceBefore="0.0" spaceAfter="0.0"/>
-    <paraStyle name="P5" fontName="Helvetica" fontSize="9.0" leading="11" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="P4" fontName="Helvetica" fontSize="9.0" leading="11" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="P5" fontName="Helvetica-Bold" fontSize="16.0" leading="20" alignment="CENTER" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="P6" fontName="Helvetica-Bold" fontSize="9.0" leading="11" alignment="RIGHT" spaceBefore="6.0" spaceAfter="6.0"/>
     <paraStyle name="Standard" fontName="Helvetica"/>
     <paraStyle name="Text body" fontName="Helvetica" spaceBefore="0.0" spaceAfter="6.0"/>
     <paraStyle name="List" fontName="Helvetica" spaceBefore="0.0" spaceAfter="6.0"/>
@@ -132,7 +133,7 @@
     <para style="terp_default_8">
       <font color="white"> </font>
     </para>
-    <para style="P4">Customer Statement</para>
+    <para style="P5">STATEMENT</para>
     <para style="terp_default_9">
       <font color="white"> </font>
     </para>
@@ -156,13 +157,13 @@
           <para style="terp_tblheader_Details_Centre">Due date</para>
         </td>
         <td>
-          <para style="terp_tblheader_Details_Right">Invoice Total</para>
+          <para style="terp_tblheader_Details_Right">Invoice</para>
         </td>
         <td>
-          <para style="terp_tblheader_Details_Right">Amount Paid</para>
+          <para style="terp_tblheader_Details_Right">Paid</para>
         </td>
         <td>
-          <para style="terp_tblheader_Details_Right">Outstanding Balance</para>
+          <para style="P6">TOTAL</para>
         </td>
       </tr>
     </blockTable>
@@ -174,7 +175,7 @@
             <para style="terp_default_9">[[ formatLang(line['date_original'],date=True) ]]</para>
           </td>
           <td>
-            <para style="P5">[[ line['name'] ]]</para>
+            <para style="P4">[[ line['name'] ]]</para>
           </td>
           <td>
             <para style="terp_default_Centre_9">[[ line['date_due'] and formatLang(line['date_due'],date=True) or '' ]]</para>
@@ -218,6 +219,12 @@
     <para style="terp_default_9">
       <font color="white"> </font>
     </para>
+    <para style="terp_default_9">
+      <font color="white"> </font>
+    </para>
+    <para style="terp_default_9">
+      <font color="white"> </font>
+    </para>
     <blockTable colWidths="85.0,85.0,85.0,97.0" style="Table6">
       <tr>
         <td>
@@ -248,6 +255,12 @@
         </td>
       </tr>
     </blockTable>
+    <para style="terp_default_9">
+      <font color="white"> </font>
+    </para>
+    <para style="terp_default_9">
+      <font color="white"> </font>
+    </para>
     <para style="terp_default_9">
       <font color="white"> </font>
     </para>
