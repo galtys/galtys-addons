@@ -124,7 +124,7 @@ class Parser(report_sxw.rml_parse):
             }
 
             if self.localcontext['form']['statement_type'] == 'open' or self._get_index(line.date, base_date) == 0:
-                if rs['amount_unreconciled']>0.0001:
+                #if rs['amount_unreconciled']>0.0001:
                     result.append(rs)
             else:
                 self.init_bal_sum+=rs['amount_unreconciled']
