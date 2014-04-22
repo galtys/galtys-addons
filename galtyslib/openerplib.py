@@ -97,10 +97,18 @@ def db_exist(c, dbname):
         return True
     except psycopg2.OperationalError:
         return False
-def load_csv(fn):
-    fp=open(os.path.join(fn))
-    data=[x for x in csv.DictReader(fp)]
-    fp.close()
+import StringIO
+def load_csv(fn, header=None):
+    if header:
+        #header_str=",".join(['"%s"'%x for x in header]) + '\n'        
+        #fp=StringIO.StringIO([header_str+file(fn).read()])
+        fp=open(os.path.join(fn))
+        data=[x for x in csv.DictReader(fp, fieldnames=header)]
+        fp.close()
+    else:
+        fp=open(os.path.join(fn))
+        data=[x for x in csv.DictReader(fp)]
+        fp.close()
     return data
 class TraversePreorder(dict):
     def __init__(self, d=None, parent_field='parent_id'):
