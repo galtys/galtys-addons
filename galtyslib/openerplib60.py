@@ -6,16 +6,14 @@ import pickle
 import time
 import base64
 
-try:
-    import openerp
-    #import openerp.tools.config
-    import openerp.service.web_services
-except ImportError:
-    pass
+import pooler
+import sql_db
+import service
+import tools
 
 def create_empty_db(dbname):
     DB=dbname
-    db=openerp.service.web_services.db(DB)
+    db=service.web_services.db(DB)
     #data = db.exp_dump('amdemo_template')
     db_id=db.exp_create(DB, False, 'en_GB','admin')
     done=False
@@ -25,13 +23,13 @@ def create_empty_db(dbname):
         if complete == 1.0:
             done=True
 def copy_db(dbname1, dbname2):
-    db1=openerp.service.web_services.db(dbname1)
+    db1=service.web_services.db(dbname1)
     data = db1.exp_dump(dbname1)
-    db2=openerp.service.web_services.db(dbname2)
+    db2=service.web_services.db(dbname2)
     #db2._create_empty_database(dbname2)
     return db2.exp_restore(dbname2, data)
 def drop_db(dbname):
-    db1=openerp.service.web_services.db(dbname)
+    db1=service.web_services.db(dbname)
     return db1.exp_drop(dbname)
     
 def install_modules(obj_pool, cr, uid,  modules):
@@ -48,9 +46,9 @@ def install_modules(obj_pool, cr, uid,  modules):
 
 def get_connection(dbname):
     DB=dbname
-    obj_pool=openerp.pooler.get_pool(DB)
-    pool=openerp.sql_db.ConnectionPool()
-    cr = openerp.sql_db.Cursor(pool,DB)
+    obj_pool=pooler.get_pool(DB)
+    pool=sql_db.ConnectionPool()
+    cr = sql_db.Cursor(pool,DB)
     uid=1
     return obj_pool, cr, uid
 
@@ -97,18 +95,10 @@ def db_exist(c, dbname):
         return True
     except psycopg2.OperationalError:
         return False
-import StringIO
-def load_csv(fn, header=None):
-    if header:
-        #header_str=",".join(['"%s"'%x for x in header]) + '\n'        
-        #fp=StringIO.StringIO([header_str+file(fn).read()])
-        fp=open(os.path.join(fn))
-        data=[x for x in csv.DictReader(fp, fieldnames=header)]
-        fp.close()
-    else:
-        fp=open(os.path.join(fn))
-        data=[x for x in csv.DictReader(fp)]
-        fp.close()
+def load_csv(fn):
+    fp=open(os.path.join(fn))
+    data=[x for x in csv.DictReader(fp)]
+    fp.close()
     return data
 class TraversePreorder(dict):
     def __init__(self, d=None, parent_field='parent_id'):
@@ -156,13 +146,9 @@ def traverse_preorder(records, parent_field = 'parent_id', key_field='id'):
     #print len(ret)
     return ret
 
-def f64(header, data, fields64, files=False):
+def f64(header, data, fields64):
     out=[]
     for row in data:
-        if files:
-            for i,f in enumerate(row):
-                    if (f.endswith('rml') or f.endswith('html')) and os.path.isfile(f):
-                        row[i] = file(f).read()
         for f64 in fields64:
             i=header.index(f64)
             fn=row[i]
@@ -176,25 +162,14 @@ def f64(header, data, fields64, files=False):
                     pass
     return data
 
-def load_data(pool, cr, uid, fn, model, files=False):
-    print 'loading data for %s from %s' %( model, fn)
+def load_data(pool, cr, uid, fn, model):
     lines = [x for x in csv.reader( file(fn).readlines() )]
     header = lines[0]
     data=lines[1:]
     fields = pool.get(model).fields_get(cr, uid)
     binary_fields = [f for f in fields if fields[f]['type']=='binary']
     fields64 = list( set(binary_fields).intersection( set(header) ) )
-    ret = pool.get(model).load(cr, uid, header, f64(header, data, fields64, files=files) )
-    if ret['messages']:
-        print ret
-    if ret['ids']:
-        ids_str = ','.join( map(str, ret['ids'] ) )
-#        if model not in ['account.fiscalyear','account.period']:
-        #print ids_str
-        cr.execute("update ir_model_data set noupdate=True where (module is Null or module='') and model='%s' and res_id in (%s)" % (model,ids_str) )
-        if model in ['stock.location']:
-            cr.execute("update ir_model_data set noupdate=True where model='stock.location'")
-    return ret
+    return pool.get(model).load(cr, uid, header, f64(header, data, fields64) )
 def export_data(pool, cr, uid, model, fn, db_only=False, ext_ref=None):
     obj=pool.get(model)
     if db_only:
@@ -216,14 +191,9 @@ def export_data(pool, cr, uid, model, fn, db_only=False, ext_ref=None):
     header=[]
     header_export=['id']
     for f, v in fields.items():
-        if 'function' not in v:            
+        if 'function' not in v:
             if v['type'] in ['many2one', 'many2many']:
-                if v['relation'] in ['account.account', 'account.journal']:
-                    header_export.append( "%s/code" % f )
-                elif v['relation'] in ['account.tax']:
-                    header_export.append( "%s/description" % f )
-                else:
-                    header_export.append( "%s/id" % f )
+                header_export.append( "%s/id" % f )
                 header.append(f)
             elif v['type']=='one2many':
                 pass
@@ -241,7 +211,10 @@ def export_data(pool, cr, uid, model, fn, db_only=False, ext_ref=None):
             if (v is False) and (t != 'boolean'):
                 out_row.append('')
             else:
-                out_row.append(v.encode('utf8'))
+                if v in (True,False):
+                    out_row.append(v)
+                else:
+                    out_row.append(v.encode('utf8'))
         out.append(out_row)
     import csv
     fp = open(fn, 'wb')
@@ -320,18 +293,12 @@ def set_product_pricelist(pool, cr, uid):
     row = ['product.list0', 'GBP']
     ret = pool.get('product.pricelist').load(cr, uid, header, [row] )
     return
-def use_filestore(pool, cr, uid, name=''):
-    print "Setting DB to use filestore"
-    ret = pool.get('ir.config_parameter').load(cr, uid, ['key','value'],[['ir_attachment.location','file:///filestore'+name]])
-    if ret['messages']:
-        print ret
-    return ret
 
 def module_dep(dbname):
     pool, cr, uid = get_connection(dbname)
     dbname2=dbname+'_analyse2'
-    import openerp.tools.config
-    if db_exist(openerp.tools.config, dbname2):
+    import tools.config
+    if db_exist(tools.config, dbname2):
         drop_db(dbname2)
     cr.execute("select name,id from ir_module_module")
     module_name_id_map=dict([x for x in cr.fetchall()])
@@ -386,7 +353,7 @@ def module_dep(dbname):
             if obj:
                 all_fields = obj.fields_get(cr, uid)
                 v=model_field_module_map.setdefault(model.model, {})
-                model_transient_map[model.model]=pool.get(model.model).is_transient()
+                model_transient_map[model.model]=False #pool.get(model.model).is_transient()
                 if not model_transient_map[model.model]:
                     model_fields_map[model.model] = all_fields
                 for kf in all_fields:
@@ -528,24 +495,14 @@ def list_models(obj_pool, cr, uid, model_ids, fnout='model2.html',  mfm_map=None
 
     fp.close()
     return rel_map
-def run_sql_via_psql(sql, dbname, port='5432'):
-    import tempfile
-    import subprocess
-    import os
-    tmp_fn=tempfile.mktemp()
-    fp=file(tmp_fn,'wb').write(sql)
-    #fp.close()
-    ret=subprocess.call(["psql","-p",port,"-f",tmp_fn,dbname])
-    os.unlink(tmp_fn)
-    return ret
 
 if __name__ == '__main__':
     sys.path.append('/home/jan/openerp6/server/6.1/')
     import openerp
-    import openerp.tools.config
-    import openerp.service.web_services
+    import tools.config
+    import service.web_services
 
-    conf = openerp.tools.config
+    conf = tools.config
 
     conf['db_user']='jan'
     conf['db_host']='localhost'
