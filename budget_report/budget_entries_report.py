@@ -49,31 +49,38 @@ class budget_entries_wizard(osv.osv_memory):
         print 'update pricelist', ids, context
         active_ids=context['active_ids']
         for w in self.browse(cr, uid, ids):
-            br_items=self.pool.get('budget.entries.report').browse(cr, uid, active_ids)
+            br_items=self.pool.get('budget.entries.report_noa').browse(cr, uid, active_ids)
             #acc_ids=[br.account_id.id for br in br_items]
             gen_ids=[[x.id for x in br.general_budget_id.account_ids] for br in br_items]
             month_ids=[br.month for br in br_items]
+            year_ids=[br.year for br in br_items]
+
             #print acc_ids, gen_ids
             #['|',('create_date','>', self.delta),('write_date','>', self.delta),
 
             args=[#('account_id','in',acc_ids),
                   ('account_id','in',reduce(lambda x,y:x+y,gen_ids))]
-            
-            line_ids=self.pool.get('account.move').search(cr, uid, args)
+            #print args
+            line_ids=self.pool.get('account.move.line').search(cr, uid, args)
             line_str=','.join( map(str,line_ids))
             if line_str:
-                cr.execute("select id,to_char(date::timestamp with time zone, 'MM'::text) AS month from account_analytic_line where id in (%s)"%(line_str))
+                cr.execute("select id,to_char(date::timestamp with time zone, 'MM'::text) AS month,to_char(date::timestamp with time zone, 'yy'::text) AS year from account_move_line where id in (%s)"%(line_str))
                 item_id_month=[x for x in cr.fetchall()]
             else:
                 item_id_month=[]
-            print 'filter months', item_id_month, month_ids
+
+            #print 'filter months', item_id_month, month_ids
             out_ids=[]
-            for line_id, month in item_id_month:
-                print 'line, month', line_id, month
-                if month in month_ids:
+            print 44*'-'
+            print month_ids
+            print year_ids
+            print item_id_month
+            for line_id, month,year in item_id_month:
+                #print 'line, month', line_id, month
+                if (month in month_ids) and (u'20'+year in year_ids) :
                     out_ids.append(line_id)
                 else:
-                    print 'not in selection', line_id, month, month_ids
+                    pass#print 'not in selection', line_id, month, month_ids
             print 'out_ids', out_ids
             #open_lines= [x[0] for x in cr.fetchall() if x[1] in month_ids]
             #print 'open lines', open_lines
