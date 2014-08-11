@@ -1,2 +1,2 @@
-import appinstance
+import galtys_deploy
 

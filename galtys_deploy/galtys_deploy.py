@@ -14,6 +14,7 @@ class deploy_password(osv.osv):
     _name = "deploy.password"
     _name_rec='password'
     _columns = {
+        'name':fields.char('Name',size=1000),
         'password':fields.char('Password',size=1000),#password encrypted
         }
 

@@ -1,20 +1,17 @@
 # -*- coding: utf-8 *-*
 {
-    "name" : "appinstance",
-    "version" : "0.1",
+    "name" : "galtys_deploy",
+    "version" : "0.1draft",
     "author" : "Jan Troler",
     "website" : "http://www.galtys.com/",
     "category" : "Generic Modules/Others",
     "depends" : ['base'],
-    "description" : "Instance Mgmt",
+    "description" : "Deployment MGMT",
     "init_xml" : [],
     "demo_xml" : [],
     "data" : [],
-    "update_xml" : [#'data/appinstance.component_group.csv',
-                    #'data/appinstance.transport.csv',
-                    #'data/appinstance.component.csv',
-                    #'data/appinstance.app.csv',
-                    ],
+    "update_xml" : [
+        ],
     "active": False,
     "installable": True
 }
