@@ -1,7 +1,5 @@
-from osv import fields, osv
-from openerp import netsvc
+from openerp.osv import fields, osv, expression
 import openerp.addons.decimal_precision as dp
-
 
 class deploy_account(osv.osv):
     _order = "name"
@@ -86,7 +84,7 @@ class repository_clone(osv.osv):
         'remote_location':fields.char('Remote Location',size=1111),
         'proto':fields.selection([('git','git'),('bzr+ssh','bzr+ssh'),('http','http'),('https','https')],'Proto'),
         'local_host_id':fields.many2one('deploy.host','Local host'),
-        'local_user_id':fields.many2one('deploy.user','Local user'),
+        'local_user_id':fields.many2one('deploy.host.user','Local user'),
         'local_location':fields.char('Local Locationi',size=1111),
         'branch':fields.char('Branch',size=100),
         'addon_subdir':fields.char('Addon Subdir',size=100),
@@ -115,7 +113,7 @@ class options(osv.osv):
     
 class deploy(osv.osv):
     _name='deploy.deploy'
-    _columns= = {
+    _columns = {
         'application_id':fields.many2one('deploy.application'),
         'account_id':fields.many2one('deploy.account'),
         'clone_ids':fields.many2many('deploy.repository.clone', 'application_repository_clone','app_id','clone_id', 'Repository Clones'),
