@@ -1,7 +1,0 @@
-id,name,type
-server,server,openerp_server
-addons,addons,openerp_addons
-web,web,openerp_addons
-bridgman,bridgman,project
-analogue_micro,analogue_micro,project
-stronghold7,stronghold7,project

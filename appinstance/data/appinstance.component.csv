@@ -1,8 +1,0 @@
-id,name,group_id/id,path,vcs,transport_id/id,transport_alt_id/id,location
-server_7.0,7.0,server,,bzr,jetel_422,jetel,/home/jan/openerp6/server/7.0/
-addon_7.0,7.0,addons,,bzr,jetel_422,jetel,/home/jan/openerp6/addons/7.0/
-web_7.0,7.0,addons,addons,bzr,jetel_422,jetel,/home/jan/openerp6/web/7.0/
-galt70,galtysaddons,addons,,bzr,jetel_422,jetel,/home/jan/openerp6/addons/galtysaddons
-bridgman_7.0,bridgman,bridgman,addons,bzr,jetel_422,jetel,/home/jan/openerp6/bridgman
-am_7.0,analogue_micro,analogue_micro,addons,bzr,jetel_422,jetel,/home/jan/openerp6/analogue_micro
-id_stronghold7,stronghold7,stronghold7,addons,bzr,jetel_422,jetel,/home/jan/openerp6/stronghold7
