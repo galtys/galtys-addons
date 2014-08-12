@@ -81,7 +81,7 @@ class repository_clone(osv.osv):
     _columns = {
         'name':fields.char('Name',size=100),
         'owner_id':fields.many2one('deploy.account','Owner'),
-        'repository_id':fields.many2one('deploy.repository','Repository'),
+        'remote_id':fields.many2one('deploy.repository','Repository'),
 
         'remote_host_id':fields.many2one('deploy.host','Remote Host'),
         'remote_account_id':fields.many2one('deploy.account','Remote Account'),
