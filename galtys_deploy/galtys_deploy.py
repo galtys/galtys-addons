@@ -141,3 +141,40 @@ class deploy(osv.osv):
 
         }
 
+
+class deploy2(osv.osv):
+    _inherit = "deploy.deploy"
+    def _get(self, cr, uid, ids,field_name,arg, context=None):
+        res={}
+        for d in self.browse(cr, uid, ids):
+            OPTIONS=[('db_host', '127.0.0.1'),
+                     ('db_port', str(d.options_id.pg_user_id.cluster_id.port)),
+                     ('db_user', d.options_id.pg_user_id.login),
+                     ('unaccent',d.options_id.unaccent),
+                     #('db_password', 'glot_U43!!a33'),
+                     #('db_filter', 'galtys_website'),
+                     ('xmlrpc_interface',d.options_id.xmlrpc_interface),
+                     ('xmlrpc_port',str(d.options_id.xmlrpc_port)),
+                      ]
+
+            res[d.id]={'options':str(OPTIONS),
+                       'db_password':d.options_id.pg_user_id.password_id.password,
+                       'admin_password':d.options_id.admin_password.password,
+                       }
+                       #'type':c.repository_id.type,
+                       #'local_location_fnc':local,
+                       #'git_clone':"git clone --branch %s %s %s"%(c.branch,
+            #                                                      url,
+             #                                                     local),
+                       #'bzr_branch':"bzr branch %s"%url,
+                       #'mkdir':"mkdir -p %s" % local,
+        return res
+    _columns = {
+        'options':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'db_password':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'admin_password':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        #'git_clone':fields.function(_get_url, type='char', size=1000,multi='url',method=True),
+        #'mkdir':fields.function(_get_url, type='char', size=1000,multi='url',method=True),
+        #'type':fields.function(_get_url, type='char', size=1000,multi='url',method=True),
+        #'local_location_fnc':fields.function(_get_url, type='char', size=1000,multi='url',method=True),
+        }
