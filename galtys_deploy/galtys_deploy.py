@@ -1,15 +1,18 @@
 from openerp.osv import fields, osv, expression
 import openerp.addons.decimal_precision as dp
 
+#Main menu: Deploy
+
+#Sub menu: Configuration
 class deploy_account(osv.osv):
     _order = "name"
-    _name = "deploy.account"
+    _name = "deploy.account"  #Accounts
     _columns = {
         'name':fields.char('Name', size=444),
         #'app_ids':fields.many2many('appinstance.app', 'appinstance_app_host_rel', 'host_id', 'app_id', 'Apps'),
 }
 class deploy_password(osv.osv):
-    _name = "deploy.password"
+    _name = "deploy.password" #Passwords
     _name_rec='password'
     _columns = {
         'name':fields.char('Name',size=1000),
@@ -17,13 +20,13 @@ class deploy_password(osv.osv):
         }
 
 class host(osv.osv):
-    _name = "deploy.host"
+    _name = "deploy.host"   #Hosts
     _columns = {
         'name':fields.char('Name',size=100),
         }
 
 class pg_cluster(osv.osv):
-    _name = "deploy.pg.cluster"
+    _name = "deploy.pg.cluster" #Postgresql Clusters
     _columns = {
         'host_id':fields.many2one('deploy.host','Hostname'),
         'port':fields.integer('Port'),
@@ -44,7 +47,7 @@ class pg_user(osv.osv):
         }
 
 class host_group(osv.osv):
-    _name = "deploy.host.group"
+    _name = "deploy.host.group" #Host Groups
     _columns = {
         'name':fields.char('Name',size=100),
         'gid':fields.integer('GID'),
@@ -53,7 +56,7 @@ class host_group(osv.osv):
         }
 
 class host_user(osv.osv):
-    _name = 'deploy.host.user'
+    _name = 'deploy.host.user' #Host User
     _columns = {
         'name':fields.char('Name',size=100),
         'login':fields.char('Login',size=100),
@@ -68,8 +71,9 @@ class host_user(osv.osv):
         'shell':fields.char('shell',size=44),
         }
 
+#Submenu: Applications
 class repository(osv.osv):
-    _name = 'deploy.repository'
+    _name = 'deploy.repository' #Repositories
     _columns = {
         'name':fields.char('Name',size=100),
         'type':fields.selection([('git','git'),('bzr','bzr')],'Type'),
@@ -78,7 +82,7 @@ class repository(osv.osv):
         }
 #[root_directory, remote_host_id.name, local_location, remote_location]
 class repository_clone(osv.osv):
-    _name ='deploy.repository.clone'
+    _name ='deploy.repository.clone' #Repository clones
     _columns = {
         'name':fields.char('Name',size=100),
         'owner_id':fields.many2one('deploy.account','Owner'),
@@ -101,14 +105,14 @@ class repository_clone(osv.osv):
         }
 
 class application(osv.osv):
-    _name = 'deploy.application'
+    _name = 'deploy.application' #Applications
     _columns = {
         'repository_ids':fields.many2many('deploy.repository', 'application_repository_rel','app_id','repository_id', 'Repositories'),
         'name':fields.char('Name',size=444),
         }
 
 class options(osv.osv):
-    _name='deploy.options'
+    _name='deploy.options' #Server options
     _columns = {
         'pg_user_id':fields.many2one('deploy.pg.user','PG USER'),
         'unaccent':fields.boolean('Unaccent'),
@@ -119,7 +123,7 @@ class options(osv.osv):
         }
     
 class deploy(osv.osv):
-    _name='deploy.deploy'
+    _name='deploy.deploy' #Deployments
     _columns = {
         'application_id':fields.many2one('deploy.application'),
         'account_id':fields.many2one('deploy.account'),#not needed now
