@@ -13,7 +13,7 @@ class deploy_account(osv.osv):
 }
 class deploy_password(osv.osv):
     _name = "deploy.password" #Passwords
-    _name_rec='password'
+    _rec_name='name'
     _columns = {
         'name':fields.char('Name',size=1000),
         'password':fields.char('Password',size=1000),#password encrypted
@@ -27,6 +27,7 @@ class host(osv.osv):
 
 class pg_cluster(osv.osv):
     _name = "deploy.pg.cluster" #Postgresql Clusters
+    _rec_name = 'host_id'
     _columns = {
         'host_id':fields.many2one('deploy.host','Hostname'),
         'port':fields.integer('Port'),
@@ -35,7 +36,7 @@ class pg_cluster(osv.osv):
         }
 class pg_user(osv.osv):
     _name="deploy.pg.user"
-    _name_rec='login'
+    _rec_name='login'
     _columns ={
         'cluster_id':fields.many2one('deploy.pg.cluster','PG Cluster'),
         'account_id':fields.many2one('deploy.account','Account'),
@@ -48,6 +49,7 @@ class pg_user(osv.osv):
 
 class host_group(osv.osv):
     _name = "deploy.host.group" #Host Groups
+    _rec_name='gid'
     _columns = {
         'name':fields.char('Name',size=100),
         'gid':fields.integer('GID'),
@@ -57,6 +59,7 @@ class host_group(osv.osv):
 
 class host_user(osv.osv):
     _name = 'deploy.host.user' #Host User
+    _rec_name='login'
     _columns = {
         'name':fields.char('Name',size=100),
         'login':fields.char('Login',size=100),
@@ -66,7 +69,7 @@ class host_user(osv.osv):
         'uid':fields.integer('UID'),
         'ssh':fields.boolean('Allow SSH'),
         'sudo':fields.boolean('Allow SFTP'),    
-        'host_id':fields.many2one('deploy.host'),
+        'host_id':fields.many2one('deploy.host','Host'),
         'home':fields.char('home',size=44),
         'shell':fields.char('shell',size=44),
         }
@@ -125,11 +128,11 @@ class options(osv.osv):
 class deploy(osv.osv):
     _name='deploy.deploy' #Deployments
     _columns = {
-        'application_id':fields.many2one('deploy.application'),
-        'account_id':fields.many2one('deploy.account'),#not needed now
+        'application_id':fields.many2one('deploy.application', 'Application'),
+        'account_id':fields.many2one('deploy.account','Account'),#not needed now
         'clone_ids':fields.many2many('deploy.repository.clone', 'application_repository_clone','app_id','clone_id', 'Repository Clones'),
         'name':fields.char('Name',size=444),
-        'host_id':fields.many2one('deploy.host'),#hostname
+        'host_id':fields.many2one('deploy.host','Host'),#hostname
         'site_name':fields.char('site_name',size=444),
         'daemon':fields.boolean('daemon'),
         'vhost':fields.boolean('vhost'),
@@ -143,7 +146,7 @@ class deploy(osv.osv):
         'SSLCACertificateFile':fields.char('SSLCACertificateFile', size=111),
         'ssl':fields.boolean('ssl'),
         'Redirect':fields.char('Redirect',size=444),
-        'mode':fields.selection([('dev','dev'),('live','live')]),
+        'mode':fields.selection([('dev','dev'),('live','live')],'Mode'),
 
         }
 
