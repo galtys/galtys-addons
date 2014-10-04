@@ -25,6 +25,7 @@ class host(osv.osv):
         'name':fields.char('Name',size=100),
         }
 
+
 class pg_cluster(osv.osv):
     _name = "deploy.pg.cluster" #Postgresql Clusters
     _rec_name = 'host_id'
@@ -33,7 +34,21 @@ class pg_cluster(osv.osv):
         'port':fields.integer('Port'),
         'version':fields.char('Version',size=10),
         'name':fields.char('Name', size=20),
+        'description':fields.char('Description',size=4444),
+
+        'listen_addresses':fields.char('listen_addresses',size=444),
+        'shared_buffers':fields.char('shared_buffers',size=444),
+        'fsync':fields.char('fsync',size=444),
+        'synchronous_commit':fields.char('synchronous_commit',size=444),
+        'full_page_writes':fields.char('full_page_writes', size=444),
+        'checkpoint_segments':fields.char('checkpoint_segments',size=444),
+        'checkpoint_timeout':fields.char('checkpoint_timeout',size=444),
+
+        'user_ids':fields.one2many("deploy.pg.user",'cluster_id','PG Users'),
+        'database_ids':fields.one2many("deploy.pg.database",'cluster_id','Databases'),
+        'hba_ids':fields.one2many("deploy.pg.hba",'cluster_id','HBA'),
         }
+
 class pg_user(osv.osv):
     _name="deploy.pg.user"
     _rec_name='login'
@@ -45,7 +60,33 @@ class pg_user(osv.osv):
         'create_db':fields.boolean('Create db'),
         'create_role':fields.boolean('Create Role'),
         'login':fields.char('Login',size=44),
+        'type':fields.selection([('real','real'),('virtual','virtual'),('system','system')],'Type' ),
         }
+
+class pg_database(osv.osv):
+    _name="deploy.pg.database"
+    _columns = {
+        'name':fields.char("name",size=444),
+        'cluster_id':fields.many2one('deploy.pg.cluster','PG Cluster'),
+        'type':fields.selection([('live','live'),('virtual','virtual'),('system','system'),('demo','demo'),('snapshot','snapshot'),('replicated','replicated')]),
+        'date':fields.date('date'),
+        'backup':fields.boolean('backup needed'),
+        }
+
+class pg_hba(osv.osv):
+    _name = "deploy.pg.hba"
+    _columns = {
+        'name':fields.char('Description', size=444),
+        'type':fields.selection([('local','local'),('host','host'),('hostssl','hostssl'),('hostnossl','hostnossl')], 'Type' ),
+        'database_ids':fields.many2one('deploy.pg.database','database'),
+        'cluster_id':fields.many2one('deploy.pg.cluster','PG Cluster'),
+        'user':fields.many2one('deploy.pg.user','PG USER'),
+        'address':fields.char('address',size=444),
+        'ip_address':fields.char('ip_address',size=444),
+        'ip_mask':fields.char('ip_mask',size=444),
+        'auth_method':fields.selection([('peer','peer'),('trust','trust'),('md5','md5')], 'auth_method'),
+        'auth_options':fields.char('auth_options',size=444),       
+}
 
 class host_group(osv.osv):
     _name = "deploy.host.group" #Host Groups
@@ -82,6 +123,7 @@ class repository(osv.osv):
         'type':fields.selection([('git','git'),('bzr','bzr')],'Type'),
         'host_id':fields.many2one('deploy.host','Host'),
         'version':fields.char('Version',size=10),
+        'clone_ids':fields.one2many('deploy.repository.clone','remote_id','Reposisoty Clones'),
         }
 #[root_directory, remote_host_id.name, local_location, remote_location]
 class repository_clone(osv.osv):
@@ -98,6 +140,9 @@ class repository_clone(osv.osv):
         'remote_name':fields.char('Remote Name',size=122), #used in git
 
         'local_host_id':fields.many2one('deploy.host','Local host'),
+        'local_host_ids':fields.many2many('deploy.host','repository_clone_host_rel','clone_id','host_id','Hosts'),
+    
+
         'local_user_id':fields.many2one('deploy.host.user','Local user'),
         'local_location':fields.char('Local Locationi',size=1111),
         'branch':fields.char('Branch',size=100),
@@ -122,6 +167,7 @@ class options(osv.osv):
         'xmlrpc_interface':fields.char('xmlrpc_interface',size=100),
         'xmlrpc_port':fields.integer('xmlrpc_port'),
         'admin_password':fields.many2one('deploy.password','Admin Password'),
+        'name':fields.char('Name',size=444),
         #'logfile':
         }
     
