@@ -16,13 +16,17 @@ class deploy_password(osv.osv):
     _rec_name='name'
     _columns = {
         'name':fields.char('Name',size=1000),
-        'password':fields.char('Password',size=1000),#password encrypted
+        'password':fields.text('Password'),#password encrypted
         }
 
 class host(osv.osv):
     _name = "deploy.host"   #Hosts
     _columns = {
         'name':fields.char('Name',size=100),
+        'memory_total':fields.integer('Memory Total Pages'),
+        'memory_pagesize':fields.integer('Memory PageSize'),
+        'memory_buffer_percent':fields.integer('Buffer Size Percent'),
+        'user_ids':fields.one2many('deploy.host.user','host_id','Users'),
         }
 
 
@@ -35,6 +39,7 @@ class pg_cluster(osv.osv):
         'version':fields.char('Version',size=10),
         'name':fields.char('Name', size=20),
         'description':fields.char('Description',size=4444),
+        'active':fields.boolean('Active'),
 
         'listen_addresses':fields.char('listen_addresses',size=444),
         'shared_buffers':fields.char('shared_buffers',size=444),
@@ -96,6 +101,7 @@ class host_group(osv.osv):
         'gid':fields.integer('GID'),
         'host_id':fields.many2one('deploy.host','Host'),
         'sftp':fields.boolean('Allow SFTP'),        
+        'type':fields.selection([('user','user'),('system','system')],'Type'),
         }
 
 class host_user(osv.osv):
@@ -113,6 +119,7 @@ class host_user(osv.osv):
         'host_id':fields.many2one('deploy.host','Host'),
         'home':fields.char('home',size=44),
         'shell':fields.char('shell',size=44),
+        'type':fields.selection([('user','user'),('system','system')],'Type'),
         }
 
 #Submenu: Applications
