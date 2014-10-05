@@ -139,6 +139,7 @@ class repository_clone(osv.osv):
         'name':fields.char('Name',size=100),
         'owner_id':fields.many2one('deploy.account','Owner'),
         'remote_id':fields.many2one('deploy.repository','Repository'),
+        'validated_addon_path':fields.char('Validated Addon Path',size=444),
         #remote_host_id > remote_id.host_id
         'remote_account_id':fields.many2one('deploy.account','Remote Account'),
         'remote_login':fields.char('Remote Login',size=122),
@@ -148,7 +149,7 @@ class repository_clone(osv.osv):
 
         'local_host_id':fields.many2one('deploy.host','Local host'),
         'local_host_ids':fields.many2many('deploy.host','repository_clone_host_rel','clone_id','host_id','Hosts'),
-    
+   
 
         'local_user_id':fields.many2one('deploy.host.user','Local user'),
         'local_location':fields.char('Local Locationi',size=1111),
@@ -200,6 +201,9 @@ class deploy(osv.osv):
         'ssl':fields.boolean('ssl'),
         'Redirect':fields.char('Redirect',size=444),
         'mode':fields.selection([('dev','dev'),('live','live')],'Mode'),
+        'validated_server_path':fields.char('Validated Server Path',size=444),
+        'validated_config_file':fields.char('Validated Config File',size=444),
+        'validated_root':fields.char('Validated ROOT',size=444),
 
         }
 
