@@ -9,11 +9,10 @@ class deploy_account(osv.osv):
     _name = "deploy.account"  #Accounts
     _columns = {
         'name':fields.char('Name', size=444),
-        #'app_ids':fields.many2many('appinstance.app', 'appinstance_app_host_rel', 'host_id', 'app_id', 'Apps'),
+        'host_ids':fields.many2many('deploy.host', 'deploy_account_deploy_host_rel', 'host_id', 'account_id', 'Hosts'),
 }
 class deploy_password(osv.osv):
     _name = "deploy.password" #Passwords
-    _rec_name='name'
     _columns = {
         'name':fields.char('Name',size=1000),
         'password':fields.text('Password'),#password encrypted
@@ -27,12 +26,15 @@ class host(osv.osv):
         'memory_pagesize':fields.integer('Memory PageSize'),
         'memory_buffer_percent':fields.integer('Buffer Size Percent'),
         'user_ids':fields.one2many('deploy.host.user','host_id','Users'),
+        'group_ids':fields.one2many('deploy.host.group','host_id','Groups'),
+        'cluster_ids':fields.one2many('deploy.pg.cluster','host_id','PG Clusters'),
+        #'deploy_ids':fields.one2many('deploy.deploy','host_id','Deployments'),
         }
 
 
 class pg_cluster(osv.osv):
     _name = "deploy.pg.cluster" #Postgresql Clusters
-    _rec_name = 'host_id'
+#    _rec_name = 'host_id'
     _columns = {
         'host_id':fields.many2one('deploy.host','Hostname'),
         'port':fields.integer('Port'),
@@ -95,7 +97,7 @@ class pg_hba(osv.osv):
 
 class host_group(osv.osv):
     _name = "deploy.host.group" #Host Groups
-    _rec_name='gid'
+    _rec_name='name'
     _columns = {
         'name':fields.char('Name',size=100),
         'gid':fields.integer('GID'),
@@ -120,6 +122,8 @@ class host_user(osv.osv):
         'home':fields.char('home',size=44),
         'shell':fields.char('shell',size=44),
         'type':fields.selection([('user','user'),('system','system')],'Type'),
+        'deploy_ids':fields.one2many('deploy.deploy','user_id','Deployments'),
+        #'user_id':fields.many2one('deploy.host.user','HostUser'),
         }
 
 #Submenu: Applications
@@ -127,7 +131,7 @@ class repository(osv.osv):
     _name = 'deploy.repository' #Repositories
     _columns = {
         'name':fields.char('Name',size=100),
-        'type':fields.selection([('git','git'),('bzr','bzr')],'Type'),
+        'type':fields.selection([('git','git'),('bzr','bzr'),('rsync','RSYNC')],'Type'),
         'host_id':fields.many2one('deploy.host','Host'),
         'version':fields.char('Version',size=10),
         'remote_account_id':fields.many2one('deploy.account','Remote Account'),
@@ -136,7 +140,7 @@ class repository(osv.osv):
         'remote_proto':fields.selection([('git','git'),('bzr+ssh','bzr+ssh'),('http','http'),('https','https'),('ssh','ssh'),('lp','lp')],'Remote_Proto'),#not all supported
         'remote_name':fields.char('Remote Name',size=122), #used in git
 
-	'local_location':fields.char('Local Locationi',size=1111),
+	'local_location':fields.char('Local Location',size=1111),
        
         'branch':fields.char('Branch',size=100),
         'addon_subdir':fields.char('Addon Subdir',size=100),
@@ -196,7 +200,11 @@ class deploy(osv.osv):
         'account_id':fields.many2one('deploy.account','Account'),#not needed now
         'clone_ids':fields.many2many('deploy.repository.clone', 'application_repository_clone','app_id','clone_id', 'Repository Clones'),
         'name':fields.char('Name',size=444),
-        'host_id':fields.many2one('deploy.host','Host'),#hostname
+        #'host_id':fields.many2one('deploy.host','Host'),#hostname
+        'user_id':fields.many2one('deploy.host.user','HostUser'),
+        'host_id_depr':fields.many2one('deploy.host','HostDepr'),
+        #'host_id':fields.many2one('deploy.host','Host'),
+        'host_id':fields.related('user_id', 'host_id',  string="Host",type="many2one",relation="deploy.host"),
         'site_name':fields.char('site_name',size=444),
         'daemon':fields.boolean('daemon'),
         'vhost':fields.boolean('vhost'),
@@ -214,7 +222,6 @@ class deploy(osv.osv):
         'validated_server_path':fields.char('Validated Server Path',size=444),
         'validated_config_file':fields.char('Validated Config File',size=444),
         'validated_root':fields.char('Validated ROOT',size=444),
-
         }
 
 
