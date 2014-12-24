@@ -1,16 +1,25 @@
 from openerp.osv import fields, osv, expression
 import openerp.addons.decimal_precision as dp
 
+#Steps
+#golive register
+#golive pull
+
 #Main menu: Deploy
 
 #Sub menu: Configuration
+
 class deploy_account(osv.osv):
     _order = "name"
     _name = "deploy.account"  #Accounts
     _columns = {
         'name':fields.char('Name', size=444),
-        'host_ids':fields.many2many('deploy.host', 'deploy_account_deploy_host_rel', 'host_id', 'account_id', 'Hosts'),
-}
+        #'login':fields.char('Login',size=444),
+        #'host_ids':fields.many2many('deploy.host', 'deploy_account_deploy_host_rel', 'host_id', 'account_id', 'Hosts'),
+        'user_ids':fields.many2many('deploy.host.user', 'deploy_account_deploy_host_user_rel', 'user_id', 'account_id', 'Users'),
+        'app_ids':fields.many2many('deploy.application', 'deploy_account_deploy_application_rel', 'app_id', 'account_id', 'Apps'),
+    }
+
 class deploy_password(osv.osv):
     _name = "deploy.password" #Passwords
     _columns = {
@@ -224,4 +233,34 @@ class deploy(osv.osv):
         'validated_root':fields.char('Validated ROOT',size=444),
         }
 
+class mako_template(osv.osv):
+    _name = "deploy.mako.template"
+    _columns = {
+        'name':fields.char('name',size=444),
+        'type':fields.selection([('template','template'),('bash','bash'),('python','python')],'Type' ),
+        'gl_command':fields.char('GoLive Command',size=444),
+        'model':fields.char('model',size=444),
+        'module':fields.char('module',size=444), #to locate template
+        'path':fields.char('path', size=444),    #to locate template
+        'fn':fields.char('fn',size=4444),        #to locate template
+
+        'domain':fields.char('domain',size=444),
+        'out_fn':fields.char('out_fn',size=444),
+
+        'sequence':fields.integer('Sequence'),
+        'python_function':fields.char('python_function',size=444),
+        'subprocess_arg':fields.char('subprocess_arg',size=444),
+        'chmod':fields.char('chmod',size=444),
+    }
+
+class deploy_file(osv.osv):
+    _name = "deploy.file"
+    _columns = {
+        'gl_command':fields.char('GoLive Command',size=444),
+        'model':fields.char('model',size=444),
+        'res_id':fields.integer('res_id'),
+        'template_id':fields.many2one('deploy.mako.template', 'Template Used'),
+        'encrypted':fields.boolean('Encrypted'),
+        'user_id':fields.many2one('deploy.host.user','User'),        
+    }
 
