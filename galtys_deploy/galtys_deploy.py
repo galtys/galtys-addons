@@ -251,6 +251,7 @@ class mako_template(osv.osv):
         'python_function':fields.char('python_function',size=444),
         'subprocess_arg':fields.char('subprocess_arg',size=444),
         'chmod':fields.char('chmod',size=444),
+        'user_id':fields.many2one('deploy.host.user','HostUser'),
     }
 
 class deploy_file(osv.osv):
