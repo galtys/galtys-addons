@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <record id="jan" model="deploy.account">
+            <field name="name">jan</field>
+        </record>
+
+        <record id="jan_pass" model="deploy.password">
+            <field name="name">jan</field>
+            <field name="password">c2MAAYlpagqWnXXQxUfqW9m7O8hai5I4y72I0febIQJ3elCRoddxHqcCl+NtAzUXhKXYaFiFE8hFAvpJsSlAK1GhpCXX1w6pJi9graRwfBY=</field>	    
+        </record>
+
+        <record id="github" model="deploy.host">
+            <field name="name">github.com</field>
+        </record>
+
+        <record id="codebasehq" model="deploy.host">
+            <field name="name">codebasehq.com</field>
+        </record>
+
+        <record id="launchpad" model="deploy.host">
+            <field name="name">bazaar.launchpad.net</field>
+        </record>
+
+
+	
+    </data>
+</openerp>

@@ -1,0 +1,806 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <!-- Top menu item -->
+        <menuitem id='menu_deploy' name='Deploy' sequence="100" />
+        <menuitem name="Configurations" parent="menu_deploy" id="menu_configurations" sequence="101" />
+        <menuitem name="Applications" parent="menu_deploy" id="menu_applications" sequence="102" />
+        
+        <record id="view_deploy_account_form" model="ir.ui.view">
+            <field name="name">deploy.account.form</field>
+            <field name="model">deploy.account</field>
+            <field name="arch" type="xml">
+                <form string="Accounts">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+			<separator string="Users"/>
+			<field name="user_ids" colspan="4"/>
+			<separator string="Apps"/>
+			<field name="app_ids" colspan="4"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_account_tree" model="ir.ui.view">
+            <field name="name">deploy.account.tree</field>
+            <field name="model">deploy.account</field>
+            <field name="arch" type="xml">
+                <tree string="Accounts">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+                
+        <record model="ir.actions.act_window" id="action_deploy_accounts_form">
+            <field name="name">Accounts</field>
+            <field name="res_model">deploy.account</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Accounts" parent="menu_configurations" id="menu_deploy_accounts_form" action="action_deploy_accounts_form" />
+        
+        <record id="view_deploy_password_form" model="ir.ui.view">
+            <field name="name">deploy.password.form</field>
+            <field name="model">deploy.password</field>
+            <field name="arch" type="xml">
+                <form string="Passwords">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                            <group>
+                                <field name="password"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_password_tree" model="ir.ui.view">
+            <field name="name">deploy.password.tree</field>
+            <field name="model">deploy.password</field>
+            <field name="arch" type="xml">
+                <tree string="Passwords">
+                    <field name="name"/>
+                    <field name="password"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_password_form">
+            <field name="name">Passwords</field>
+            <field name="res_model">deploy.password</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Passwords" parent="menu_configurations" id="menu_deploy_password_form" action="action_deploy_password_form" />
+        
+        <record id="view_deploy_host_form" model="ir.ui.view">
+            <field name="name">deploy.host.form</field>
+            <field name="model">deploy.host</field>
+            <field name="arch" type="xml">
+                <form string="Hosts">
+                    <sheet>
+		        <separator string="Host Info"/>
+                        <group>
+                            <field name="name"/>
+			    <field name="memory_total"/>
+			    <field name="memory_pagesize"/>
+			    <field name="memory_buffer_percent"/>
+                        </group>
+			<group>
+			    <field name="memory_buffer_calc"/>
+			    <field name="memory_buffer_calc_mb"/>
+			    <field name="kernel_shmall"/>
+			    <field name="kernel_shmmax"/>
+			</group>
+			<separator string="Users"/>
+			<field name="user_ids" colspan="4"/>
+			<separator string="Groups"/>
+			<field name="group_ids" colspan="4"/>
+			<separator string="Clusters"/>
+			<field name="cluster_ids" colspan="4"/>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_host_tree" model="ir.ui.view">
+            <field name="name">deploy.host.tree</field>
+            <field name="model">deploy.host</field>
+            <field name="arch" type="xml">
+                <tree string="Hosts">
+                    <field name="name"/>
+		    <field name="memory_total"/>
+			    <field name="memory_pagesize"/>
+			    <field name="memory_buffer_percent"/>
+			    <field name="memory_buffer_calc"/>
+			    <field name="memory_buffer_calc_mb"/>
+			    <field name="kernel_shmall"/>
+			    <field name="kernel_shmmax"/>
+
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_host_form">
+            <field name="name">Hosts</field>
+            <field name="res_model">deploy.host</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Hosts" parent="menu_configurations" id="menu_deploy_host_form" action="action_deploy_host_form"/>
+        
+        <record id="view_deploy_pg_cluster_form" model="ir.ui.view">
+            <field name="name">deploy.pg.cluster.form</field>
+            <field name="model">deploy.pg.cluster</field>
+
+            <field name="arch" type="xml">
+                <form string="Cluster">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="host_id"/>
+                                <field name="port"/>
+				<field name="version"/>
+                                <field name="name"/>
+                                <field name="description"/>
+				<field name="active"/>
+                            </group>
+                            <group>
+                                <field name="listen_addresses"/>
+                                <field name="shared_buffers"/>
+                                <field name="fsync"/>
+                                <field name="synchronous_commit"/>
+                                <field name="full_page_writes"/>
+                                <field name="checkpoint_segments"/>
+                                <field name="checkpoint_timeout"/>
+                            </group>
+                        </group>
+
+			<field name="user_ids"/>
+			<field name="hba_ids">
+			  <tree>
+			    <field name="name"/>
+			    <field name="type"/>
+			    <field name="database_ids" widget="many2many_tags"/>
+			    <field name="user"/>
+			    <field name="address"/>
+			    <field name="ip_address"/>
+			    <field name="ip_mask"/>
+			    <field name="auth_method"/>
+			    <field name="auth_options"/>
+			  </tree>
+			</field>
+			<field name="database_ids">
+			  <tree>
+			    <field name="name"/>
+			    <field name="type"/>
+			    <field name="date"/>
+			  </tree>
+			</field>
+			<field name="template_ids">
+			  <tree>
+			    <field name="model"/>
+			    <field name="module"/>
+			    <field name="path"/>
+			    <field name="fn"/>
+			    <field name="name"/>
+			    <field name="out_fn"/>
+			  </tree>
+			  <form>
+			    <field name="name"/>
+			    <field name="out_content"/>
+			  </form>
+			</field>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_pg_cluster_tree" model="ir.ui.view">
+            <field name="name">deploy.pg.cluster.tree</field>
+            <field name="model">deploy.pg.cluster</field>
+            <field name="arch" type="xml">
+                <tree string="Postgresql Clusters">
+                    <field name="host_id"/>
+                    <field name="name"/>
+                    <field name="port"/>
+                    <field name="version"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_pg_cluster_form">
+            <field name="name">Postgresql Clusters</field>
+            <field name="res_model">deploy.pg.cluster</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem name="Postgresql Clusters" parent="menu_configurations" id="menu_deploy_pg_cluster_form" action="action_deploy_pg_cluster_form"/>
+        
+        <record id="view_deploy_pg_user_form" model="ir.ui.view">
+            <field name="name">deploy.pg.user.form</field>
+            <field name="model">deploy.pg.user</field>
+            <field name="arch" type="xml">
+                <form string="Postgresql Users">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="login"/>
+                                <field name="cluster_id"/>
+                                <field name="account_id"/>
+                                <field name="password_id"/>
+                            </group>
+                            <group>
+                                <field name="superuser"/>
+                                <field name="create_db"/>
+                                <field name="create_role"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_pg_user_tree" model="ir.ui.view">
+            <field name="name">deploy.pg.user.tree</field>
+            <field name="model">deploy.pg.user</field>
+            <field name="arch" type="xml">
+                <tree string="Postgresql Users">
+                    <field name="login"/>
+                    <field name="cluster_id"/>
+                    <field name="account_id"/>
+                    <field name="password_id"/>
+                    <field name="superuser"/>
+                    <field name="create_db"/>
+                    <field name="create_role"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_pg_user_form">
+            <field name="name">Postgresql Users</field>
+            <field name="res_model">deploy.pg.user</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Postgresql Users" parent="menu_configurations" id="menu_deploy_pg_user_form" action="action_deploy_pg_user_form"/>
+        
+        <record id="view_deploy_host_group_form" model="ir.ui.view">
+            <field name="name">deploy.host.group.form</field>
+            <field name="model">deploy.host.group</field>
+            <field name="arch" type="xml">
+                <form string="Host Groups">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="gid"/>
+				<field name="type"/>
+                            </group>
+                            <group>
+                                <field name="host_id"/>
+                                <field name="sftp"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_host_group_tree" model="ir.ui.view">
+            <field name="name">deploy.host.group.tree</field>
+            <field name="model">deploy.host.group</field>
+            <field name="arch" type="xml">
+                <tree string="Host Groups">
+                    <field name="name"/>
+                    <field name="gid"/>
+		    <field name="type"/>
+                    <field name="host_id"/>
+                    <field name="sftp"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_host_group_form">
+            <field name="name">Host Groups</field>
+            <field name="res_model">deploy.host.group</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Host Groups" parent="menu_configurations" id="menu_deploy_host_group_form" action="action_deploy_host_group_form"/>
+        
+        <record id="view_deploy_host_user_form" model="ir.ui.view">
+            <field name="name">deploy.host.user.form</field>
+            <field name="model">deploy.host.user</field>
+            <field name="arch" type="xml">
+                <form string="Host User">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="login"/>
+                                <field name="group_id"/>
+                                <field name="password_id"/>
+                                <field name="account_id"/>
+                                <field name="uid"/>
+				<field name="type"/>
+                            </group>
+                            <group>
+                                <field name="ssh"/>
+                                <field name="sudo"/>
+                                <field name="host_id"/>
+                                <field name="home"/>
+                                <field name="shell"/>
+                            </group>
+			    <separator string="Deployments"/>
+			    <field name="deploy_ids" colspan="4"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_host_user_tree" model="ir.ui.view">
+            <field name="name">deploy.host.user.tree</field>
+            <field name="model">deploy.host.user</field>
+            <field name="arch" type="xml">
+                <tree string="Host User">
+                    <field name="name"/>
+                    <field name="login"/>
+                    <field name="group_id"/>
+                    <field name="password_id"/>
+                    <field name="account_id"/>
+                    <field name="uid"/>
+		    <field name="type"/>
+                    <field name="ssh"/>
+                    <field name="sudo"/>
+                    <field name="host_id"/>
+                    <field name="home"/>
+                    <field name="shell"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_host_user_form">
+            <field name="name">Host User</field>
+            <field name="res_model">deploy.host.user</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Host User" parent="menu_configurations" id="menu_deploy_host_user_form" action="action_deploy_host_user_form"/>
+        
+        <record id="view_deploy_repository_form" model="ir.ui.view">
+            <field name="name">deploy.repository.form</field>
+            <field name="model">deploy.repository</field>
+            <field name="arch" type="xml">
+                <form string="Repositories">
+                    <sheet>
+                        <group>
+                            <group>
+			      <field name="name"/>
+			      <field name="type"/>
+			      <field name="host_id"/>
+			      <field name="version"/>
+			      <field name="remote_login"/>
+			      <field name="remote_location"/>
+                            </group>
+                            <group>
+			      <field name="remote_proto"/>
+			      <field name="remote_name"/>
+			      <field name="local_location"/>
+			      <field name="branch"/>
+			      <field name="addon_subdir"/>
+			      <field name="is_module_path"/>
+			      <field name="root_directory"/>
+
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Clone Ids">
+                                <field name="clone_ids">
+				  <!--
+                                    <tree string="Clone Ids" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="type"/>
+                                        <field name="host_id"/>
+                                        <field name="version"/>
+                                    </tree>
+				    -->
+                                </field>
+                            </page>
+                        </notebook>
+			
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_repository_tree" model="ir.ui.view">
+            <field name="name">deploy.repository</field>
+            <field name="model">deploy.repository</field>
+            <field name="arch" type="xml">
+                <tree string="Repositories">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="host_id"/>
+                    <field name="version"/>
+                    <field name="remote_login"/>
+                    <field name="remote_location"/>
+                    <field name="remote_proto"/>
+                    <field name="remote_name"/>
+		    <field name="local_location"/>
+		    <field name="branch"/>
+		    <field name="addon_subdir"/>
+		    <field name="is_module_path"/>
+		    <field name="root_directory"/>
+
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_repository_form">
+            <field name="name">Repositories</field>
+            <field name="res_model">deploy.repository</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Repositories" parent="menu_applications" id="menu_deploy_repository_form" action="action_deploy_repository_form"/>
+
+        <record id="view_deploy_repository_clone_form" model="ir.ui.view">
+            <field name="name">deploy.repository.clone.form</field>
+            <field name="model">deploy.repository.clone</field>
+            <field name="arch" type="xml">
+                <form string="Repository Clones">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+<!--                                <field name="owner_id"/>-->
+                                <field name="remote_id"/>
+<!--                                <field name="remote_account_id"/>-->
+                                <field name="remote_login"/>
+                                <field name="remote_location"/>
+                                <field name="remote_proto"/>
+                                <field name="remote_name"/>
+                            </group>
+                            <group>
+<!--                                <field name="local_host_id"/>-->
+                                <field name="local_user_id"/>
+                                <field name="local_host_id"/>
+
+                                <field name="local_location"/>
+                                <field name="branch"/>
+                                <field name="addon_subdir"/>
+                                <field name="is_module_path"/>
+                                <field name="root_directory"/>
+                            </group>
+                        </group>
+			    <group>
+			      <field name="url"/>
+			      <field name="git_clone"/>
+			      <field name="mkdir"/>
+			      <field name="type"/>
+			      <field name="local_location_fnc"/>
+			    </group>		    
+
+                        <notebook>
+                            <page string="Clone On Hosts">
+                                <field name="local_host_ids">
+                                </field>
+                            </page>
+                        </notebook>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_repository_clone_tree" model="ir.ui.view">
+            <field name="name">deploy.repository.clone</field>
+            <field name="model">deploy.repository.clone</field>
+            <field name="arch" type="xml">
+                <tree string="Repository Clones">
+		    <field name="id"/>
+		    <field name="extid"/>
+		    <field name="validated_addon_path"/>
+                    <field name="name"/>
+<!--                    <field name="owner_id"/>-->
+                    <field name="remote_id"/>
+		    <!--
+                    <field name="remote_account_id"/>
+                    <field name="remote_login"/>
+                    <field name="remote_location"/>
+                    <field name="remote_proto"/>
+                    <field name="remote_name"/>
+                    <field name="local_host_id"/>
+                    <field name="local_user_id"/>
+                    <field name="local_location"/>
+		    -->
+                    <field name="branch"/>
+		    <!--
+                    <field name="addon_subdir"/>
+                    <field name="is_module_path"/>
+		    -->
+                    <field name="root_directory"/>
+		    <field name="url"/>
+		    <!--
+		    <field name="git_clone"/>
+		    <field name="mkdir"/>
+		    -->
+		    <field name="type"/>
+		    <field name="local_location_fnc"/>
+
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_repository_clone_form">
+            <field name="name">Repository Clones</field>
+            <field name="res_model">deploy.repository.clone</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Repository Clones" parent="menu_applications" id="menu_deploy_repository_clone_form" action="action_deploy_repository_clone_form"/>
+        
+        <record id="view_deploy_application_form" model="ir.ui.view">
+            <field name="name">deploy.application.form</field>
+            <field name="model">deploy.application</field>
+            <field name="arch" type="xml">
+                <form string="Applications">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Repository Ids">
+                                <field name="repository_ids">
+                                    <tree string="Repository Ids" editable="bottom">
+                                        <field name="name"/>
+                                        <field name="type"/>
+                                        <field name="host_id"/>
+                                        <field name="version"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+                </field>
+        </record>
+        
+        <record id="view_deploy_application_tree" model="ir.ui.view">
+            <field name="name">deploy.application</field>
+            <field name="model">deploy.application</field>
+            <field name="arch" type="xml">
+                <tree string="Applications">
+                    <field name="name"/>
+                    <field name="repository_ids"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_application_form">
+            <field name="name">Applications</field>
+            <field name="res_model">deploy.application</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Applications" parent="menu_applications" id="menu_deploy_application_form" action="action_deploy_application_form"/>
+
+        <record id="view_deploy_options_form" model="ir.ui.view">
+            <field name="name">deploy.options.form</field>
+            <field name="model">deploy.options</field>
+            <field name="arch" type="xml">
+                <form string="Server Options">
+                    <sheet>
+                        <group>
+                            <group>
+			        <field name="name"/>
+                                <field name="pg_user_id"/>
+                                <field name="unaccent"/>
+                                <field name="xmlrpc_interface"/>
+                            </group>
+                            <group>
+                                <field name="xmlrpc_port"/>
+                                <field name="admin_password"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_options_tree" model="ir.ui.view">
+            <field name="name">deploy.options</field>
+            <field name="model">deploy.options</field>
+            <field name="arch" type="xml">
+                <tree string="Server Options">
+		    <field name="name"/>
+                    <field name="pg_user_id"/>
+                    <field name="unaccent"/>
+                    <field name="xmlrpc_interface"/>
+                    <field name="xmlrpc_port"/>
+                    <field name="admin_password"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_options_form">
+            <field name="name">Server Options</field>
+            <field name="res_model">deploy.options</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Server Options" parent="menu_applications" id="menu_deploy_options_form" action="action_deploy_options_form"/>
+        
+        <record id="view_deploy_deploy_form" model="ir.ui.view">
+            <field name="name">deploy.deploy.form</field>
+            <field name="model">deploy.deploy</field>
+            <field name="arch" type="xml">
+                <form string="Deployments">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="application_id"/>
+                                <field name="account_id"/>
+                                <field name="name"/>
+
+				<field name="user_id"/>		    		    
+				<field name="host_id_depr"/>		    
+				<field name="host_id"/>
+				<field name="who"/>
+                                <field name="site_name"/>
+                                <field name="daemon"/>
+                                <field name="vhost"/>
+                                <field name="options_id"/>
+                                <field name="ServerName"/>
+				<field name="validated_server_path"/>
+				<field name="validated_config_file"/>
+                            </group>
+                            <group>
+                                <field name="IP"/>
+                                <field name="PORT"/>
+                                <field name="SSLCertificateFile"/>
+                                <field name="SSLCertificateKeyFile"/>
+                                <field name="SSLCACertificateFile"/>
+                                <field name="ssl"/>
+                                <field name="Redirect"/>
+                                <field name="mode"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Config Clones">
+                                <field name="config_clone_ids">
+                                <tree string="Config Clone Ids" editable="bottom">
+                                    <field name="name"/>
+<!--                                    <field name="owner_id"/>-->
+                                    <field name="remote_id"/>
+                                    <field name="remote_account_id"/>
+                                    <field name="remote_login"/>
+                                    <field name="remote_location"/>
+                                    <field name="remote_proto"/>
+                                    <field name="remote_name"/>
+                                    <field name="local_host_id"/>
+                                    <field name="local_user_id"/>
+                                    <field name="local_location"/>
+                                    <field name="branch"/>
+                                    <field name="addon_subdir"/>
+                                    <field name="is_module_path"/>
+                                    <field name="root_directory"/>
+                                </tree>
+                                </field>
+                            </page>
+                            <page string="Clones">
+			        <separator string="Clone IDS"/>
+                                <field name="clone_ids">
+                                <tree string="Clone Ids" editable="bottom">
+                                    <field name="name"/>
+<!--                                    <field name="owner_id"/>-->
+                                    <field name="remote_id"/>
+                                    <field name="remote_account_id"/>
+                                    <field name="remote_login"/>
+                                    <field name="remote_location"/>
+                                    <field name="remote_proto"/>
+                                    <field name="remote_name"/>
+                                    <field name="local_host_id"/>
+                                    <field name="local_user_id"/>
+                                    <field name="local_location"/>
+                                    <field name="branch"/>
+                                    <field name="addon_subdir"/>
+                                    <field name="is_module_path"/>
+                                    <field name="root_directory"/>
+                                </tree>
+                                </field>
+				<separator string="Implicit Clone IDS"/>
+                                <field name="implicit_clone_ids">
+                                <tree string="Clone Ids" editable="bottom">
+                                    <field name="name"/>
+<!--                                    <field name="owner_id"/>-->
+                                    <field name="remote_id"/>
+                                    <field name="remote_account_id"/>
+                                    <field name="remote_login"/>
+                                    <field name="remote_location"/>
+                                    <field name="remote_proto"/>
+                                    <field name="remote_name"/>
+                                    <field name="local_host_id"/>
+                                    <field name="local_user_id"/>
+                                    <field name="local_location"/>
+                                    <field name="branch"/>
+                                    <field name="addon_subdir"/>
+                                    <field name="is_module_path"/>
+                                    <field name="root_directory"/>
+                                </tree>
+                                </field>
+                            </page>
+
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_deploy_tree" model="ir.ui.view">
+            <field name="name">deploy.deploy.tree</field>
+            <field name="model">deploy.deploy</field>
+            <field name="arch" type="xml">
+                <tree string="Deployments">
+                    <field name="application_id"/>
+		    <field name="who"/>
+		    <field name="user_id"/>		    		    
+		    <field name="host_id_depr"/>		    
+                    <field name="host_id"/>
+                    <field name="account_id"/>
+<!--
+                    <field name="implicit_clone_ids"/>
+-->
+                    <field name="validated_server_path"/>
+		    <field name="validated_config_file"/>
+                    <field name="name"/>
+		    <field name="who"/>		    		    
+                    <field name="site_name"/>
+		    <!--
+                    <field name="daemon"/>
+                    <field name="vhost"/>
+		    -->
+                    <field name="options_id"/>
+		    <!--
+                    <field name="ServerName"/>
+                    <field name="IP"/>
+                    <field name="PORT"/>
+                    <field name="SSLCertificateFile"/>
+                    <field name="SSLCertificateKeyFile"/>
+                    <field name="SSLCACertificateFile"/>
+                    <field name="ssl"/>
+                    <field name="Redirect"/>
+		    -->
+                    <field name="mode"/>
+		    <field name="validated_root"/>
+                    
+                </tree>
+            </field>
+        </record>
+        
+        <record model="ir.actions.act_window" id="action_deploy_deploy_form">
+            <field name="name">Deployments</field>
+            <field name="res_model">deploy.deploy</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Deployments" parent="menu_applications" id="menu_deploy_deploy_form" action="action_deploy_deploy_form"/>
+
+        
+        
+    </data>
+</openerp>

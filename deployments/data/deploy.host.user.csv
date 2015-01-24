@@ -1,0 +1,3 @@
+id,account_id/id,sudo,ssh,host_id/id,login,group_id/id,name,password_id/id,uid,home,shell,type
+postgres,,FALSE,FALSE,,postgres,group_postgres,postgres,,115,,,system
+root,,,,,root,group_root,root,,0,/root,/bin/bash,system

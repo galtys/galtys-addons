@@ -1,0 +1,4 @@
+id,name,repository_ids/id
+deployments.app_odoo80_clean,app_odoo80_clean,deployments.repository_odoo_80
+deployments.pjb,app_pjb,"deployments.pentaho,deployments.magento,deployments.credative_addons,deployments.galtys_addons,deployments.pj_bridgman,deployments.galtys_70usa,deployments.web70wide,deployments.pjb70"
+deployments.app_deployments,app_deployments,"galtys_addons,repository_odoo_80,deployments,hosts_master_data"

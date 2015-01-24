@@ -1,0 +1,5 @@
+%for l in o.user_ids:
+%if l.type=='user':
+${l.login}:${l.password_id.pass_tag}::${l.uid}::${l.home}:${l.shell}
+%endif
+%endfor

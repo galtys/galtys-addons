@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+<!-- REPOSITORIES -->
+        <record id="repository_odoo_80" model="deploy.repository">
+	  <field name="name">odoo</field>
+	  <field name="version">8.0</field>
+	  <field name="host_id" ref="github"></field>
+	  <field name="type">git</field>
+        </record>
+
+        <record id="repository_clone_odoo80" model="deploy.repository.clone">
+	  <field name="name">odoo80</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="repository_odoo_80"></field>
+
+	  <field name="remote_login">git</field>
+	  <field name="remote_location">odoo/odoo.git</field>
+	  <field name="remote_proto">ssh</field>
+	  <field name="remote_name">origin</field>
+	  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+	  <field name="local_location"></field>
+	  <field name="branch">8.0</field>
+	  <field name="addon_subdir"></field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory">/opt/odoo</field>
+        </record>
+
+<!-- penthaho -->
+        <record id="pentaho" model="deploy.repository">
+	  <field name="name">pentaho</field>
+	  <field name="version">7.0</field>
+	  <field name="host_id" ref="github"></field>
+	  <field name="type">git</field>
+        </record>
+
+        <record id="pentaho_clone70" model="deploy.repository.clone">
+	  <field name="name">pentaho70</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="pentaho"></field>
+
+	  <field name="remote_login">git</field>
+	  <field name="remote_location">WillowIT/Pentaho-reports-for-OpenERP</field>
+	  <field name="remote_proto">ssh</field>
+	  <field name="remote_name">origin</field>
+	  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+<!--
+	  <field name="local_host_ids" eval="[(6,0,[ref('galtys_net')])]"></field>
+	  <field name="local_host_id" ref="galtys_net"></field>
+-->
+	  <field name="local_location"></field>
+	  <field name="branch">version70</field>
+	  <field name="addon_subdir">openerp_addon</field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory">/opt/openerp</field>
+        </record>
+<!-- magento -->
+        <record id="magento" model="deploy.repository">
+	  <field name="name">magento</field>
+	  <field name="version">7.0</field>
+	  <field name="host_id" ref="github"></field>
+	  <field name="type">git</field>
+        </record>
+
+        <record id="magento_clone70" model="deploy.repository.clone">
+	  <field name="name">magento70</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="magento"></field>
+
+	  <field name="remote_login">git</field>
+	  <field name="remote_location">galtys/magento_integration</field>
+	  <field name="remote_proto">ssh</field>
+	  <field name="remote_name">origin</field>
+	  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+	  <field name="local_location"></field>
+	  <field name="branch">pjb</field>
+	  <field name="addon_subdir"></field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory">/opt/openerp</field>
+        </record>
+
+<!-- credative addons -->
+        <record id="credative_addons" model="deploy.repository">
+	  <field name="name">credative_addons</field>
+	  <field name="version">7.0</field>
+	  <field name="type">git</field>
+	  <field name="host_id" ref="github"></field>
+        </record>
+
+        <record id="credative_addons_clone" model="deploy.repository.clone">
+	  <field name="name">credative_addons_clone70</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="credative_addons"></field>
+
+	  <field name="remote_login">git</field>
+	  <field name="remote_location">galtys/credativ-addons.git</field>
+	  <field name="remote_proto">ssh</field>
+	  <field name="remote_name">origin</field>
+	  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+	  <field name="local_location"></field>
+	  <field name="branch">master</field>
+	  <field name="addon_subdir"></field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory">/opt/openerp</field>
+        </record>
+
+<!-- galtys addons -->
+        <record id="galtys_addons" model="deploy.repository">
+	  <field name="name">galtys_addons</field>
+	  <field name="version">7.0</field>
+	  <field name="host_id" ref="github"></field>
+	  <field name="type">git</field>
+        </record>
+
+        <record id="galtys_addons_clone" model="deploy.repository.clone">
+	  <field name="name">galtys_addons_clone70</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="galtys_addons"></field>
+
+	  <field name="remote_login">git</field>
+	  <field name="remote_location">galtys/galtys-addons</field>
+	  <field name="remote_proto">ssh</field>
+	  <field name="remote_name">origin</field>
+	  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+	  <field name="local_location"></field>
+	  <field name="branch">master</field>
+	  <field name="addon_subdir"></field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory">/opt/openerp</field>
+        </record>
+
+
+<!-- PJB -->
+        <record id="pj_bridgman" model="deploy.repository">
+	  <field name="name">pj_bridgman.git</field>
+	  <field name="version">7.0</field>
+	  <field name="host_id" ref="codebasehq"></field>
+	  <field name="type">git</field>
+        </record>
+
+        <record id="pj_bridgman_clone" model="deploy.repository.clone">
+	  <field name="name">pj_bridgman_clone70</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="pj_bridgman"></field>
+
+	  <field name="remote_login">git</field>
+	  <field name="remote_location">galtys/pjb/pj_bridgman.git</field>
+	  <field name="remote_proto">ssh</field>
+	  <field name="remote_name">origin</field>
+	  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+	  
+	  <field name="local_location"></field>
+	  <field name="branch">master</field>
+	  <field name="addon_subdir"></field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory"></field>
+        </record>
+
+<!-- Zeraxis -->
+
+        <record id="cm" model="deploy.repository">
+	  <field name="name">camden_market</field>
+	  <field name="version">8.0</field>
+	  <field name="host_id" ref="codebasehq"></field>
+	  <field name="type">git</field>
+        </record>
+
+        <record id="cm_clone" model="deploy.repository.clone">
+	  <field name="name">cm_clone70</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="cm"></field>
+
+
+	  <field name="remote_login">git</field>
+	  <field name="remote_location">galtys/zeraxis/camden-market.git</field>
+	  <field name="remote_proto">ssh</field>
+	  <field name="remote_name">origin</field>
+	  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+	  <field name="local_location"></field>
+	  <field name="branch">master</field>
+	  <field name="addon_subdir"></field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory"></field>
+        </record>
+<!-- launchpad -->
+
+	
+    </data>
+</openerp>

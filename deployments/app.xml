@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <record id="app_odoo80_clean" model="deploy.application">
+	  <field name="name">app_odoo80_clean</field>
+	  <field name="repository_ids"  eval="[(6,0,[ref('repository_odoo_80')])]"></field>
+        </record>
+        <record id="pjb" model="deploy.application">
+	  <field name="name">app_pjb</field>
+	  <field name="repository_ids"  eval="[(6,0,[ref('pentaho'),ref('magento'),ref('credative_addons'),ref('galtys_addons'),ref('pj_bridgman'),ref('galtys_70usa'),ref('web70wide'),ref('pjb70')])]"></field>
+        </record>
+
+<!-- options -->
+
+        <record id="options_galtys" model="deploy.options">
+	  <field name="pg_user_id" ref="galtys_pg_user_openerp"></field>
+	  <field name="unaccent">True</field>
+	  <field name="xmlrpc_interface">v80.golive-ontime.co.uk</field>
+	  <field name="xmlrpc_port">8066</field>
+	  <field name="admin_password" ref="jan_pass"></field>
+        </record>
+
+<!-- deploy clean odoo80 -->	
+        <record id="odoo80_on_galtys" model="deploy.deploy">
+	  <field name="name">odoo80_on_galtys</field>
+
+	  <field name="application_id" ref="app_odoo80_clean"></field>
+	  <field name="clone_ids"  eval="[(6,0,[ref('repository_clone_odoo80')])]"></field>
+
+	  <field name="host_id" ref="galtys_net"></field>
+	  <field name="site_name">v80</field>
+	  <field name="daemon">False</field>
+	  <field name="vhost">True</field>
+	  <field name="parse_config">True</field>
+	  <field name="options_id" ref="options_galtys"></field>
+	  <field name="ServerName">v80.golive-ontime.co.uk</field>
+	  <field name="IP">77.68.37.165</field>
+	  <field name="PORT">443</field>
+	  <field name="SSLCertificateFile">/etc/apache2/ssl/golive-ontime.co.uk.crt</field>
+	  <field name="SSLCertificateKeyFile">/etc/apache2/ssl/golive-ontime.co.uk.key</field>
+	  <field name="SSLCACertificateFile">/etc/apache2/ssl/rapid_ssl_secondary_intermediate.csr</field>
+	  <field name="ssl">True</field>
+	  <field name="mode">dev</field>
+        </record>
+
+<!-- deploy pjb -->	
+        <record id="pjb_on_galtys" model="deploy.deploy">
+	  <field name="name">deploy_pjb_on_galtys</field>
+
+	  <field name="application_id" ref="pjb"></field>
+	  <field name="clone_ids"  eval="[(6,0,[ref('pentaho_clone70'),ref('magento_clone70'),ref('credative_addons_clone'), ref('galtys_addons_clone'), ref('pj_bridgman_clone'), ref('galtys_70usa_clone'), ref('web70wide_clone'), ref('server70_clone'), ref('pjb70_clone')])]"></field>
+	  <field name="name">deploy_odoo80_on_galtys</field>
+	  <field name="host_id" ref="galtys_net"></field>
+	  <field name="site_name">v80</field>
+	  <field name="daemon">False</field>
+	  <field name="vhost">True</field>
+	  <field name="parse_config">True</field>
+	  <field name="options_id" ref="options_galtys"></field>
+	  <field name="ServerName">v80.golive-ontime.co.uk</field>
+	  <field name="IP">77.68.37.165</field>
+	  <field name="PORT">443</field>
+	  <field name="SSLCertificateFile">/etc/apache2/ssl/golive-ontime.co.uk.crt</field>
+	  <field name="SSLCertificateKeyFile">/etc/apache2/ssl/golive-ontime.co.uk.key</field>
+	  <field name="SSLCACertificateFile">/etc/apache2/ssl/rapid_ssl_secondary_intermediate.csr</field>
+	  <field name="ssl">True</field>
+	  <field name="mode">dev</field>
+        </record>
+
+
+
+	
+    </data>
+</openerp>

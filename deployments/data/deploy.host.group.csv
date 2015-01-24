@@ -1,0 +1,3 @@
+id,sftp,gid,host_id/id,name,type
+group_root,,0,,root,system
+group_postgres,,125,,postgres,system

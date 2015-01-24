@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+<!-- launchpad -->
+
+        <record id="galtys_70usa" model="deploy.repository">
+	  <field name="name">galtys_70usa</field>
+	  <field name="version">7.0</field>
+	  <field name="host_id" ref="launchpad"></field>
+	  <field name="type">bzr</field>
+        </record>
+
+        <record id="galtys_70usa_clone" model="deploy.repository.clone">
+	  <field name="name">galtys_70usa_clone70</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="galtys_70usa"></field>
+
+	  <field name="remote_login">galtys</field>
+	  <field name="remote_location">~openerp-community/openobject-addons/galtys_70usa</field>
+	  <field name="remote_proto">bzr+ssh</field>
+	  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+	  <field name="local_location">openobject-addons/galtys_70usa</field>
+	  <field name="branch"></field>
+	  <field name="addon_subdir"></field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory">/opt/openerp</field>
+        </record>
+
+        <record id="web70wide" model="deploy.repository">
+	  <field name="name">web70wide</field>
+	  <field name="version">7.0</field>
+	  <field name="host_id" ref="launchpad"></field>
+	  <field name="type">bzr</field>
+        </record>
+
+        <record id="web70wide_clone" model="deploy.repository.clone">
+	  <field name="name">web70_clone70</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="web70wide"></field>
+
+	  <field name="remote_login">galtys</field>
+	  <field name="remote_location">~openerp-community/openerp-web/galtys_70wide</field>
+	  <field name="remote_proto">bzr+ssh</field>
+  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+	  <field name="local_location">openerp-web/galtys_70wide</field>
+	  <field name="branch"></field>
+	  <field name="addon_subdir"></field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory">/opt/openerp</field>
+        </record>
+
+        <record id="server70" model="deploy.repository">
+	  <field name="name">server70</field>
+	  <field name="version">7.0</field>
+	  <field name="host_id" ref="launchpad"></field>
+	  <field name="type">bzr</field>
+        </record>
+
+        <record id="server70_clone" model="deploy.repository.clone">
+	  <field name="name">server70_clone</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="server70"></field>
+
+
+	  <field name="remote_login">galtys</field>
+	  <field name="remote_location">~openerp-community/openobject-server/galtys_70</field>
+	  <field name="remote_proto">bzr+ssh</field>
+	  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+	  <field name="local_location">openobject-server/galtys_70</field>
+	  <field name="branch"></field>
+	  <field name="addon_subdir"></field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory">/opt/openerp</field>
+        </record>
+
+
+        <record id="pjb70" model="deploy.repository">
+	  <field name="name">pjb70</field>
+	  <field name="version">7.0</field>
+	  <field name="type">bzr</field>
+	  <field name="host_id" ref="launchpad"></field>
+        </record>
+
+        <record id="pjb70_clone" model="deploy.repository.clone">
+	  <field name="name">pjb70_clone</field>
+	  <field name="owner_id" ref="jan"></field>
+	  <field name="remote_id" ref="pjb70"></field>
+
+
+	  <field name="remote_login">galtys</field>
+	  <field name="remote_location">~openerp-community/openobject-addons/galtys_70pjb</field>
+	  <field name="remote_proto">bzr+ssh</field>
+	  
+	  <field name="local_user_id" ref="galtys_host_user_openerp"></field>
+	  <field name="local_location">openobject-addons/galtys_70pjb</field>
+	  <field name="branch"></field>
+	  <field name="addon_subdir"></field>
+	  <field name="is_module_path">False</field>
+	  <field name="root_directory">/opt/openerp</field>
+        </record>
+
+
+
+	
+    </data>
+</openerp>
