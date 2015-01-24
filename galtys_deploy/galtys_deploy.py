@@ -141,6 +141,8 @@ class repository(osv.osv):
     _columns = {
         'name':fields.char('Name',size=100),
         'type':fields.selection([('git','git'),('bzr','bzr'),('rsync','RSYNC')],'Type'),
+        'use':fields.selection([('addon','addon'),('server','server'),('scripts','scripts'),('site','site')],'Use'),
+
         'host_id':fields.many2one('deploy.host','Host'),
         'version':fields.char('Version',size=10),
         'remote_account_id':fields.many2one('res.users','Remote Account'),
@@ -193,11 +195,10 @@ class application(osv.osv):
 class options(osv.osv):
     _name='deploy.options' #Server options
     _columns = {
-        'pg_user_id':fields.many2one('deploy.pg.user','PG USER'),
         'unaccent':fields.boolean('Unaccent'),
         'xmlrpc_interface':fields.char('xmlrpc_interface',size=100),
         'xmlrpc_port':fields.integer('xmlrpc_port'),
-        'admin_password':fields.many2one('deploy.password','Admin Password'),
+#        'admin_password':fields.many2one('deploy.password','Admin Password'),
         'name':fields.char('Name',size=444),
         #'logfile':
         }
@@ -206,7 +207,10 @@ class deploy(osv.osv):
     _name='deploy.deploy' #Deployments
     _columns = {
         'application_id':fields.many2one('deploy.application', 'Application'),
-        'account_id':fields.many2one('res.users','Account'),#not needed now
+        'pg_user_id':fields.many2one('deploy.pg.user','PG USER'),
+        'options_id':fields.many2one('deploy.options','Options'),
+        'account_id':fields.many2one('res.users','Account'),
+        'password_id':fields.many2one('deploy.password','Admin Password'),
         #'clone_ids':fields.many2many('deploy.repository', 'application_repository','app_id','repository_id', 'Repositories'),
         'name':fields.char('Name',size=444),
         #'host_id':fields.many2one('deploy.host','Host'),#hostname
@@ -218,7 +222,6 @@ class deploy(osv.osv):
         'daemon':fields.boolean('daemon'),
         'vhost':fields.boolean('vhost'),
         'parse_config':fields.boolean('parse_config'),
-        'options_id':fields.many2one('deploy.options','Options'),
         'ServerName':fields.char('ServerName',size=444),
         'IP':fields.char('IP',size=100), #get it from options ?
         'PORT':fields.integer('PORT'), #get it from options!

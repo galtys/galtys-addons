@@ -60,8 +60,8 @@ class deploy2(osv.osv):
         res={}
         for d in self.browse(cr, uid, ids):
             OPTIONS=[('db_host', '127.0.0.1'),
-                     ('db_port', str(d.options_id.pg_user_id.cluster_id.port)),
-                     ('db_user', d.options_id.pg_user_id.login),
+                     ('db_port', str(d.pg_user_id.cluster_id.port)),
+                     ('db_user', d.pg_user_id.login),
                      ('unaccent',d.options_id.unaccent),
                      #('db_password', 'glot_U43!!a33'),
                      #('db_filter', 'galtys_website'),
@@ -78,9 +78,10 @@ class deploy2(osv.osv):
                 who="%s@%s"%(d.user_id.login,d.user_id.host_id.name)
             else:
                 who='N/A'
+            
             res[d.id]={'options':str(OPTIONS),
-                       'db_password':d.options_id.pg_user_id.password_id.password,
-                       'admin_password':d.options_id.admin_password.password,
+                       'db_password':d.pg_user_id.password_id.password,
+                       'admin_password':d.password_id.password,
                        #'implicit_clone_ids':clone_ids,
                        #'config_clone_ids':clone_ids+[x.id for x in d.clone_ids],
                        'who':who,
