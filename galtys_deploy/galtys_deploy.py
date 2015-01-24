@@ -70,7 +70,7 @@ class pg_user(osv.osv):
     _rec_name='login'
     _columns ={
         'cluster_id':fields.many2one('deploy.pg.cluster','PG Cluster'),
-        'account_id':fields.many2one('deploy.account','Account'),
+        'account_id':fields.many2one('res.users','Account'),
         'password_id':fields.many2one('deploy.password','PG Password'),
         'superuser':fields.boolean('Superuser'),
         'create_db':fields.boolean('Create db'),
@@ -117,13 +117,13 @@ class host_group(osv.osv):
 
 class host_user(osv.osv):
     _name = 'deploy.host.user' #Host User
-#    _rec_name='login'
+    _rec_name='login'
     _columns = {
         'name':fields.char('Name',size=100),
         'login':fields.char('Login',size=100),
         'group_id':fields.many2one('deploy.host.group','Main Group'),
         'password_id':fields.many2one('deploy.password','Password'),
-        'account_id':fields.many2one('deploy.account','Account'),
+        'account_id':fields.many2one('res.users','Account'),
         'uid':fields.integer('UID'),
         'ssh':fields.boolean('Allow SSH'),
         'sudo':fields.boolean('Allow SFTP'),    
@@ -143,7 +143,7 @@ class repository(osv.osv):
         'type':fields.selection([('git','git'),('bzr','bzr'),('rsync','RSYNC')],'Type'),
         'host_id':fields.many2one('deploy.host','Host'),
         'version':fields.char('Version',size=10),
-        'remote_account_id':fields.many2one('deploy.account','Remote Account'),
+        'remote_account_id':fields.many2one('res.users','Remote Account'),
         'remote_login':fields.char('Remote Login',size=122),
         'remote_location':fields.char('Remote Location',size=1111),
         'remote_proto':fields.selection([('git','git'),('bzr+ssh','bzr+ssh'),('http','http'),('https','https'),('ssh','ssh'),('lp','lp')],'Remote_Proto'),#not all supported
@@ -162,11 +162,11 @@ class repository_clone(osv.osv):
     _name ='deploy.repository.clone' #Repository clones
     _columns = {
         'name':fields.char('Name',size=100),
-        #'owner_id':fields.many2one('deploy.account','Owner'),
+        #'owner_id':fields.many2one('res.users','Owner'),
         'remote_id':fields.many2one('deploy.repository','Repository'),
         'validated_addon_path':fields.char('Validated Addon Path',size=444),
         #remote_host_id > remote_id.host_id
-        'remote_account_id':fields.many2one('deploy.account','Remote Account'),
+        'remote_account_id':fields.many2one('res.users','Remote Account'),
         'remote_login':fields.char('Remote Login',size=122),
         'remote_location':fields.char('Remote Location',size=1111),
         'remote_proto':fields.selection([('git','git'),('bzr+ssh','bzr+ssh'),('http','http'),('https','https'),('ssh','ssh'),('lp','lp')],'Remote_Proto'),#not all supported
@@ -206,12 +206,12 @@ class deploy(osv.osv):
     _name='deploy.deploy' #Deployments
     _columns = {
         'application_id':fields.many2one('deploy.application', 'Application'),
-        'account_id':fields.many2one('deploy.account','Account'),#not needed now
-        'clone_ids':fields.many2many('deploy.repository.clone', 'application_repository_clone','app_id','clone_id', 'Repository Clones'),
+        'account_id':fields.many2one('res.users','Account'),#not needed now
+        #'clone_ids':fields.many2many('deploy.repository', 'application_repository','app_id','repository_id', 'Repositories'),
         'name':fields.char('Name',size=444),
         #'host_id':fields.many2one('deploy.host','Host'),#hostname
         'user_id':fields.many2one('deploy.host.user','HostUser'),
-        'host_id_depr':fields.many2one('deploy.host','HostDepr'),
+        #'host_id_depr':fields.many2one('deploy.host','HostDepr'),
         #'host_id':fields.many2one('deploy.host','Host'),
         'host_id':fields.related('user_id', 'host_id',  string="Host",type="many2one",relation="deploy.host"),
         'site_name':fields.char('site_name',size=444),

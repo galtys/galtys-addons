@@ -53,78 +53,6 @@ class repository2(osv.osv):
         'local_location_fnc':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='llf'),
         }
 
-class repository_clone2(osv.osv):
-    _inherit = "deploy.repository.clone"
-    def _get_url(self, cr, uid, ids,field_name,arg, context=None):
-        #print 'BAFFF'
-        res={}
-        models_data = self.pool.get('ir.model.data')
-        cr.execute("select res_id,name,module from ir_model_data where model='deploy.repository.clone' and res_id in (%s)" % ",".join(map(str,ids)) )
-        ext_map=dict([(x[0],'%s.%s'%(x[2],x[1])) for x in cr.fetchall()])
-        
-        for c in self.browse(cr, uid, ids):
-            #print [clone.name, clone.owner_id.name]
-            
-            #dummy, form_view = models_data.get_object_reference(cr, uid, 'postcode_address_search', 'view_address_finder_form')
-            res[c.id]={'url':c.remote_id.url,
-                       'type':c.remote_id.type,
-                       'extid': ext_map.get( c.id, ''),
-                       'local_location_fnc':c.remote_id.local_location_fnc,
-                       'git_clone':c.remote_id.git_clone,
-                       'local_host_id':c.local_user_id.host_id.id,
-                       'addon_subdir':c.remote_id.addon_subdir,
-                       'is_module_path':c.remote_id.is_module_path,
-                       'branch':c.remote_id.branch,
-                       'mkdir':c.remote_id.mkdir}
-            if 0: #no local changes for start
-                if c.remote_proto=='ssh':
-                    url="%s@%s:/%s"%(c.remote_login,c.remote_id.host_id.name,c.remote_location)
-                else: #bzr or launchapd?
-                    url="%s://%s@%s/%s"%(c.remote_proto,c.remote_login,c.remote_id.host_id.name,c.remote_location)
-
-                if c.root_directory:
-                    local=c.root_directory
-                else:
-                    local=''
-                if c.remote_id.host_id:
-                    local=os.path.join(local, c.remote_id.host_id.name)
-
-                if c.local_location:
-                    local=os.path.join(local, c.local_location)
-                if c.remote_location and (not c.local_location):
-                    local=os.path.join(local, c.remote_location)
-                if url != remote_id.url:
-                    res[c.id]['url'] = url
-
-                if local != remote_id.local_location_fnc:
-                    res[c.id]['local_location_fnc'] = local
-
-                git_clone = "git clone --branch %s %s %s"%(c.branch,
-                                                           url,
-                                                           local)
-                if git_clone != remote_id.git_clone:
-                    res[c.id]['git_clone']==git_clone
-
-                mkdir = "mkdir -p %s" % local
-
-                if mkdir != remote_id.mkdir:
-                    res[c.id]['mkdir'] = mkdir
-
-        return res
-    _columns = {
-        'url':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='URL'),
-        'addon_subdir':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='addon_subdir'),
-        'is_module_path':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='is_module_path'),
-        'branch':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='branch'),
-
-        'local_host_id':fields.function(_get_url, type='many2one', relation='deploy.host',multi='url',method=True,string='LocalHost'),
-        'extid':fields.function(_get_url, type="char",size=333,multi='url',method=True,string='EXTID'),
-        'git_clone':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='GIT CLONE'),
-        'mkdir':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='mkdir'),
-        'type':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='type'),
-        'local_location_fnc':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='llf'),
-        }
-
 
 class deploy2(osv.osv):
     _inherit = "deploy.deploy"
@@ -153,8 +81,8 @@ class deploy2(osv.osv):
             res[d.id]={'options':str(OPTIONS),
                        'db_password':d.options_id.pg_user_id.password_id.password,
                        'admin_password':d.options_id.admin_password.password,
-                       'implicit_clone_ids':clone_ids,
-                       'config_clone_ids':clone_ids+[x.id for x in d.clone_ids],
+                       #'implicit_clone_ids':clone_ids,
+                       #'config_clone_ids':clone_ids+[x.id for x in d.clone_ids],
                        'who':who,
                        }
                        #'type':c.repository_id.type,
@@ -167,8 +95,8 @@ class deploy2(osv.osv):
         return res
     _columns = {
         'options':fields.function(_get, type='char', size=1000,multi='options',method=True),
-        'implicit_clone_ids':fields.function(_get, type='one2many',relation='deploy.repository.clone',method=True,multi='options',string='Implicit Clones'),
-        'config_clone_ids':fields.function(_get, type='one2many',relation='deploy.repository.clone',method=True,multi='options',string='Config Clones'),
+       # 'implicit_clone_ids':fields.function(_get, type='one2many',relation='deploy.repository.clone',method=True,multi='options',string='Implicit Clones'),
+       # 'config_clone_ids':fields.function(_get, type='one2many',relation='deploy.repository.clone',method=True,multi='options',string='Config Clones'),
 
         'db_password':fields.function(_get, type='char', size=1000,multi='options',method=True),
         'admin_password':fields.function(_get, type='char', size=1000,multi='options',method=True),

@@ -553,8 +553,9 @@
                             <group>
 
                                 <field name="local_user_id"/>
-                                <field name="local_host_id"/>
+
 <!--                                <field name="local_host_id"/>
+                                <field name="local_host_id"/>
                                 <field name="local_location"/>
                                 <field name="branch"/>
                                 <field name="addon_subdir"/>
@@ -564,10 +565,12 @@
                             </group>
                         </group>
 			    <group>
-			      <field name="url"/>
-			      <field name="local_location_fnc"/>
+
+			   
 <!--
+       <field name="local_location_fnc"/>
 			      <field name="git_clone"/>
+			      <field name="url"/>
 			      <field name="mkdir"/>
 			      <field name="type"/>
 -->
@@ -592,14 +595,16 @@
                 <tree string="Repository Clones">
                     <field name="name"/>
                     <field name="local_user_id"/>
-                    <field name="local_host_id"/>
+        
                     <field name="remote_id"/>
 		    <field name="validated_addon_path"/>
+<!--	
 		    <field name="url"/>
+            <field name="local_host_id"/>
 		    <field name="local_location_fnc"/>
 
 
-<!--		    <field name="extid"/> -->
+	    <field name="extid"/> -->
 <!--		    <field name="id"/> -->
 <!--                    <field name="owner_id"/>-->
 		    <!--
@@ -767,72 +772,8 @@
                                 <field name="mode"/>
                             </group>
                         </group>
-                        <notebook>
-                            <page string="Config Clones">
-                                <field name="config_clone_ids">
-                                <tree string="Config Clone Ids" editable="bottom">
-                                    <field name="name"/>
-<!--                                    <field name="owner_id"/>-->
-                                    <field name="remote_id"/>
-                                    <field name="remote_account_id"/>
-                                    <field name="remote_login"/>
-                                    <field name="remote_location"/>
-                                    <field name="remote_proto"/>
-                                    <field name="remote_name"/>
-                                    <field name="local_host_id"/>
-                                    <field name="local_user_id"/>
-                                    <field name="local_location"/>
-                                    <field name="branch"/>
-                                    <field name="addon_subdir"/>
-                                    <field name="is_module_path"/>
-                                    <field name="root_directory"/>
-                                </tree>
-                                </field>
-                            </page>
-                            <page string="Clones">
-			        <separator string="Clone IDS"/>
-                                <field name="clone_ids">
-                                <tree string="Clone Ids" editable="bottom">
-                                    <field name="name"/>
-<!--                                    <field name="owner_id"/>-->
-                                    <field name="remote_id"/>
-                                    <field name="remote_account_id"/>
-                                    <field name="remote_login"/>
-                                    <field name="remote_location"/>
-                                    <field name="remote_proto"/>
-                                    <field name="remote_name"/>
-                                    <field name="local_host_id"/>
-                                    <field name="local_user_id"/>
-                                    <field name="local_location"/>
-                                    <field name="branch"/>
-                                    <field name="addon_subdir"/>
-                                    <field name="is_module_path"/>
-                                    <field name="root_directory"/>
-                                </tree>
-                                </field>
-				<separator string="Implicit Clone IDS"/>
-                                <field name="implicit_clone_ids">
-                                <tree string="Clone Ids" editable="bottom">
-                                    <field name="name"/>
-<!--                                    <field name="owner_id"/>-->
-                                    <field name="remote_id"/>
-                                    <field name="remote_account_id"/>
-                                    <field name="remote_login"/>
-                                    <field name="remote_location"/>
-                                    <field name="remote_proto"/>
-                                    <field name="remote_name"/>
-                                    <field name="local_host_id"/>
-                                    <field name="local_user_id"/>
-                                    <field name="local_location"/>
-                                    <field name="branch"/>
-                                    <field name="addon_subdir"/>
-                                    <field name="is_module_path"/>
-                                    <field name="root_directory"/>
-                                </tree>
-                                </field>
-                            </page>
 
-                        </notebook>
+
                     </sheet>
                 </form>
             </field>
