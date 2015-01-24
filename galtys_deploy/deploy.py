@@ -235,25 +235,25 @@ class mako_template(osv.osv):
             path = get_module_resource(t.module, t.path, t.fn)
             if 'active_id' in context:
                 obj=self.pool.get(t.model).browse(cr, uid, context['active_id'])
+                if t.type in ['template','bash']:
+                    ctx={#'context':context,
+                         'o':obj,
+                         't':t,
+                         'to_ascii':to_ascii,
+                         'value':value,
+                         'to_ascii':to_ascii,
+                         'html_indent':html_indent,                                  
+                         }
+                    #print ctx
+                    ret=render_mako_file(path,ctx)
+                elif t.type in ['python']:
+                    ret=file(path).read()
+                ctx2={'o':obj }
+                out_file=render_mako_str(str(t.out_fn),ctx2)
+                res[t.id] = {'out_content':ret,'source_fn':path,'out_file':out_file}
             else:
-                obj=None
-            if t.type in ['template','bash']:
-                ctx={#'context':context,
-                     'o':obj,
-                     't':t,
-                     'to_ascii':to_ascii,
-                     'value':value,
-                     'to_ascii':to_ascii,
-                     'html_indent':html_indent,                                  
-                     }
-                print ctx
-                ret=render_mako_file(path,ctx)
-            elif t.type in ['python']:
-                ret=file(path).read()
-            ctx2={'o':obj }
-            out_file=render_mako_str(str(t.out_fn),ctx2)
+                res[t.id] = {'out_content':file(path).read(),'source_fn':path,'out_file':''}
 
-            res[t.id] = {'out_content':ret,'source_fn':path,'out_file':out_file}
             #fp = misc.file_open(pathname)
         return res
     _columns = {

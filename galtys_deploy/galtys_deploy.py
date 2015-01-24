@@ -117,7 +117,7 @@ class host_group(osv.osv):
 
 class host_user(osv.osv):
     _name = 'deploy.host.user' #Host User
-    _rec_name='login'
+#    _rec_name='login'
     _columns = {
         'name':fields.char('Name',size=100),
         'login':fields.char('Login',size=100),

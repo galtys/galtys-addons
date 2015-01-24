@@ -41,6 +41,81 @@
             <field name="view_mode">tree,form</field>
         </record>
         <menuitem name="Accounts" parent="menu_configurations" id="menu_deploy_accounts_form" action="action_deploy_accounts_form" />
+
+
+        <record id="view_deploy_mako_template_form" model="ir.ui.view">
+            <field name="name">deploy.mako.template.form</field>
+            <field name="model">deploy.mako.template</field>
+            <field name="arch" type="xml">
+                <form string="Template">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+			    <field name="type"/>
+			    <field name="gl_command"/>
+			    <field name="model"/>
+			    <field name="module"/>
+			    <field name="path"/>
+                        </group>
+			<group>
+			  <field name="fn"/>
+			  <field name="domain"/>
+			  <field name="out_fn"/>
+			  <field name="sequence"/>
+			  <field name="python_function"/>
+			  <field name="subprocess_arg"/>
+			  <field name="chmod"/>
+			  <field name="user_id"/>
+			</group>
+			<separator string="source_fn"/>
+			<field name="source_fn"/>
+			<separator string="out_content"/>
+			<field name="out_content"/>
+
+			<separator string="out_file"/>
+			<field name="out_file"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        
+        <record id="view_deploy_mako_template_tree" model="ir.ui.view">
+            <field name="name">deploy.mako.template.tree</field>
+            <field name="model">deploy.mako.template</field>
+            <field name="arch" type="xml">
+                <tree string="Templates">
+                    <field name="name"/>
+			    <field name="type"/>
+			    <field name="gl_command"/>
+			    <field name="model"/>
+			    <field name="module"/>
+			    <field name="path"/>
+			  <field name="fn"/>
+			  <field name="domain"/>
+			  <field name="out_fn"/>
+			  <field name="sequence"/>
+			  <field name="python_function"/>
+			  <field name="subprocess_arg"/>
+			  <field name="chmod"/>
+			  <field name="user_id"/>
+
+                </tree>
+            </field>
+        </record>
+                
+        <record model="ir.actions.act_window" id="action_deploy_mako_template_form">
+            <field name="name">Mako Template</field>
+            <field name="res_model">deploy.mako.template</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem name="Mako Templates" parent="menu_configurations" id="menu_deploy_mako_template_form" action="action_deploy_mako_template_form" />
+
+
+
+
+
+
         
         <record id="view_deploy_password_form" model="ir.ui.view">
             <field name="name">deploy.password.form</field>
@@ -465,32 +540,37 @@
                         <group>
                             <group>
                                 <field name="name"/>
-<!--                                <field name="owner_id"/>-->
                                 <field name="remote_id"/>
-<!--                                <field name="remote_account_id"/>-->
+<!--                                <field name="owner_id"/>-->
+
+<!--                                <field name="remote_account_id"/>
                                 <field name="remote_login"/>
                                 <field name="remote_location"/>
                                 <field name="remote_proto"/>
                                 <field name="remote_name"/>
+-->
                             </group>
                             <group>
-<!--                                <field name="local_host_id"/>-->
+
                                 <field name="local_user_id"/>
                                 <field name="local_host_id"/>
-
+<!--                                <field name="local_host_id"/>
                                 <field name="local_location"/>
                                 <field name="branch"/>
                                 <field name="addon_subdir"/>
                                 <field name="is_module_path"/>
                                 <field name="root_directory"/>
+-->
                             </group>
                         </group>
 			    <group>
 			      <field name="url"/>
+			      <field name="local_location_fnc"/>
+<!--
 			      <field name="git_clone"/>
 			      <field name="mkdir"/>
 			      <field name="type"/>
-			      <field name="local_location_fnc"/>
+-->
 			    </group>		    
 
                         <notebook>
@@ -510,12 +590,18 @@
             <field name="model">deploy.repository.clone</field>
             <field name="arch" type="xml">
                 <tree string="Repository Clones">
-		    <field name="id"/>
-		    <field name="extid"/>
-		    <field name="validated_addon_path"/>
                     <field name="name"/>
-<!--                    <field name="owner_id"/>-->
+                    <field name="local_user_id"/>
+                    <field name="local_host_id"/>
                     <field name="remote_id"/>
+		    <field name="validated_addon_path"/>
+		    <field name="url"/>
+		    <field name="local_location_fnc"/>
+
+
+<!--		    <field name="extid"/> -->
+<!--		    <field name="id"/> -->
+<!--                    <field name="owner_id"/>-->
 		    <!--
                     <field name="remote_account_id"/>
                     <field name="remote_login"/>
@@ -526,19 +612,20 @@
                     <field name="local_user_id"/>
                     <field name="local_location"/>
 		    -->
-                    <field name="branch"/>
+<!--                    <field name="branch"/> -->
 		    <!--
                     <field name="addon_subdir"/>
                     <field name="is_module_path"/>
 		    -->
-                    <field name="root_directory"/>
-		    <field name="url"/>
+<!--                    <field name="root_directory"/> -->
+
 		    <!--
 		    <field name="git_clone"/>
 		    <field name="mkdir"/>
-		    -->
 		    <field name="type"/>
-		    <field name="local_location_fnc"/>
+		    -->
+
+
 
                 </tree>
             </field>
