@@ -10,8 +10,7 @@
     "init_xml" : [],
     "demo_xml" : [],
     "data" : [],
-    "update_xml" : [
-        ],
+    "update_xml" : ['galtys_deploy_view.xml'],
     "active": False,
     "installable": True
 }
