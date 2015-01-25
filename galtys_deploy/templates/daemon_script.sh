@@ -18,7 +18,7 @@
   DAEMON=os.path.join(o.validated_server_path, 'openerp-server')
   NAME=o.name
   DESC=o.name
-  CONFIG=o.validated_config_file
+  CONFIG=o.odoo_config
   USER=o.user_id.name
   GROUP=o.user_id.group_id.name
   ROOT=o.validated_root

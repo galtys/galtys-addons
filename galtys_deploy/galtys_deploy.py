@@ -219,13 +219,17 @@ class deploy(osv.osv):
         #'host_id_depr':fields.many2one('deploy.host','HostDepr'),
         #'host_id':fields.many2one('deploy.host','Host'),
         'host_id':fields.related('user_id', 'host_id',  string="Host",type="many2one",relation="deploy.host"),
+        'ROOT':fields.char('site_name',size=444),
         'site_name':fields.char('site_name',size=444),
         'daemon':fields.boolean('daemon'),
         'vhost':fields.boolean('vhost'),
         'parse_config':fields.boolean('parse_config'),
         'ServerName':fields.char('ServerName',size=444),
-        'IP':fields.char('IP',size=100), #get it from options ?
-        'PORT':fields.integer('PORT'), #get it from options!
+        'IP':fields.char('IP',size=100),
+        'PORT':fields.integer('PORT'), 
+        'IPSSL':fields.char('IP',size=100),
+        'PORTSSL':fields.integer('PORT'), 
+
         'SSLCertificateFile':fields.char('SSLCertificateFile',size=111),
         'SSLCertificateKeyFile':fields.char('SSLCertificateKeyFile',size=111),
         'SSLCACertificateFile':fields.char('SSLCACertificateFile', size=111),

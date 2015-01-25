@@ -110,6 +110,8 @@
 			<field name="group_ids" colspan="4"/>
 			<separator string="Clusters"/>
 			<field name="cluster_ids" colspan="4"/>
+			<separator string="Deployments"/>
+			<field name="deploy_ids" colspan="4"/>
 
                     </sheet>
                 </form>
@@ -344,8 +346,6 @@
                                 <field name="home"/>
                                 <field name="shell"/>
                             </group>
-			    <separator string="Deployments"/>
-			    <field name="deploy_ids" colspan="4"/>
                         </group>
                     </sheet>
                 </form>
@@ -683,6 +683,7 @@
 			      <field name="host_id"/>
 			      <field name="who"/>
                               <field name="site_name"/>
+			      <field name="options_id"/>
                             </group>
                             <group>
                                 <field name="daemon"/>
@@ -693,6 +694,9 @@
 				
                                 <field name="IP"/>
                                 <field name="PORT"/>
+                                <field name="IPSSL"/>
+                                <field name="PORTSSL"/>
+
                                 <field name="SSLCertificateFile"/>
                                 <field name="SSLCertificateKeyFile"/>
                                 <field name="SSLCACertificateFile"/>
@@ -701,6 +705,8 @@
                                 <field name="mode"/>
                             </group>
                         </group>
+			<separator string="Clones"/>
+			<field name="clone_ids" colspan="4"/>
 
 
                     </sheet>
@@ -713,6 +719,10 @@
             <field name="model">deploy.deploy</field>
             <field name="arch" type="xml">
                 <tree string="Deployments">
+		  <field name="id"/>
+                    <field name="name"/>
+                    <field name="site_name"/>
+
                     <field name="application_id"/>
 		    <field name="who"/>
 		    <field name="user_id"/>		    		    
@@ -724,9 +734,6 @@
 -->
                     <field name="validated_server_path"/>
 		    <field name="validated_config_file"/>
-                    <field name="name"/>
-		    <field name="who"/>		    		    
-                    <field name="site_name"/>
 		    <!--
                     <field name="daemon"/>
                     <field name="vhost"/>

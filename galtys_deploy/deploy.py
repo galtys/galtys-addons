@@ -69,11 +69,13 @@ class deploy2(osv.osv):
                      ('xmlrpc_port',str(d.options_id.xmlrpc_port)),
                       ]
             clone_ids=[]
+            addons_path=[]
             for reps in [r for r in d.application_id.repository_ids]:
                 for r in reps:
                     for c in r.clone_ids:
-                        if (d.host_id.id in [h.id for h in c.local_host_ids]):
-                            clone_ids.append( c.id )
+                        if c.local_user_id.id==d.user_id.id:
+                            clone_ids.append(c.id)
+                            addons_path.append(c.validated_addon_path)
             if d.user_id:
                 who="%s@%s"%(d.user_id.login,d.user_id.host_id.name)
             else:
@@ -85,6 +87,16 @@ class deploy2(osv.osv):
                        #'implicit_clone_ids':clone_ids,
                        #'config_clone_ids':clone_ids+[x.id for x in d.clone_ids],
                        'who':who,
+                       'wsgi_script':'%s_%s.py'%(d.validated_root,d.name),
+                       'odoo_config':'%s/server_%s.conf'%(d.validated_root,d.name),
+                       'odoo_log':'%s_%s.log'%(d.validated_root,d.name),
+                       'apache_log':'%s_%s.log'%(d.validated_root,d.name),
+                       'apache_errlog':'%s_%s.log'%(d.validated_root,d.name),
+                       'user':d.user_id.login,
+                       'group':d.user_id.group,
+                       'processes':'2',
+                       'clone_ids':clone_ids,
+                       'addons_path':','.join(addons_path),
                        }
                        #'type':c.repository_id.type,
                        #'local_location_fnc':local,
@@ -100,8 +112,21 @@ class deploy2(osv.osv):
        # 'config_clone_ids':fields.function(_get, type='one2many',relation='deploy.repository.clone',method=True,multi='options',string='Config Clones'),
 
         'db_password':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'wsgi_script':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'odoo_config':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'odoo_log':fields.function(_get, type='char', size=1000,multi='options',method=True),
+
+        'apache_log':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'apache_errlog':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'user':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'group':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'processes':fields.function(_get, type='char', size=1000,multi='options',method=True),
+
         'admin_password':fields.function(_get, type='char', size=1000,multi='options',method=True),
         'who':fields.function(_get, type='char', size=1000,multi='options',method=True,string='ByWho'),
+        'addons_path':fields.function(_get, type='char', size=1000,multi='options',method=True,string='addons_path'),
+
+        'clone_ids':fields.function(_get,type='one2many',relation='deploy.repository.clone',multi='options',method=True,string="clone_ids"),
         }
 from openerp.modules.module import get_module_resource
 from mako.template import Template
@@ -214,7 +239,7 @@ class deploy_file(osv.osv):
                          'to_ascii':to_ascii,
                          'value':value,
                          'to_ascii':to_ascii,
-                         'html_indent':html_indent,                                  
+                        #'html_indent':html_indent,                                  
                          }
                     #print ctx
                     ret=render_mako_file(path,ctx)
@@ -222,7 +247,7 @@ class deploy_file(osv.osv):
                     ret=file(path).read()
                 ctx2={'o':obj }
                 out_file=render_mako_str(str(t.out_fn),ctx2)
-                file_ctx={'f':f}
+                file_ctx={'f':f,'o':obj}
                 res[f.id] = {'content_generated':ret,'source_fn':path,
                              'file_generated':out_file,
                              'who':f.user_id.who,
@@ -396,49 +421,6 @@ class ir_module_module(osv.osv):
     
 class host(osv.osv):
     _inherit = 'deploy.host'
-    def render(self, cr, uid, ids, context=None):
-        ret=self.render_files(cr, uid, ids, [], [] ,context=context)
-        out=[]
-        for h,ret_h in ret.items():
-            files=ret_h['files']
-            for k,v in files.items():
-                #print k,v
-                model,t_id,r_id=k
-                out_fn,content,user,group,_type,name,python_function,subprocess_arg,chmod,sequence=v
-                out.append( (h,model,t_id,r_id,out_fn,content,user,group,_type,name,python_function,subprocess_arg,chmod,sequence) )
-        
-        return sorted(out, key=lambda a:a[-1] )
-
-    def render_files(self, cr, uid, ids,field_name,arg, context=None):
-        res={}
-        #field_ids = self.pool.get('ir.model.fields').search(cr, uid, [('relation','=','deploy.host')] )
-        #models=[]
-        active_hostname=context['hostname']
-        #for f in self.pool.get('ir.model.fields').browse(cr, uid, field_ids):
-        #    if f.model not in models:
-        #        models.append(f.model)
-        models = [u'deploy.host.user', u'deploy.host.group', u'deploy.repository', u'deploy.pg.cluster', u'deploy.deploy', u'deploy.repository.clone']
-        print models, context
-        t_h_ids = self.pool.get('deploy.mako.template').search(cr, uid, [('model','=','deploy.host')])            
-        template_ids = self.pool.get('deploy.mako.template').search(cr, uid, [('model','in',models)])
-        t_ids = template_ids+t_h_ids
-        for h in self.browse(cr, uid, ids):
-            files={}
-            for t in self.pool.get('deploy.mako.template').browse(cr, uid, t_ids):
-                eval_arg = t.domain%active_hostname
-                print t.name, eval_arg, t.model
-                rec_ids = self.pool.get(t.model).search(cr, uid, eval(eval_arg) ) #!!!! find safe eval
-                for r_id in rec_ids:
-                    o=self.pool.get('deploy.mako.template').browse(cr, uid, t.id,context={'active_id':r_id})
-                    key=(str(t.model),t.id,r_id)
-                    user=t.user_id.login
-                    group=t.user_id.group_id.name
-                    #print 'key:', key
-                    files[key]=(o.out_file,o.out_content,user,group,t.type,t.name,t.python_function,t.subprocess_arg,t.chmod,t.sequence )
-                
-            res[h.id] = {'template_ids':template_ids,'files':files}
-            
-        return res
     def _host(self, cr, uid, ids, field_name, arg, context=None):
         res={}
         for h in self.browse(cr, uid, ids):
@@ -456,11 +438,22 @@ class host(osv.osv):
                        'kernel_shmall':shmall,
                        'kernel_shmmax':shmmax}
         return res
+    def _deploy(self, cr, uid, ids, field_name, arg, context=None):
+        res={}
+        for h in self.browse(cr, uid, ids):
+            deploy_ids=self.pool.get('deploy.deploy').search(cr,uid, [])
+            d_ids=[]
+            for d in self.pool.get('deploy.deploy').browse(cr, uid, deploy_ids):
+                if d.user_id.host_id.id==h.id:
+                    d_ids.append(d.id)
+
+            res[h.id]={'deploy_ids':d_ids}
+        return res
     _columns = {
-        'template_ids':fields.function(render_files, type='one2many',relation='deploy.mako.template',multi='template',method=True),
-        'files':fields.function(render_files, type='text',multi='template',method=True),
         'memory_buffer_calc':fields.function(_host,type='integer',multi='host',method=True,string="Calc buff size"),
         'memory_buffer_calc_mb':fields.function(_host,type='integer',multi='host',method=True,string="Calc buff size MB"),
         'kernel_shmall':fields.function(_host,type='integer',multi='host',method=True,string="shmall"),
         'kernel_shmmax':fields.function(_host,type='integer',multi='host',method=True,string="shmmax"),
+        'deploy_ids':fields.function(_deploy,type='one2many',relation='deploy.deploy',multi='host',method=True,string="deploy"),
+
         }
