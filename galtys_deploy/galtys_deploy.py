@@ -37,6 +37,7 @@ class host(osv.osv):
         'user_ids':fields.one2many('deploy.host.user','host_id','Users'),
         'group_ids':fields.one2many('deploy.host.group','host_id','Groups'),
         'cluster_ids':fields.one2many('deploy.pg.cluster','host_id','PG Clusters'),
+        'control':fields.boolean('Control'),
         #'deploy_ids':fields.one2many('deploy.deploy','host_id','Deployments'),
         }
 
@@ -198,7 +199,7 @@ class options(osv.osv):
         'unaccent':fields.boolean('Unaccent'),
         'xmlrpc_interface':fields.char('xmlrpc_interface',size=100),
         'xmlrpc_port':fields.integer('xmlrpc_port'),
-#        'admin_password':fields.many2one('deploy.password','Admin Password'),
+        #'admin_password':fields.many2one('deploy.password','Admin Password'),
         'name':fields.char('Name',size=444),
         #'logfile':
         }
@@ -255,16 +256,24 @@ class mako_template(osv.osv):
         'subprocess_arg':fields.char('subprocess_arg',size=444),
         'chmod':fields.char('chmod',size=444),
         'user_id':fields.many2one('deploy.host.user','HostUser'),
+        'target_user':fields.char('target_user',size=444),
+        'target_group':fields.char('target_group',size=444),
+
     }
 
 class deploy_file(osv.osv):
     _name = "deploy.file"
+    _name_rec = "command"
     _columns = {
-        'gl_command':fields.char('GoLive Command',size=444),
-        'model':fields.char('model',size=444),
+        'command':fields.char('Last Command',size=444),
+        #'model':fields.char('model',size=444),
         'res_id':fields.integer('res_id'),
         'template_id':fields.many2one('deploy.mako.template', 'Template Used'),
         'encrypted':fields.boolean('Encrypted'),
         'user_id':fields.many2one('deploy.host.user','User'),        
+        'sequence':fields.integer('Sequence'),
+        'file_written':fields.char('File Written', size=444),
+        'content_written':fields.text('Content Written'),
+        'cmd_exit_code':fields.char('cmd_exit_code', size=444),
     }
 

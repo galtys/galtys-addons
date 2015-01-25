@@ -1,7 +1,7 @@
-def host_explore(host_ids):
+def host_explore(host_id):
     import psutil
-    #print 'explore host', host_ids
     ret=psutil.phymem_usage()
-    write('deploy.host',host_ids, {'memory_total':int(ret.total)/resource.getpagesize(),
-                                   'memory_pagesize': int( resource.getpagesize()  )} )
-    return
+    val={'memory_total':int(ret.total)/resource.getpagesize(),
+         'memory_pagesize': int( resource.getpagesize()  )}
+    write('deploy.host',host_id, val )
+    return val

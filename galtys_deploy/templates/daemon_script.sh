@@ -19,8 +19,8 @@
   NAME=o.name
   DESC=o.name
   CONFIG=o.validated_config_file
-  USER=o.config_clone_ids[0].local_user_id.name
-  GROUP=o.config_clone_ids[0].local_user_id.group_id.name
+  USER=o.user_id.name
+  GROUP=o.user_id.group_id.name
   ROOT=o.validated_root
   OPENERP_LOG=os.path.join(ROOT,'%s.log'%o.name)
 %>

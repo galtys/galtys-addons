@@ -1,3 +1,3 @@
 #!/bin/bash
-echo "sysctl"
-sysctl -p /etc/sysctl.d/40-pg_buffers.conf
+echo "running sysctl"
+sudo sysctl -p /etc/sysctl.d/40-pg_buffers.conf

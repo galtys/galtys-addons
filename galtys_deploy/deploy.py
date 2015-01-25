@@ -162,8 +162,51 @@ class mako_template(osv.osv):
         for t in self.browse(cr, uid, ids):
             #path = get_module_resource('hr', 'static/src/img', 'default_image.png')
             path = get_module_resource(t.module, t.path, t.fn)
-            if 'active_id' in context:
-                obj=self.pool.get(t.model).browse(cr, uid, context['active_id'])
+            res[t.id] = {'source_fn':path}
+            if os.path.isfile(path):
+                source=file(path).read()
+            else:
+                source=''
+            res[t.id] = {'source':source,'source_fn':path}
+
+        return res
+    _columns = {
+        #'model_id':fields.many2one('ir.model', 'Model Link')
+#        'out_file':fields.function(_get,type='text',multi='content',method=True,string='out_file'),       
+        'source':fields.function(_get,type='text',multi='content',method=True,string='source'),
+        'source_fn':fields.function(_get,type='char',size=4444,multi='content',method=True,string='source_fn'),
+        }
+
+class host_user(osv.osv):
+    _inherit = "deploy.host.user"
+    def _get(self, cr, uid, ids,field_name,arg, context=None):
+        res={}
+        for u in self.browse(cr, uid, ids):
+            res[u.id] = {'who':"%s@%s" % (u.login,u.host_id.name),
+                         'info':"%s:%s" %( u.login, u.group_id.name ),
+                         'numinfo': "%s:%s" %( u.uid, u.group_id.gid ),
+                         'group':u.group_id.name}
+        return res
+    _columns = {
+        'info':fields.function(_get,type='char',size=4444,multi='content',method=True,string='info'),
+        'numinfo':fields.function(_get,type='char',size=4444,multi='content',method=True,string='numinfo'),
+
+        'group':fields.function(_get,type='char',size=4444,multi='content',method=True,string='group'),
+        'who':fields.function(_get,type='char',size=4444,multi='content',method=True,string='who'),
+        
+
+        }
+class deploy_file(osv.osv):
+    _inherit = "deploy.file"
+    _order = "template_id,user_id,sequence"
+    def _get(self, cr, uid, ids,field_name,arg, context=None):
+        res={}
+        for f in self.browse(cr, uid, ids):
+            #path = get_module_resource('hr', 'static/src/img', 'default_image.png')
+            t=f.template_id
+            path = get_module_resource(t.module, t.path, t.fn)
+            if 1:#'active_id' in context:
+                obj=self.pool.get(t.model).browse(cr, uid, f.res_id )
                 if t.type in ['template','bash']:
                     ctx={#'context':context,
                          'o':obj,
@@ -179,18 +222,34 @@ class mako_template(osv.osv):
                     ret=file(path).read()
                 ctx2={'o':obj }
                 out_file=render_mako_str(str(t.out_fn),ctx2)
-                res[t.id] = {'out_content':ret,'source_fn':path,'out_file':out_file}
+                file_ctx={'f':f}
+                res[f.id] = {'content_generated':ret,'source_fn':path,
+                             'file_generated':out_file,
+                             'who':f.user_id.who,
+                             'user':render_mako_str(f.template_id.target_user, file_ctx),
+                             'group':render_mako_str(f.template_id.target_group, file_ctx),}
             else:
-                res[t.id] = {'out_content':file(path).read(),'source_fn':path,'out_file':''}
+                res[f.id] = {'content_generated':file(path).read(),
+                             'source_fn':path,
+                             'file_generated':'',
+                             'who':f.user_id.who,
+                             'user':render_mako_str(f.template_id.target_user, file_ctx),
+                             'group':render_mako_str(f.template_id.target_group, file_ctx)}
 
             #fp = misc.file_open(pathname)
         return res
     _columns = {
         #'model_id':fields.many2one('ir.model', 'Model Link')
-        'out_file':fields.function(_get,type='text',multi='content',method=True,string='out_file'),       
-        'out_content':fields.function(_get,type='text',multi='content',method=True,string='out_content'),
+        'file_generated':fields.function(_get,type='text',multi='content',method=True,string='file_generated'),       
+        'content_generated':fields.function(_get,type='text',multi='content',method=True,string='content_generated'),
         'source_fn':fields.function(_get,type='char',size=4444,multi='content',method=True,string='source_fn'),
+
+        'user':fields.function(_get,type='char',size=4444,multi='content',method=True,string='user'),
+        'group':fields.function(_get,type='char',size=4444,multi='content',method=True,string='group'),
+        'who':fields.function(_get,type='char',size=4444,multi='content',method=True,string='who'),
+
         }
+    
 
 class deploy_pg_cluster(osv.osv):
     _inherit = "deploy.pg.cluster"
