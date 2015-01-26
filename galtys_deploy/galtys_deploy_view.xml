@@ -400,6 +400,10 @@
 			      <field name="version"/>
 			      <field name="remote_login"/>
 			      <field name="remote_location"/>
+                              <field name="remote_id"/>
+			      <field name="local_user_id"/>
+			      <field name="validated_addon_path"/>
+
                             </group>
                             <group>
 			      <field name="remote_proto"/>
@@ -409,7 +413,9 @@
 			      <field name="addon_subdir"/>
 			      <field name="is_module_path"/>
 			      <field name="root_directory"/>
-
+			      <field name="url"/>
+			      <field name="local_location_fnc"/>
+		    
                             </group>
                         </group>
                         <notebook>
@@ -438,6 +444,9 @@
             <field name="arch" type="xml">
                 <tree string="Repositories">
                     <field name="name"/>
+                    <field name="remote_id"/>
+		    <field name="local_user_id"/>
+		    <field name="validated_addon_path"/>
                     <field name="type"/>
 		    <field name="use"/>
                     <field name="host_id"/>
@@ -474,6 +483,8 @@
                             <group>
                                 <field name="name"/>
                                 <field name="remote_id"/>
+				<field name="local_user_id"/>
+				<field name="validated_addon_path"/>
 <!--                                <field name="owner_id"/>-->
 
 <!--                                <field name="remote_account_id"/>
@@ -485,9 +496,9 @@
                             </group>
                             <group>
 
-                                <field name="local_user_id"/>
+<!--                                 
 
-<!--                                <field name="local_host_id"/>
+                               <field name="local_host_id"/>
                                 <field name="local_host_id"/>
                                 <field name="local_location"/>
                                 <field name="branch"/>
@@ -508,14 +519,14 @@
 			      <field name="type"/>
 -->
 			    </group>		    
-
+<!--
                         <notebook>
                             <page string="Clone On Hosts">
                                 <field name="local_host_ids">
                                 </field>
                             </page>
                         </notebook>
-
+-->
                     </sheet>
                 </form>
             </field>

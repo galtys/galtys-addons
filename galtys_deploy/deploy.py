@@ -11,11 +11,15 @@ class repository2(osv.osv):
    #     cr.execute("select res_id,name,module from ir_model_data where model='deploy.repository.clone' and res_id in (%s)" % ",".join(map(str,ids)) )
     #    ext_map=dict([(x[0],'%s.%s'%(x[2],x[1])) for x in cr.fetchall()])
         
-        for c in self.browse(cr, uid, ids):
+        for r in self.browse(cr, uid, ids):
             #print [clone.name, clone.owner_id.name]
             
             #dummy, form_view = models_data.get_object_reference(cr, uid, 'postcode_address_search', 'view_address_finder_form')
-            
+            if r.remote_id:
+                c=r.remote_id
+            else:
+                c=r
+
             if c.remote_proto=='ssh':
                 url="%s@%s:/%s"%(c.remote_login,c.host_id.name,c.remote_location)
             else: #bzr or launchapd?
@@ -33,7 +37,12 @@ class repository2(osv.osv):
             if c.remote_location and (not c.local_location):
                 local=os.path.join(local, c.remote_location)
 
-            res[c.id]={'url':url,
+            if not local.startswith('/'):
+                if r.local_user_id:
+                    local = os.path.join( r.local_user_id.home, local)
+                else:
+                    local = ''
+            res[r.id]={'url':url,
                        #'type':c.e_id.type,
  #                      'extid': ext_map.get( c.id, ''),
                        'local_location_fnc':local,
@@ -126,7 +135,7 @@ class deploy2(osv.osv):
         'who':fields.function(_get, type='char', size=1000,multi='options',method=True,string='ByWho'),
         'addons_path':fields.function(_get, type='char', size=1000,multi='options',method=True,string='addons_path'),
 
-        'clone_ids':fields.function(_get,type='one2many',relation='deploy.repository.clone',multi='options',method=True,string="clone_ids"),
+        'clone_ids':fields.function(_get,type='one2many',relation='deploy.repository',multi='options',method=True,string="clone_ids"),
         }
 from openerp.modules.module import get_module_resource
 from mako.template import Template
