@@ -134,6 +134,7 @@ class host_user(osv.osv):
         'shell':fields.char('shell',size=44),
         'type':fields.selection([('user','user'),('system','system')],'Type'),
         'deploy_ids':fields.one2many('deploy.deploy','user_id','Deployments'),
+        'app_ids':fields.many2many('deploy.application', 'host_user_application_rel', 'user_id', 'app_id', 'Apps'),
         #'user_id':fields.many2one('deploy.host.user','HostUser'),
         }
 
@@ -197,7 +198,7 @@ class repository_clone(osv.osv): #will be likely deprecated
 class application(osv.osv):
     _name = 'deploy.application' #Applications
     _columns = {
-        'repository_ids':fields.many2many('deploy.repository', 'application_repository_rel','app_id','repository_id', 'Repositories'),
+        'repository_ids':fields.many2many('deploy.repository', 'application_repository_rel','app_id','repository_id', 'Repositories', domain=[('remote_id','=',False)]),
         'name':fields.char('Name',size=444),
         }
 

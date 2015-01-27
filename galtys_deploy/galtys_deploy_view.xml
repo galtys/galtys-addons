@@ -333,6 +333,7 @@
                             <group>
                                 <field name="name"/>
                                 <field name="login"/>
+				<field name="who"/>
                                 <field name="group_id"/>
                                 <field name="password_id"/>
                                 <field name="account_id"/>
@@ -346,6 +347,9 @@
                                 <field name="home"/>
                                 <field name="shell"/>
                             </group>
+			    <separator string="Apps"/>
+			    <field name="app_ids" colspan="4"/>
+
                         </group>
                     </sheet>
                 </form>
@@ -749,7 +753,6 @@
                     <field name="daemon"/>
                     <field name="vhost"/>
 		    -->
-                    <field name="options_id"/>
 		    <!--
                     <field name="ServerName"/>
                     <field name="IP"/>

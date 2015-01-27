@@ -84,7 +84,8 @@ class deploy2(osv.osv):
                     for c in r.clone_ids:
                         if c.local_user_id.id==d.user_id.id:
                             clone_ids.append(c.id)
-                            addons_path.append(c.validated_addon_path)
+                            if c.use in ['server','addon']:
+                                addons_path.append(c.validated_addon_path)
             if d.user_id:
                 who="%s@%s"%(d.user_id.login,d.user_id.host_id.name)
             else:
