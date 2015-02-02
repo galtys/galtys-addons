@@ -42,6 +42,12 @@ class repository2(osv.osv):
                     local = os.path.join( r.local_user_id.home, local)
                 else:
                     local = ''
+            if c.local_location and r.remote_id:
+                if len(c.local_location)>=2:
+                    if c.local_location[0:2]=='~/':
+                        home, ll = r.local_user_id.home, c.local_location[2:]
+                        print [home, ll]
+                        local = os.path.join(home, ll  )
             res[r.id]={'url':url,
                        #'type':c.e_id.type,
  #                      'extid': ext_map.get( c.id, ''),
