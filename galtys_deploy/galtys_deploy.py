@@ -41,7 +41,6 @@ class host(osv.osv):
         #'deploy_ids':fields.one2many('deploy.deploy','host_id','Deployments'),
         }
 
-
 class pg_cluster(osv.osv):
     _name = "deploy.pg.cluster" #Postgresql Clusters
 #    _rec_name = 'host_id'
@@ -64,6 +63,15 @@ class pg_cluster(osv.osv):
         'user_ids':fields.one2many("deploy.pg.user",'cluster_id','PG Users'),
         'database_ids':fields.one2many("deploy.pg.database",'cluster_id','Databases'),
         'hba_ids':fields.one2many("deploy.pg.hba",'cluster_id','HBA'),
+        }
+    _defaults = {
+        'listen_addresses':'127.0.0.1',
+        'shared_buffers':'24MB',
+        'fsync': 'off',
+        'synchronous_commit':'off',
+        'full_page_writes':'off',
+        'checkpoint_segments':7,
+        'checkpoint_timeout':'15min',       
         }
 
 class pg_user(osv.osv):
@@ -288,5 +296,194 @@ class deploy_file(osv.osv):
         'file_written':fields.char('File Written', size=444),
         'content_written':fields.text('Content Written'),
         'cmd_exit_code':fields.char('cmd_exit_code', size=444),
-    }
+        }
+class export_tag(osv.osv):
+    _name = "deploy.export.tag"
+    _columns ={
+        "name":fields.char("name", size=100),
+        "sequence":fields.integer('sequence'),
+        "parent_id":fields.many2one("deploy.export.tag", "Parent Tag"),
+        'field_ids':fields.many2many('ir.model.fields', 'deploy_export_tag_ir_model_fields_rel', 'tag_id', 'field_id', 'Tags'),        
+        }
+    _default = {
+        'sequence':100,
+        }
+
+class ir_model(osv.osv):
+    _inherit = "ir.model"
+    _order = "sequence"
+    _columns = {
+        'sequence':fields.integer('Sequence'),
+        'export_domain':fields.char("Export Domain", size=500),
+        }
+    def name_get(self,cr, uid, ids, context=None):
+        ret={}
+        for m in self.browse(cr, uid, ids):
+            ret[m.id]="%s[%s]"%(m.name,m.model)
+        return ret
+    _default = {
+        'sequence':100,
+        'export_domain':'[]',
+        }
+
+class ir_model_fields(osv.osv):
+    _inherit = "ir.model.fields"
+    _order = "sequence"
+    _columns = {
+        'sequence':fields.integer('Sequence'),
+        'export_tag_ids':fields.many2many('deploy.export.tag', 'deploy_export_tag_ir_model_fields_rel', 'field_id', 'tag_id', 'Export Tags'),        
+        
+        }
+    def write(self, cr, uid, ids, vals, context=None):
+        if context is None:
+            context = {}
+        context['manual']='manual'
+        prev={}
+        for f in self.browse(cr, uid, ids):
+            prev[f.id]=f.state
+            cr.execute("update ir_model_fields set state='manual' where id=%s", (f.id, ) )
+        #    f.write({'state':'manual'})
+        res = super(ir_model_fields,self).write(cr, uid, ids, vals, context=context)
+        for f in self.browse(cr, uid, ids):
+            cr.execute("update ir_model_fields set state=%s where id=%s", (prev[f.id], f.id, ) )
+        return res
+    _default = {
+        'sequence':100,
+        
+        }
+
+import galtyslib.openerplib as openerplib
+def export_data(pool, cr, uid, model, fn, field_list, arg):
+    if arg:
+        arg=eval(arg)
+    else:
+        arg=[]
+    obj=pool.get(model)
+
+    fields = obj.fields_get(cr, uid)
+    f_map={}
+    for f,v in fields.items():
+        if f in field_list:
+            f_map[f]=v
+    fields = f_map
+    #id_ref_ids = pool.get('ir.model.data').search(cr, uid, [('model','=',model)])   
+    #ref_ids = [x.res_id for x in pool.get('ir.model.data').browse(cr, uid, id_ref_ids)]
+
+    ids = pool.get(model).search(cr, uid, arg)
+
+    header=[]
+    header_export=['id']
+    for f, v in fields.items():
+        if 'function' not in v:            
+            if v['type'] in ['many2one', 'many2many']:
+                if v['relation'] in ['account.account', 'account.journal']:
+                    header_export.append( "%s/code" % f )
+                elif v['relation'] in ['account.tax']:
+                    header_export.append( "%s/description" % f )
+                else:
+                    header_export.append( "%s/id" % f )
+                header.append(f)
+            elif v['type']=='one2many':
+                pass
+            else:
+                header.append(f)
+                header_export.append(f)
+    header_types = [fields[x]['type'] for x in header]
+    data = pool.get(model).export_data(cr, uid, ids,  header_export)
+    out=[]
+    for row in data['datas']:
+        out_row=[row[0]]
+        for i,h in enumerate(header):
+            v=row[i+1]
+            t=header_types[i]
+            if (v is False) and (t != 'boolean'):
+                out_row.append('')
+            else:
+                out_row.append(v.encode('utf8'))
+        out.append(out_row)
+    import csv
+    fp = open(fn, 'wb')
+    csv_writer=csv.writer(fp)
+    csv_writer.writerows( [header_export] )
+    csv_writer.writerows( out )
+    fp.close()
+    return out
+import os
+
+class exported_file(osv.osv):
+    _name = "deploy.exported.file"
+    _order = "sequence"
+    _columns = {
+        'path':fields.char('path'),
+        'fn':fields.char('fn'),
+        'model_id':fields.many2one('ir.model','Model'),
+        'company_id':fields.many2one('res.company','Company'),
+        'tag_id':fields.many2one('deploy.export.tag', 'Export Tag'),
+        'sequence': fields.integer('sequence'),
+        }
+
+class res_company(osv.osv):
+    _inherit = "res.company"
+    _columns = {
+        'export_module_name':fields.char('Export Module Name', size=100),
+        'export_module_repo':fields.char('Export Module Repository', size=100),
+        'exported_file_ids':fields.one2many('deploy.exported.file','company_id','Exported Files'),
+        }
+    def set_external_ids(self, cr, uid, ids, context=None):
+        for c in self.browse(cr, uid, ids):
+            tag_ids = self.pool.get('deploy.export.tag').search(cr, uid, [])
+            model_ids = []
+            tag_id_map={}
+            for tag in self.pool.get('deploy.export.tag').browse(cr, uid, tag_ids):
+                tag_id_map[tag.name]=tag
+                for f in tag.field_ids:
+                    model_ids.append( f.model_id.id )
+
+            for m in self.pool.get('ir.model').browse(cr, uid, model_ids):
+                fields = m.field_id
+                tag_map = {}
+                for f in fields:
+                    for t in f.export_tag_ids:
+                        v=tag_map.setdefault(t.name, [])
+                        v.append(f.name)
+                for tag,flds in tag_map.items():
+                    path = os.path.join(c.export_module_repo, tag)
+                    if not os.path.isdir(path):
+                        os.makedirs(path)
+                    fn=m.model+'.csv'
+                    file_path=os.path.join(path, fn)
+                    tag_inst=tag_id_map[tag]
+                    arg=[('path','=',path),
+                         ('fn','=',fn),
+                         ('model_id','=',m.id),
+                         ('company_id','=',c.id),
+                         ('tag_id','=',tag_inst.id),
+                         ]
+                    val=dict( [(x[0],x[2]) for x in arg] )
+                    val['sequence']=m.sequence * tag_inst.sequence
+                    ef_id = self.pool.get('deploy.exported.file').search(cr, uid,arg)
+                    if not ef_id:
+                        ef_id = self.pool.get('deploy.exported.file').create(cr, uid, val)
+                    #export_data(self.pool, cr, uid, m.model, fn, flds, m.export_domain)
+                
+        return True
+
+class tag_wizzard(osv.osv_memory):
+    _name = 'deploy.export.tag.wizzard'
+    _description="Export Tag"
+    _columns ={
+        'tag_ids':fields.many2many('deploy.export.tag', 'tag_wizzard_tag_rel', 'wiz_id', 'tag_id', 'Export Tags'),
+        #'name':fields.char('Name', size=444),
+        #'start_period': fields.many2one('account.period','Start Period', required=True),
+        #'end_period': fields.many2one('account.period','End Period', required=True),        
+        }
+    def set_tags(self, cr, uid, ids, context=None):
+        active_ids = context.get('active_ids', [])
+        print active_ids
+        for w in self.browse(cr, uid, ids):
+            val={'export_tag_ids':[(6,0,[t.id for t in w.tag_ids])]}
+            self.pool.get('ir.model.fields').write(cr, uid, active_ids, val, context=context)
+            
+        return True
+
 
