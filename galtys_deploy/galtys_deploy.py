@@ -352,7 +352,7 @@ class ir_model_fields(osv.osv):
         
         }
 
-import galtyslib.openerplib as openerplib
+#import galtyslib.openerplib as openerplib
 def export_data(pool, cr, uid, model, fn, field_list, arg):
     if arg:
         arg=eval(arg)
