@@ -316,7 +316,7 @@ class ir_model(osv.osv):
         'sequence':fields.integer('Sequence'),
         'export_domain':fields.char("Export Domain", size=500),
         }
-    def name_get(self,cr, uid, ids, context=None):
+    def name_get2(self,cr, uid, ids, context=None):
         ret={}
         for m in self.browse(cr, uid, ids):
             ret[m.id]="%s[%s]"%(m.name,m.model)
@@ -348,8 +348,7 @@ class ir_model_fields(osv.osv):
             cr.execute("update ir_model_fields set state=%s where id=%s", (prev[f.id], f.id, ) )
         return res
     _default = {
-        'sequence':100,
-        
+        'sequence':100,        
         }
 
 import galtyslib.openerplib as openerplib
@@ -447,24 +446,27 @@ class res_company(osv.osv):
                         v=tag_map.setdefault(t.name, [])
                         v.append(f.name)
                 for tag,flds in tag_map.items():
-                    path = os.path.join(c.export_module_repo, tag)
+                    path = os.path.join(c.export_module_repo)
                     if not os.path.isdir(path):
                         os.makedirs(path)
-                    fn=m.model+'.csv'
-                    file_path=os.path.join(path, fn)
+                   
                     tag_inst=tag_id_map[tag]
-                    arg=[('path','=',path),
+                    sq = m.sequence * tag_inst.sequence
+                    fn="%s_%d_%s"%(tag, sq, m.model+'_.csv')
+                    
+                    file_path=os.path.join(path, fn)
+                    arg=[('path','=',path ),
                          ('fn','=',fn),
                          ('model_id','=',m.id),
-                         ('company_id','=',c.id),
+                         ('company_id','=',c.id),                         
                          ('tag_id','=',tag_inst.id),
                          ]
                     val=dict( [(x[0],x[2]) for x in arg] )
-                    val['sequence']=m.sequence * tag_inst.sequence
+                    val['sequence']=sq
                     ef_id = self.pool.get('deploy.exported.file').search(cr, uid,arg)
                     if not ef_id:
                         ef_id = self.pool.get('deploy.exported.file').create(cr, uid, val)
-                    #export_data(self.pool, cr, uid, m.model, fn, flds, m.export_domain)
+                    export_data(self.pool, cr, uid, m.model, file_path, flds, m.export_domain)
                 
         return True
 
