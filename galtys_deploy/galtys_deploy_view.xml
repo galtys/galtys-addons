@@ -1,8 +1,146 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
+      <!-- Security -->
+      <record id="deployment_access" model="res.groups">
+	<field name="name">Deployment</field>
+<!--	<field name="category_id" ref="base.module_category_sales_management"/>  
+	<field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+-->
+	<field name="comment">The user will have access to system deployment settings.</field>	
+
+      </record>
+      
+      <record id="export_tag_base" model="deploy.export.tag">
+	<field name="name">base</field>
+	<field name="sequence">10</field>
+      </record>
+
+      <record id="view_ir_model_fields_export_tag_form" model="ir.ui.view">
+	<field name="name">ir.model.fields.export_tag.form</field>
+	<field name="model">ir.model.fields</field>
+	<field name="type">form</field>
+	<field name="inherit_id" ref="base.view_model_fields_form" />
+	<field name="arch" type="xml">
+	  <data>
+	    <field name="name" position="after">
+	      <field name="sequence"/>
+	      <field name="export_tag_ids" widget="many2many_tags" placeholder="Export Tags.."/>
+	    </field>
+	  </data>
+
+	</field>
+
+      </record>
+
+      <record model="ir.ui.view" id="view_ir_model_fields_export_tag_tree">
+	<field name="name">ir.model.fields.export_tag.form</field>
+	<field name="model">ir.model.fields</field>
+	<field name="inherit_id" ref="base.view_model_fields_tree" />
+	<field name="type">tree</field>
+	<field name="arch" type="xml">
+	  <field name="name" position="after">
+	    <field name="sequence"/>
+	    <field name="export_tag_ids" widget="many2many_tags"/>
+	  </field>
+	</field>
+      </record>
+
+
+      <record id="view_ir_model_form" model="ir.ui.view">
+	<field name="name">ir.model.form.export</field>
+	<field name="model">ir.model</field>
+	<field name="type">form</field>
+	<field name="inherit_id" ref="base.view_model_form" />
+	<field name="arch" type="xml">
+	  <data>
+	    <field name="name" position="after">
+	      <field name="sequence"/>
+	      <field name="export_domain"/>
+	    </field>
+	  </data>
+
+	</field>
+
+      </record>
+
+      <record model="ir.ui.view" id="view_ir_model_tree">
+	<field name="name">ir.model.tree.export</field>
+	<field name="model">ir.model</field>
+	<field name="inherit_id" ref="base.view_model_tree" />
+	<field name="type">tree</field>
+	<field name="arch" type="xml">
+	  <field name="name" position="after">
+	    <field name="sequence"/>
+	    <field name="export_domain"/>
+	  </field>
+	</field>
+      </record>
+      
+
+      <record model="ir.ui.view" id="company_export_tab">
+	  <field name="name">res.company.form.inherit.export.tab</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Export">
+<!--		      <field name="export_module_name"/> -->
+		      <field name="export_module_repo"/>
+		      <button name="set_external_ids" string="Set External IDS" type="object"/>
+		      <separator string="Exported Files"/>
+		      <field name="exported_file_ids">
+			<tree>
+			  <field name="sequence"/>
+			  <field name="path"/>
+			  <field name="fn"/>
+			  <field name="model_id"/>
+			  <field name="tag_id"/>
+			</tree>
+		      </field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+
+
+<!-- Export tag wiz -->
+
+	  <record id="export_tag_wiz_view" model="ir.ui.view">
+            <field name="name">Export Wizzard</field>
+            <field name="model">deploy.export.tag.wizzard</field>
+	    <field name="type">form</field>
+            <field name="arch" type="xml">
+	      <form string="Export Tag Wizzard">
+		<field name="tag_ids"/>
+		<button name="set_tags" string="Run" type="object"/>
+	      </form>
+            </field>
+	  </record>
+
+	  <act_window
+	      id="action_tag_wizzard"
+	      name="Export Wizzard"
+	      view_mode="form,tree"
+	      view_type="form"
+	      res_model="deploy.export.tag.wizzard"
+	      src_model="ir.model.fields"
+	      target="new"/>
+
+	  <record id="action_tag_wizzard" model="ir.actions.act_window">
+	    <field name="view_id" ref="export_tag_wiz_view"/>
+	    <field name="context">{}</field>
+	    <field name="target">new</field>
+	    <field name="multi">True</field>
+	  </record>
+
+<!-- END -->
+
+
+
         <!-- Top menu item -->
-        <menuitem id='menu_deploy' name='Deploy' sequence="100" />
+        <menuitem id='menu_deploy' name='Deploy' sequence="100" groups="deployment_access"/>
         <menuitem name="Configurations" parent="menu_deploy" id="menu_configurations" sequence="101" />
         <menuitem name="Applications" parent="menu_deploy" id="menu_applications" sequence="102" />
         
@@ -10,7 +148,7 @@
             <field name="name">deploy.account.form</field>
             <field name="model">deploy.account</field>
             <field name="arch" type="xml">
-                <form string="Accounts">
+                <form version="7.0" string="Accounts">
                     <sheet>
                         <group>
                             <field name="name"/>
@@ -50,7 +188,7 @@
             <field name="name">deploy.password.form</field>
             <field name="model">deploy.password</field>
             <field name="arch" type="xml">
-                <form string="Passwords">
+                <form version="7.0" string="Passwords">
                     <sheet>
                         <group>
                             <group>
@@ -88,7 +226,7 @@
             <field name="name">deploy.host.form</field>
             <field name="model">deploy.host</field>
             <field name="arch" type="xml">
-                <form string="Hosts">
+                <form version="7.0" string="Hosts">
                     <sheet>
 		        <separator string="Host Info"/>
                         <group>
@@ -150,7 +288,7 @@
             <field name="model">deploy.pg.cluster</field>
 
             <field name="arch" type="xml">
-                <form string="Cluster">
+                <form version="7.0" string="Cluster">
                     <sheet>
                         <group>
                             <group>
@@ -235,7 +373,7 @@
             <field name="name">deploy.pg.user.form</field>
             <field name="model">deploy.pg.user</field>
             <field name="arch" type="xml">
-                <form string="Postgresql Users">
+                <form version="7.0" string="Postgresql Users">
                     <sheet>
                         <group>
                             <group>
@@ -283,7 +421,7 @@
             <field name="name">deploy.host.group.form</field>
             <field name="model">deploy.host.group</field>
             <field name="arch" type="xml">
-                <form string="Host Groups">
+                <form version="7.0" string="Host Groups">
                     <sheet>
                         <group>
                             <group>
@@ -327,7 +465,7 @@
             <field name="name">deploy.host.user.form</field>
             <field name="model">deploy.host.user</field>
             <field name="arch" type="xml">
-                <form string="Host User">
+                <form version="7.0" string="Host User">
                     <sheet>
                         <group>
                             <group>
@@ -393,7 +531,7 @@
             <field name="name">deploy.repository.form</field>
             <field name="model">deploy.repository</field>
             <field name="arch" type="xml">
-                <form string="Repositories">
+                <form version="7.0" string="Repositories">
                     <sheet>
                         <group>
                             <group>
@@ -481,7 +619,7 @@
             <field name="name">deploy.repository.clone.form</field>
             <field name="model">deploy.repository.clone</field>
             <field name="arch" type="xml">
-                <form string="Repository Clones">
+                <form version="7.0" string="Repository Clones">
                     <sheet>
                         <group>
                             <group>
@@ -596,7 +734,7 @@
             <field name="name">deploy.application.form</field>
             <field name="model">deploy.application</field>
             <field name="arch" type="xml">
-                <form string="Applications">
+                <form version="7.0" string="Applications">
                     <sheet>
                         <group>
                             <group>
@@ -643,7 +781,7 @@
             <field name="name">deploy.options.form</field>
             <field name="model">deploy.options</field>
             <field name="arch" type="xml">
-                <form string="Server Options">
+                <form version="7.0" string="Server Options">
                     <sheet>
                         <group>
                             <group>
@@ -685,7 +823,7 @@
             <field name="name">deploy.deploy.form</field>
             <field name="model">deploy.deploy</field>
             <field name="arch" type="xml">
-                <form string="Deployments">
+                <form version="7.0" string="Deployments">
                     <sheet>
                         <group>
                             <group>
@@ -784,7 +922,7 @@
             <field name="name">deploy.mako.template.form</field>
             <field name="model">deploy.mako.template</field>
             <field name="arch" type="xml">
-                <form string="Template">
+                <form version="7.0" string="Template">
                     <sheet>
                         <group>
                             <field name="name"/>
@@ -862,7 +1000,7 @@
             <field name="name">deploy.file.form</field>
             <field name="model">deploy.file</field>
             <field name="arch" type="xml">
-                <form string="Template">
+                <form version="7.0" string="Template">
                     <sheet>
                       <group>
                         <field name="command"/>

@@ -25,15 +25,18 @@ class repository2(osv.osv):
             else: #bzr or launchapd?
                 url="%s://%s@%s/%s"%(c.remote_proto,c.remote_login,c.host_id.name,c.remote_location)
 
-            if c.root_directory:
-                local=c.root_directory
-            else:
-                local=''
-            if c.host_id:
-                local=os.path.join(local, c.host_id.name)
+            #if c.root_directory:
+            #    local=c.root_directory
+            ##else:
+            local=''
 
             if c.local_location:
-                local=os.path.join(local, c.local_location)
+                local=c.local_location
+            elif c.host_id and (not c.local_location):
+                local=os.path.join(local, c.host_id.name)
+
+            #if c.local_location:
+            #    local=os.path.join(local, c.local_location)
             if c.remote_location and (not c.local_location):
                 local=os.path.join(local, c.remote_location)
 
