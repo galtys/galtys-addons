@@ -10,7 +10,7 @@ class repository2(osv.osv):
   #      models_data = self.pool.get('ir.model.data')
    #     cr.execute("select res_id,name,module from ir_model_data where model='deploy.repository.clone' and res_id in (%s)" % ",".join(map(str,ids)) )
     #    ext_map=dict([(x[0],'%s.%s'%(x[2],x[1])) for x in cr.fetchall()])
-        
+
         for r in self.browse(cr, uid, ids):
             #print [clone.name, clone.owner_id.name]
             
@@ -25,32 +25,15 @@ class repository2(osv.osv):
             else: #bzr or launchapd?
                 url="%s://%s@%s/%s"%(c.remote_proto,c.remote_login,c.host_id.name,c.remote_location)
 
-            #if c.root_directory:
-            #    local=c.root_directory
-            ##else:
-            local=''
-
-            if c.local_location:
-                local=c.local_location
-            elif c.host_id and (not c.local_location):
-                local=os.path.join(local, c.host_id.name)
-
-            #if c.local_location:
-            #    local=os.path.join(local, c.local_location)
-            if c.remote_location and (not c.local_location):
-                local=os.path.join(local, c.remote_location)
-
-            if not local.startswith('/'):
-                if r.local_user_id:
-                    local = os.path.join( r.local_user_id.home, local)
-                else:
-                    local = ''
-            if c.local_location and r.remote_id:
-                if len(c.local_location)>=2:
-                    if c.local_location[0:2]=='~/':
-                        home, ll = r.local_user_id.home, c.local_location[2:]
-                        print [home, ll]
-                        local = os.path.join(home, ll  )
+            if r.local_location:
+                local=r.local_location
+            elif r.remote_id and r.remote_id.local_location:
+                try:
+                    local = render_mako_str(r.remote_id.local_location, {'o':r})
+                except:
+                    local = 'render exception'
+            else:
+                local = r.local_location
             res[r.id]={'url':url,
                        #'type':c.e_id.type,
  #                      'extid': ext_map.get( c.id, ''),
@@ -99,7 +82,7 @@ class deploy2(osv.osv):
                 who="%s@%s"%(d.user_id.login,d.user_id.host_id.name)
             else:
                 who='N/A'
-            
+            #print [d.user_id, d.user_id.group, addons_path]
             res[d.id]={'options':str(OPTIONS),
                        'db_password':d.pg_user_id.password_id.password,
                        'admin_password':d.password_id.password,
@@ -115,7 +98,7 @@ class deploy2(osv.osv):
                        'group':d.user_id.group,
                        'processes':'2',
                        'clone_ids':clone_ids,
-                       'addons_path':','.join(addons_path),
+                       'addons_path':','.join([x for x in addons_path if x]),
                        }
                        #'type':c.repository_id.type,
                        #'local_location_fnc':local,
