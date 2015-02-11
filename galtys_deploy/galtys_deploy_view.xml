@@ -480,7 +480,7 @@
                             </group>
                             <group>
                                 <field name="ssh"/>
-                                <field name="sudo"/>
+                                <field name="sudo_x"/>
                                 <field name="host_id"/>
                                 <field name="home"/>
                                 <field name="shell"/>
@@ -511,7 +511,7 @@
                     <field name="uid"/>
 		    <field name="type"/>
                     <field name="ssh"/>
-                    <field name="sudo"/>
+                    <field name="sudo_x"/>
                     <field name="host_id"/>
                     <field name="home"/>
                     <field name="shell"/>
@@ -557,6 +557,7 @@
 			      <field name="root_directory"/>
 			      <field name="url"/>
 			      <field name="local_location_fnc"/>
+			      <field name="delete"/>
 		    
                             </group>
                         </group>
@@ -602,7 +603,7 @@
 		    <field name="addon_subdir"/>
 		    <field name="is_module_path"/>
 		    <field name="root_directory"/>
-
+		    <field name="delete"/>
                 </tree>
             </field>
         </record>
@@ -830,7 +831,7 @@
                               <field name="name"/>
                               <field name="application_id"/>
                               <field name="pg_user_id"/>
-                              <field name="account_id"/>
+<!--                              <field name="account_id"/>  -->
                               <field name="password_id"/>
 			      <field name="user_id"/>		    		    		    
 			      <field name="host_id"/>
@@ -881,7 +882,7 @@
 		    <field name="user_id"/>		    		    
                     <field name="pg_user_id"/>
                     <field name="options_id"/>
-                    <field name="account_id"/>
+                    <field name="account_id"/>  
 <!--
                     <field name="implicit_clone_ids"/>
 -->
