@@ -126,7 +126,7 @@ class host_group(osv.osv):
 
 class host_user(osv.osv):
     _name = 'deploy.host.user' #Host User
-#    _rec_name='login'
+    _rec_name='login'
     _columns = {
         'name':fields.char('Name',size=100),
         'login':fields.char('Login',size=100),
@@ -145,6 +145,12 @@ class host_user(osv.osv):
         'app_ids':fields.many2many('deploy.application', 'host_user_application_rel', 'user_id', 'app_id', 'Apps'),
         #'user_id':fields.many2one('deploy.host.user','HostUser'),
         }
+    def name_get2(self,cr, uid, ids, context=None):
+        ret={}
+        for u in self.browse(cr, uid, ids):
+            if u.host_id:
+                ret[u.id]="%s@%s"%(u.login,u.host_id.name)
+        return ret
 
 #Submenu: Applications
 class repository(osv.osv):

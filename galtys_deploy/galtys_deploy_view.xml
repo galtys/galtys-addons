@@ -839,7 +839,7 @@
 			      <field name="user_id"/>		    		    		    
 			      <field name="host_id"/>
 			      <field name="who"/>
-                              <field name="site_name"/>
+<!--                              <field name="site_name"/> -->
 			      <field name="options_id"/>
                             </group>
                             <group>
@@ -878,7 +878,7 @@
                 <tree string="Deployments">
 		  <field name="id"/>
                     <field name="name"/>
-                    <field name="site_name"/>
+<!--                    <field name="site_name"/> -->
 
                     <field name="application_id"/>
 		    <field name="who"/>
