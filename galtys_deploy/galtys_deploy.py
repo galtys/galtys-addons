@@ -151,6 +151,9 @@ class repository(osv.osv):
     _name = 'deploy.repository' #Repositories
     _columns = {
         'name':fields.char('Name',size=100),
+        'delete':fields.boolean('Delete'),
+        'pull':fields.boolean('Pull'),
+        'push':fields.boolean('Push'),
         'type':fields.selection([('git','git'),('bzr','bzr'),('rsync','RSYNC')],'Type'),
         'use':fields.selection([('addon','addon'),('server','server'),('scripts','scripts'),('site','site')],'Use'),
 
@@ -172,10 +175,15 @@ class repository(osv.osv):
         'branch':fields.char('Branch',size=100),
         'addon_subdir':fields.char('Addon Subdir',size=100),
         'is_module_path':fields.boolean('Is Module Path'),
-        'delete':fields.boolean('Delete'),
+
         'root_directory':fields.char('Root Directory',size=100),
         #'clone_ids':fields.one2many('deploy.repository.clone','remote_id','Reposisoty Clones'),
         'clone_ids':fields.one2many('deploy.repository','remote_id','Reposisoty Clones'),
+        }
+    _defaults = {
+        'delete':False,
+        'push':True,
+        'pull':True,
         }
 #[root_directory, remote_host_id.name, local_location, remote_location]
 class repository_clone(osv.osv): #will be likely deprecated

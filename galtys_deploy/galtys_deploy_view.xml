@@ -558,7 +558,8 @@
 			      <field name="url"/>
 			      <field name="local_location_fnc"/>
 			      <field name="delete"/>
-		    
+			      <field name="push"/>
+			      <field name="pull"/>
                             </group>
                         </group>
                         <notebook>
@@ -604,6 +605,8 @@
 		    <field name="is_module_path"/>
 		    <field name="root_directory"/>
 		    <field name="delete"/>
+		    <field name="push"/>
+		    <field name="pull"/>
                 </tree>
             </field>
         </record>
