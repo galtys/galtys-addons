@@ -143,6 +143,7 @@ class host_user(osv.osv):
         'type':fields.selection([('user','user'),('system','system')],'Type'),
         'deploy_ids':fields.one2many('deploy.deploy','user_id','Deployments'),
         'app_ids':fields.many2many('deploy.application', 'host_user_application_rel', 'user_id', 'app_id', 'Apps'),
+        'validated_root':fields.char('Validated ROOT',size=444),
         #'user_id':fields.many2one('deploy.host.user','HostUser'),
         }
     def name_get2(self,cr, uid, ids, context=None):

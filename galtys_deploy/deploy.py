@@ -89,11 +89,11 @@ class deploy2(osv.osv):
                        #'implicit_clone_ids':clone_ids,
                        #'config_clone_ids':clone_ids+[x.id for x in d.clone_ids],
                        'who':who,
-                       'wsgi_script':'%s_%s.py'%(d.validated_root,d.name),
-                       'odoo_config':'%s/server_%s.conf'%(d.validated_root,d.name),
-                       'odoo_log':'%s_%s.log'%(d.validated_root,d.name),
-                       'apache_log':'%s_%s.log'%(d.validated_root,d.name),
-                       'apache_errlog':'%s_%s.log'%(d.validated_root,d.name),
+                       'wsgi_script':'%s_%s.py'%(d.user_id.validated_root,d.name),
+                       'odoo_config':'%s/server_%s.conf'%(d.user_id.validated_root,d.name),
+                       'odoo_log':'%s_%s.log'%(d.user_id.validated_root,d.name),
+                       'apache_log':'%s_%s.log'%(d.user_id.validated_root,d.name),
+                       'apache_errlog':'%s_%s.log'%(d.user_id.validated_root,d.name),
                        'user':d.user_id.login,
                        'group':d.user_id.group,
                        'processes':'2',
@@ -191,6 +191,7 @@ class mako_template(osv.osv):
             #path = get_module_resource('hr', 'static/src/img', 'default_image.png')
             path = get_module_resource(t.module, t.path, t.fn)
             res[t.id] = {'source_fn':path}
+            print [path]
             if os.path.isfile(path):
                 source=file(path).read()
             else:

@@ -484,6 +484,7 @@
                                 <field name="host_id"/>
                                 <field name="home"/>
                                 <field name="shell"/>
+				<field name="validated_root"/>
                             </group>
 			    <separator string="Apps"/>
 			    <field name="app_ids" colspan="4"/>
@@ -515,6 +516,7 @@
                     <field name="host_id"/>
                     <field name="home"/>
                     <field name="shell"/>
+		    <field name="validated_root"/>
                 </tree>
             </field>
         </record>
@@ -906,7 +908,7 @@
                     <field name="Redirect"/>
 		    -->
                     <field name="mode"/>
-		    <field name="validated_root"/>
+
                     
                 </tree>
             </field>
