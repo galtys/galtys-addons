@@ -15,6 +15,7 @@
 <%
   import os
   PATH="/sbin:/bin:/usr/sbin:/usr/bin"
+  print [o.validated_server_path, o.user_id.validated_root]
   DAEMON=os.path.join(o.validated_server_path, 'openerp-server')
   NAME=o.name
   DESC=o.name
@@ -22,7 +23,7 @@
   USER=o.user_id.name
   GROUP=o.user_id.group_id.name
   ROOT=o.validated_root
-  OPENERP_LOG=os.path.join(ROOT,'%s.log'%o.name)
+  OPENERP_LOG=os.path.join(o.user_id.validated_root,'%s.log'%o.name)
 %>
 
 test -x ${DAEMON} || exit 0

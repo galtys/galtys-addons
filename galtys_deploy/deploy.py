@@ -246,6 +246,7 @@ class deploy_file(osv.osv):
                         #'html_indent':html_indent,                                  
                          }
                     #print ctx
+                    #try:
                     ret=render_mako_file(path,ctx)
                 elif t.type in ['python']:
                     ret=file(path).read()
