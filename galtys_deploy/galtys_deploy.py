@@ -38,9 +38,18 @@ class host(osv.osv):
         'group_ids':fields.one2many('deploy.host.group','host_id','Groups'),
         'cluster_ids':fields.one2many('deploy.pg.cluster','host_id','PG Clusters'),
         'control':fields.boolean('Control'),
+        'ip_forward':fields.boolean('ip_forward'),
+        'ssmtp_root':fields.char("ssmtp_root", size=444),
+        'ssmtp_mailhub':fields.char("ssmtp_mailhub", size=444),
+        'ssmtp_rewritedomain':fields.char("rewritedomain", size=444),
+        'ssmtp_authuser':fields.char("authuser", size=444),
+        'ssmtp_authpass':fields.char("authpass", size=444),
         #'deploy_ids':fields.one2many('deploy.deploy','host_id','Deployments'),
         }
-
+    _defaults ={
+        'ip_forward':False,
+        'ssmtp_mailhub':'mailhub=smtp.deliverhq.com:2525',
+        }
 class pg_cluster(osv.osv):
     _name = "deploy.pg.cluster" #Postgresql Clusters
 #    _rec_name = 'host_id'
@@ -61,7 +70,7 @@ class pg_cluster(osv.osv):
         'checkpoint_timeout':fields.char('checkpoint_timeout',size=444),
 
         'user_ids':fields.one2many("deploy.pg.user",'cluster_id','PG Users'),
-        'database_ids':fields.one2many("deploy.pg.database",'cluster_id','Databases'),
+       # 'database_ids':fields.one2many("deploy.pg.database",'cluster_id','Databases'),
         'hba_ids':fields.one2many("deploy.pg.hba",'cluster_id','HBA'),
         }
     _defaults = {
@@ -86,16 +95,6 @@ class pg_user(osv.osv):
         'create_role':fields.boolean('Create Role'),
         'login':fields.char('Login',size=44),
         'type':fields.selection([('real','real'),('virtual','virtual'),('system','system')],'Type' ),
-        }
-
-class pg_database(osv.osv):
-    _name="deploy.pg.database"
-    _columns = {
-        'name':fields.char("name",size=444),
-        'cluster_id':fields.many2one('deploy.pg.cluster','PG Cluster'),
-        'type':fields.selection([('live','live'),('virtual','virtual'),('system','system'),('demo','demo'),('snapshot','snapshot'),('replicated','replicated')]),
-        'date':fields.date('date'),
-        'backup':fields.boolean('backup needed'),
         }
 
 class pg_hba(osv.osv):
@@ -144,6 +143,8 @@ class host_user(osv.osv):
         'deploy_ids':fields.one2many('deploy.deploy','user_id','Deployments'),
         'app_ids':fields.many2many('deploy.application', 'host_user_application_rel', 'user_id', 'app_id', 'Apps'),
         'validated_root':fields.char('Validated ROOT',size=444),
+        'backup_subdir':fields.char('backup_subdir', size=444),
+        
         #'user_id':fields.many2one('deploy.host.user','HostUser'),
         }
     def name_get2(self,cr, uid, ids, context=None):
@@ -152,7 +153,9 @@ class host_user(osv.osv):
             if u.host_id:
                 ret[u.id]="%s@%s"%(u.login,u.host_id.name)
         return ret
-
+    _defaults = {
+        'backup_subdir':'backups',
+    }
 #Submenu: Applications
 class repository(osv.osv):
     _name = 'deploy.repository' #Repositories
@@ -273,6 +276,18 @@ class deploy(osv.osv):
         'validated_config_file':fields.char('Validated Config File',size=444),
         'validated_root':fields.char('Validated ROOT',size=444),
         }
+
+class pg_database(osv.osv):
+    _name="deploy.pg.database"
+    _columns = {
+        'name':fields.char("name",size=444),        
+        'type':fields.selection([('live','live'),('virtual','virtual'),('system','system'),('demo','demo'),('snapshot','snapshot'),('replicated','replicated')], 'type'),
+        'date':fields.date('date'),
+        'backup':fields.boolean('backup needed'),
+        #'pg_user_id':fields.many2one('deploy.pg.user','PG USER'),
+        'deploy_id':fields.many2one('deploy.deploy','Deployments'),
+        'pg_user_id':fields.related('deploy_id', 'pg_user_id',  string="PG USER",type="many2one",relation="deploy.pg.user"),
+    }
 
 class mako_template(osv.osv):
     _name = "deploy.mako.template"

@@ -242,6 +242,13 @@
 			    <field name="kernel_shmall"/>
 			    <field name="kernel_shmmax"/>
 			</group>
+			<group>
+			  <field name="ssmtp_root"/>
+			  <field name="ssmtp_mailhub"/>
+			  <field name="ssmtp_rewritedomain"/>
+			  <field name="ssmtp_authuser"/>
+			  <field name="ssmtp_authpass"/>
+			</group>
 			<separator string="Users"/>
 			<field name="user_ids" colspan="4"/>
 			<separator string="Groups"/>
@@ -315,7 +322,7 @@
 			  <tree>
 			    <field name="name"/>
 			    <field name="type"/>
-			    <field name="database_ids" widget="many2many_tags"/>
+<!--			    <field name="database_ids" widget="many2many_tags"/> -->
 			    <field name="user"/>
 			    <field name="address"/>
 			    <field name="ip_address"/>
@@ -324,13 +331,14 @@
 			    <field name="auth_options"/>
 			  </tree>
 			</field>
-			<field name="database_ids">
+<!--			<field name="database_ids"> 
 			  <tree>
 			    <field name="name"/>
 			    <field name="type"/>
 			    <field name="date"/>
 			  </tree>
 			</field>
+-->
 			<field name="template_ids">
 			  <tree>
 			    <field name="model"/>
@@ -485,9 +493,12 @@
                                 <field name="home"/>
                                 <field name="shell"/>
 				<field name="validated_root"/>
+				<field name="backup_subdir"/>
                             </group>
 			    <separator string="Apps"/>
 			    <field name="app_ids" colspan="4"/>
+			    <separator string="Deployments"/>
+			    <field name="deploy_ids" colspan="4"/>
 
                         </group>
                     </sheet>
@@ -866,6 +877,8 @@
                         </group>
 			<separator string="Clones"/>
 			<field name="clone_ids" colspan="4"/>
+			<separator string="Databases"/>
+			<field name="db_ids" colspan="4"/>
 
 
                     </sheet>
@@ -1045,8 +1058,10 @@
 		  <field name="res_id"/>
 		  <field name="template_id"/>
 		  <field name="user_id"/>
+<!--
 		  <field name="file_generated"/>
 		  <field name="file_written"/>
+-->
 		  <field name="sequence"/>
                 </tree>
             </field>

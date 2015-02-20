@@ -129,7 +129,9 @@ class deploy2(osv.osv):
         'addons_path':fields.function(_get, type='char', size=1000,multi='options',method=True,string='addons_path'),
 
         'clone_ids':fields.function(_get,type='one2many',relation='deploy.repository',multi='options',method=True,string="clone_ids"),
+        'db_ids':fields.one2many('deploy.pg.database','deploy_id',"db_ids"),
         }
+
 from openerp.modules.module import get_module_resource
 from mako.template import Template
 from mako.runtime import Context
