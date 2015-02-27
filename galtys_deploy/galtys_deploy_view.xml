@@ -858,6 +858,7 @@
                             <group>
                                 <field name="daemon"/>
                                 <field name="vhost"/>
+                                <field name="wsgi"/>
                                 <field name="ServerName"/>
 				<field name="validated_server_path"/>
 				<field name="validated_config_file"/>
@@ -872,6 +873,7 @@
                                 <field name="SSLCACertificateFile"/>
                                 <field name="ssl"/>
                                 <field name="Redirect"/>
+                                <field name="ProxyPass"/>
                                 <field name="mode"/>
                             </group>
                         </group>
