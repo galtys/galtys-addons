@@ -195,6 +195,26 @@ def load_data(pool, cr, uid, fn, model, files=False):
         if model in ['stock.location']:
             cr.execute("update ir_model_data set noupdate=True where model='stock.location'")
     return ret
+def load_data(r, cr, uid, fn, model, files=False):
+    print 'loading data for %s from %s' %( model, fn)
+    lines = [x for x in csv.reader( file(fn).readlines() )]
+    header = lines[0]
+    data=lines[1:]
+    fields = r.get(model).fields_get(cr, uid)
+    binary_fields = [f for f in fields if fields[f]['type']=='binary']
+    fields64 = list( set(binary_fields).intersection( set(header) ) )
+    ret = r.get(model).load(cr, uid, header, f64(header, data, fields64, files=files) )
+    if ret['messages']:
+        print ret
+    if ret['ids']:
+        ids_str = ','.join( map(str, ret['ids'] ) )
+#        if model not in ['account.fiscalyear','account.period']:
+        #print ids_str
+        cr.execute("update ir_model_data set noupdate=True where (module is Null or module='') and model='%s' and res_id in (%s)" % (model,ids_str) )
+        if model in ['stock.location']:
+            cr.execute("update ir_model_data set noupdate=True where model='stock.location'")
+    return ret
+
 def export_data(pool, cr, uid, model, fn, db_only=False, ext_ref=None):
     obj=pool.get(model)
     if db_only:
