@@ -5,7 +5,7 @@ import sys
 import pickle
 import time
 import base64
-
+import io
 try:
     import openerp
     #import openerp.tools.config
@@ -98,7 +98,17 @@ def db_exist(c, dbname):
     except psycopg2.OperationalError:
         return False
 import StringIO
-def load_csv(fn, header=None):
+def strip_keywords(data):
+    out=[]
+    for row in data:
+        d={}
+        for k,v in row.items():
+            if '\xef\xbb\xbfSERIAL_NUMBER' ==k:
+                k='SERIAL_NUMBER'
+            d[k] = v
+        out.append(d)
+    return out
+def load_csv(fn, header=None, encoding='utf-8'):
     if header:
         #header_str=",".join(['"%s"'%x for x in header]) + '\n'        
         #fp=StringIO.StringIO([header_str+file(fn).read()])
@@ -109,6 +119,7 @@ def load_csv(fn, header=None):
         fp=open(os.path.join(fn))
         data=[x for x in csv.DictReader(fp)]
         fp.close()
+    data = strip_keywords(data)
     return data
 class TraversePreorder(dict):
     def __init__(self, d=None, parent_field='parent_id'):
