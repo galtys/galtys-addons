@@ -159,7 +159,6 @@ def render_mako_str(template, context):
     ctx=Context(buf, **context)
     t.render_context(ctx)
     return buf.getvalue()
-
 def render_mako_file(template, context, fn=None):
     if os.path.isfile(template):
         print 'RENDERING: ', template, context
