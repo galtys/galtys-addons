@@ -173,7 +173,10 @@ class analysis_chart(osv.osv):
         if image.type=='bar':
             self.generate_bar_chart(cr, uid, image )
         elif image.type=='pie':
-            self.generate_pie_chart(cr, uid,  image )
+            try:
+                self.generate_pie_chart(cr, uid,  image )
+            except:
+                pass
         elif image.type=='pie2':
             self.generate_pie2_chart(cr, uid,  image )
         elif image.type=='pie3':
@@ -400,7 +403,9 @@ class analysis_chart(osv.osv):
         q = image.query_ids[0]
         ctx=self.pool.get("analysis.sql.query").get_html_context(cr,uid,q.id)
         dd=np.array(ctx['data']).transpose()
-        #print dd
+        print dd, image, len(dd)
+        if len(dd)==0:
+            return None
         columns=ctx['columns']
         #assert len(d)==4
         s=eval(image.slice)
