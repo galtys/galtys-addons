@@ -1,0 +1,31 @@
+
+    <table class="basic_table" align="left">
+      <tr> 
+         <td>Year</td>
+	 <td>Generated</td>
+      </tr>
+
+      <tr> 
+         <td>${fy}</td>
+	 <td>${time.ctime()} UTC</td>
+      </tr>
+
+    </table>
+
+    <h2 style="clear:both;">Sales Invoices by Shop</h2>
+    ${render_table(by_shop,header)}
+
+
+    </p>
+    <h2 style="clear:both;">Sales Invoice Lines by Product Category</h2>
+    ${render_table(by_categ,header)}
+
+    </p>
+    <h2 style="clear:both;">Products Delivered - Returned by Month</h2>
+    ${render_table(by_prod,header,ff='%d')}
+
+    </p>
+    <h2 style="clear:both;">Products Incomming by Month</h2>
+    ${render_table(by_prod_in,header,ff='%d')}
+
+
