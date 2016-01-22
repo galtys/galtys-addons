@@ -705,6 +705,10 @@ class web_sql_query_list(oeweb.Controller):
     
     @oeweb.httprequest
     def index(self, req, s_action=None, data=None, **kw):
+        if req.httprequest.remote_addr in ['127.0.0.1']:
+            pass
+        else:
+            return Response('Not authorized', mimetype='text/html')
         if 'db' in kw:
             dbname=kw['db']
         else:
