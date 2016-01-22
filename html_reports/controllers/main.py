@@ -729,6 +729,13 @@ class web_sql_query_list(oeweb.Controller):
         return Response(html_ret, mimetype='text/html')
 
 
+#class SaleReport(openerp.http.Controller):
+#    @openerp.http.route('/sale_report', auth='public')
+#    def handler(self):
+#        r='hovno'
+#        return r
+
+
 class web_sql_query_list(oeweb.Controller):
     _cp_path = "/sql_query_list"
     
