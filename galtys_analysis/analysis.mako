@@ -283,10 +283,6 @@ width:50%;
 
 
 <body>
-    <h1 style="clear:both;">${title} 2015 (this is using cashed data from beg. August 2015)</h1>
-    ${render_table(header, dates,data)}
-
-
     <h1 style="clear:both;">Sale Analysis, by Shop, Category</h1>
     %for shop,table in tables:
       <h2>${shop.name}</h2>

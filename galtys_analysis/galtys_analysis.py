@@ -254,13 +254,14 @@ class analysis_wizard(osv.osv_memory):
     _description="Analysis Wizard"
     _columns ={
         'name':fields.char('Name', size=444),
-        'fiscal_year':fields.many2one('account.fiscalyear','Fiscal Year (Ignored now)'),
+        'fiscal_year':fields.many2one('account.fiscalyear','Fiscal Year (Ignored now)', required=True),
         }
     def button_run_analysis(self,cr, uid, ids, *a, **kw):
         asa = self.browse(cr, uid, ids[0])
         return {
             'type': 'ir.actions.report.xml',
             'report_name': 'generic_analysis_webkit',
+            #'context':{'fiscal_year':'2015'},
             'context':{'fiscal_year':asa.fiscal_year.code},
 #            'datas': {'fiscal_year':asa.fiscal_year.code},
         }
