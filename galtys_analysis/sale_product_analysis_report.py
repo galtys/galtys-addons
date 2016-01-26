@@ -6,6 +6,7 @@ from pjb import traverse_preorder, period2dates, ValueCalc, ValueCalcDelivery, V
 
 def sale_shop_categ_analysis(pool, cr, uid, context):
     fy=context['fiscal_year']
+    print 'fiscal year', fy
 #    fy='2015'
     cr.execute("select pjb_shop_id,categ_id,sum(price_total) from account_invoice_report where year='%s' group by pjb_shop_id,categ_id;"%fy)
     data_map_year=dict( [ ((pjb_shop_id,categ_id),price) for pjb_shop_id,categ_id,price in cr.fetchall()] )
