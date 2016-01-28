@@ -67,7 +67,7 @@ class sql_query(osv.osv):
         return dict_data
     def get_html_context(self, cr, uid, query_id):
         query = self.browse(cr,uid,query_id)
-        columns = self.get_query_columns(cr,uid,query.query)
+        columns = self.get_query_columns(cr,uid,query.query_before_limit_offset)
         cr.execute( query.query )
         data = [d for d in cr.fetchall()]
         ctx={'query' : query,
@@ -79,7 +79,7 @@ class sql_query(osv.osv):
     def _get(self, cr, uid, ids,field_name,arg, context=None):
         res={}
         for r in self.browse(cr, uid, ids):
-            cols = self.get_query_columns(cr, uid, r.query)
+            cols = self.get_query_columns(cr, uid, r.query_before_limit_offset)
             val={'sql_columns': ",".join(cols),
             }
             res[r.id] = val
@@ -90,7 +90,14 @@ class sql_query(osv.osv):
         for qt in self.browse(cr, uid, ids):
             ctx={'qt':qt}
             if qt.query_template:
-                val={'query': render_mako_str(qt.query_template, ctx),
+                query = qt.query_template
+                query_before_limit_offset = query
+                if qt.query_template_limit:
+                    query += " LIMIT %d"%qt.query_template_limit
+                if qt.query_template_offset:
+                    query += " OFFSET %d"%qt.query_template_offset
+                val={'query': render_mako_str(query, ctx),
+                     'query_before_limit_offset':query_before_limit_offset,
                  }
             else:
                 val={'query':''}
@@ -122,8 +129,10 @@ class sql_query(osv.osv):
         "date_end":fields.date("Date End"),
         "type":fields.selection([('view','SQL View'),('query','SQL Query')],'Type'),
         "query_template":fields.text("Query"),
+        "query_template_limit":fields.integer("LIMIT"),
+        "query_template_offset":fields.integer("OFFSET"),
         'query':fields.function(_query, type='text', multi='query',method=True,string='Rendered Query'),
-
+        'query_before_limit_offset':fields.function(_query, type='text', multi='query',method=True,string='Rendered Query for UI', help="this is to help with limit and offset"),
         "active":fields.boolean("Active"),
         'sql_columns':fields.function(_get, type='char', multi='get',method=True,string='SQL Columns'),
         'date_today':fields.function(_today, type='date', multi='today',method=True,string='Date Today'),

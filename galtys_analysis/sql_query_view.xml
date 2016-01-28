@@ -31,6 +31,8 @@
 
 		      <group string="Query Template">
 			<field name="query_template"/>
+			<field name="query_template_limit"/>
+			<field name="query_template_offset"/>
 		      </group>
 
 		      <group string="Query">
