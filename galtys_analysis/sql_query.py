@@ -67,7 +67,7 @@ class sql_query(osv.osv):
         return dict_data
     def get_html_context(self, cr, uid, query_id):
         query = self.browse(cr,uid,query_id)
-        columns = self.get_query_columns(cr,uid,query.query_before_limit_offset)
+        columns = self.get_query_columns(cr,uid,query.query)
         cr.execute( query.query )
         data = [d for d in cr.fetchall()]
         ctx={'query' : query,
