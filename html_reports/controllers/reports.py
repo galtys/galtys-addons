@@ -33,18 +33,6 @@ import matplotlib.dates as mdates
 
 
 
-class html_reports_images(oeweb.Controller):
-    _cp_path = "/html_images"
-    @oeweb.httprequest
-    def index(self, req, s_action=None, data=None, **kw):
-        if 'image' in kw:
-            image=kw['image']
-        else:
-            image='pie.png'
-        image_file=get_module_resource('html_reports', '', image)
-
-        return Response(file(image_file).read(), mimetype='image/png')
-
 # vim:expandtab:tabstop=4:softtabstop=4:shiftwidth=4:
 
 
