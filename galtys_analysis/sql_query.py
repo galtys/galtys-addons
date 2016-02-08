@@ -1,3 +1,7 @@
+import matplotlib
+matplotlib.use('Agg')
+#plt.ioff()
+
 from openerp.osv import fields, osv
 from openerp.report import report_sxw
 import time
@@ -13,8 +17,6 @@ from mako.template import Template
 from mako.runtime import Context
 import os
 
-import matplotlib
-matplotlib.use('Agg')
 
 
 import datetime as DT
@@ -67,7 +69,7 @@ class sql_query(osv.osv):
         return dict_data
     def get_html_context(self, cr, uid, query_id):
         query = self.browse(cr,uid,query_id)
-        columns = self.get_query_columns(cr,uid,query.query)
+        columns = self.get_query_columns(cr,uid,query.query_before_limit_offset)
         cr.execute( query.query )
         data = [d for d in cr.fetchall()]
         ctx={'query' : query,
@@ -84,26 +86,6 @@ class sql_query(osv.osv):
             }
             res[r.id] = val
         return res
-
-    def _query(self, cr, uid, ids,field_name,arg, context=None):
-        res={}
-        for qt in self.browse(cr, uid, ids):
-            ctx={'qt':qt}
-            if qt.query_template:
-                query = qt.query_template
-                query_before_limit_offset = query
-                if qt.query_template_limit:
-                    query += " LIMIT %d"%qt.query_template_limit
-                if qt.query_template_offset:
-                    query += " OFFSET %d"%qt.query_template_offset
-                val={'query': render_mako_str(query, ctx),
-                     'query_before_limit_offset':query_before_limit_offset,
-                 }
-            else:
-                val={'query':''}
-            res[qt.id] = val
-        return res
-
     def _today(self, cr, uid, ids,field_name,arg, context=None):
         res={}
         for r in self.browse(cr, uid, ids):
@@ -120,8 +102,27 @@ class sql_query(osv.osv):
                  'month_today': tm_mon,
             }
             res[r.id] = val
-
         return res
+
+    def _query(self, cr, uid, ids,field_name,arg, context=None):
+        res={}
+        for qt in self.browse(cr, uid, ids):
+            ctx={'qt':qt}
+            if qt.query_template:
+                query = qt.query_template
+                query_before_limit_offset = query
+                if qt.query_template_limit:
+                    query += " LIMIT %d"%qt.query_template_limit
+                if qt.query_template_offset:
+                    query += " OFFSET %d"%qt.query_template_offset
+                val={'query': render_mako_str(query, ctx),
+                     'query_before_limit_offset':render_mako_str(query_before_limit_offset, ctx),
+                 }
+            else:
+                val={'query':''}
+            res[qt.id] = val
+        return res
+
     _columns = {
         'date_start_type':fields.selection([('fixed_date','Fixed Date'),('date_delta','Date Delta'),('today','Today')], 'Data Start Type' ),
 
@@ -148,9 +149,23 @@ class sql_query(osv.osv):
         "active":True,
         }
 
+from openerp.modules.module import get_module_resource
+from openerp.modules.module import get_module_path
+import openerp.addons.web.http as oeweb
 
 class analysis_chart(osv.osv):
     _name = "analysis.chart"
+    def _info(self, cr, uid, ids,field_name,arg, context=None):
+        res={}
+        for r in self.browse(cr, uid, ids):            
+            pth=get_module_path('galtys_analysis')
+
+            val={'image_file': pth+'/%d.png'%r.id
+            }
+            res[r.id] = val
+
+        return res
+
     _columns = {
         'name':fields.char("Title", size=444),
         'ref':fields.char("ref", size=444),
@@ -161,7 +176,8 @@ class analysis_chart(osv.osv):
         'figdpi':fields.integer('Figure DPI'),
         'slice':fields.char('Slice',size=44),
         'colors':fields.char("Colors",size=4444),
-        'image_file':fields.char("image_file", size=444),
+        #'image_file':fields.char("image_file", size=444),
+        'image_file':fields.function(_info, type='char', multi='today',method=True,string='image_file'),
         'xdata':fields.selection([('week','Week'),('month','Month'),('day','Day')],'xdata'),
         'xtickstrftime':fields.char("xtickstrftime",size=44, help="see strftime.org"),
         'type':fields.selection([('bar','Bar Chart'),('pie','Pie Chart'),('pie2','Pie2'),('pie3','Pie3'),('line','Line Chart')],'Type'),
@@ -179,19 +195,24 @@ class analysis_chart(osv.osv):
 
     def generate_chart(self, cr, uid, image_id):
         image = self.browse(cr, uid, image_id)
+        import StringIO
+        #fp = StringIO.StringIO()
+        fp=open(image.image_file,'wb')
         if image.type=='bar':
-            self.generate_bar_chart(cr, uid, image )
+            self.generate_bar_chart(cr, uid, image,fp )
         elif image.type=='pie':
-            try:
-                self.generate_pie_chart(cr, uid,  image )
-            except:
-                pass
+            #try:
+            self.generate_pie_chart(cr, uid,  image,fp )
+            #except:
+            #    pass
         elif image.type=='pie2':
-            self.generate_pie2_chart(cr, uid,  image )
+            self.generate_pie2_chart(cr, uid,  image,fp )
         elif image.type=='pie3':
-            self.generate_pie3_chart(cr, uid,  image )
-
-    def generate_pie3_chart(self, cr, uid, image):
+            self.generate_pie3_chart(cr, uid,  image,fp )
+        fp.close()
+        
+        #return fp.getvalue()
+    def generate_pie3_chart(self, cr, uid, image, fp):
         COLOR_MAP={'picking_error':'#ff7865',
                    'faulty': '#fdaa66',
                    'damaged': '#fdbf66',
@@ -215,9 +236,9 @@ class analysis_chart(osv.osv):
         q = image.query_ids[0]
         ctx=self.pool.get("analysis.sql.query").get_html_context(cr,uid,q.id)
         dd=np.array(ctx['data']).transpose()
-       
+        print 'dd' ,dd, dd[0], dd[1]
         reason=dd[0]
-        count=[int(x) for x in dd[1] ]
+        count=[eval(x) for x in dd[1] ]
          
         print reason, count
 
@@ -253,13 +274,13 @@ class analysis_chart(osv.osv):
         # Set aspect ratio to be equal so that pie is drawn as a circle.
         plt.axis('equal')
         d=datetime.date(tm_year, tm_mon, tm_mday)
-        plt.title( d.strftime(image.xtickstrftime ) )
+        #plt.title( d.strftime(image.xtickstrftime ) )
         #image_path=get_module_path('html_reports')
         #image_file=os.path.join(image_path,fn)
-
+        print 'generate_pie3_chart', [image.image_file]
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
 
-    def generate_pie2_chart(self, cr, uid, image):
+    def generate_pie2_chart(self, cr, uid, image, fp):
         ctoday=time.gmtime()
         tm_year = ctoday.tm_year
         tm_mon = ctoday.tm_mon
@@ -330,10 +351,10 @@ class analysis_chart(osv.osv):
         plt.title( d.strftime(image.xtickstrftime ) )
         #image_path=get_module_path('html_reports')
         #image_file=os.path.join(image_path,fn)
-
+        print 'generate_pie2_chart', [image.image_file]
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
 
-    def generate_pie_chart(self, cr, uid, image):
+    def generate_pie_chart(self, cr, uid, image, fp):
         ctoday=time.gmtime()
         tm_year = ctoday.tm_year
         tm_mon = ctoday.tm_mon
@@ -349,6 +370,7 @@ class analysis_chart(osv.osv):
         assert len(image.query_ids)==1
         q = image.query_ids[0]
         ctx=self.pool.get("analysis.sql.query").get_html_context(cr,uid,q.id)
+        print ctx
         dd=np.array(ctx['data']).transpose()
         s=eval(image.slice)
 
@@ -401,18 +423,19 @@ class analysis_chart(osv.osv):
         plt.title( d.strftime(image.xtickstrftime ) )
         #image_path=get_module_path('html_reports')
         #image_file=os.path.join(image_path,fn)
+        print 'generate_pie_chart', [image.image_file]
 
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
 
 
-    def generate_bar_chart(self, cr, uid, image):
+    def generate_bar_chart(self, cr, uid, image, fp):
         #N=0
         #data_map={}
         assert len(image.query_ids)==1
         q = image.query_ids[0]
         ctx=self.pool.get("analysis.sql.query").get_html_context(cr,uid,q.id)
         dd=np.array(ctx['data']).transpose()
-        print dd, image, len(dd)
+        #print dd, image, len(dd)
         if len(dd)==0:
             return None
         columns=ctx['columns']
@@ -520,5 +543,5 @@ class analysis_chart(osv.osv):
         for r in rects:
             autolabel(r)
             #autolabel(rects2)
-
+        print 'generate_bar_chart', [image.image_file]
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
