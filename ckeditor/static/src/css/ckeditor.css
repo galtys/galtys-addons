@@ -1,0 +1,6 @@
+.openerp .oe_form_field_ckeditor.disabled, .openerp td.oe_form_field_ckeditor, .openerp .oe_form_field_ckeditor_raw.disabled.openerp, .openerp td.oe_form_field_ckeditor_raw {
+    /* here we need to reset openerp's styles to
+     * have the HTML display as (probably) intended
+     */
+    white-space: normal;
+}
