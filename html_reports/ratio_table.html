@@ -1,0 +1,55 @@
+<%
+records=query.table_to_dict(columns, data)
+if len(records)==1:
+   r=records[0]
+   all_calls=r['all_calls']
+   opportunity_calls=r['opportunity_calls']
+   closed_phone_sales=r['closed_phone_sales']
+
+   if all_calls>0:
+      o_ratio=int(100*opportunity_calls / all_calls)
+   else:
+      o_ratio='Not a Number'
+
+   if opportunity_calls>0:
+      c_ratio=int(100 * closed_phone_sales/opportunity_calls )
+   else:
+      c_ratio='Not a Number'
+else:
+   all_calls='N/A'
+   opportunity_calls='N/A'
+   closed_phone_sales='N/A'
+   o_ratio='N/A'
+   c_ratio='N/A'
+
+
+%>
+
+<table class="basic_table">
+  <tr>
+    <td> # </td>
+    <td> PER WEEK </td>
+    <td> % </td>
+  </tr>
+
+  <tr>
+    <td> Inbound </td>
+    <td> ${all_calls} </td>
+    <td> 100 </td>
+  </tr>
+
+  <tr>
+    <td> Opportunities </td>
+    <td> ${opportunity_calls} </td>
+    <td> ${o_ratio} </td>
+  </tr>
+
+
+  <tr>
+    <td> Inbound </td>
+    <td> ${closed_phone_sales} </td>
+    <td> ${c_ratio} </td>
+  </tr>
+
+  
+</table>

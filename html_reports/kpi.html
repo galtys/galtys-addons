@@ -1,0 +1,245 @@
+<html>
+
+<head>
+
+  <meta http-equiv="refresh" content="3600" >
+
+        <script>
+            function subst() {
+            var vars={};
+            var x=document.location.search.substring(1).split('&');
+            for(var i in x) {var z=x[i].split('=',2);vars[z[0]] = unescape(z[1]);}
+            var x=['frompage','topage','page','webpage','section','subsection','subsubsection'];
+            for(var i in x) {
+            var y = document.getElementsByClassName(x[i]);
+            for(var j=0; j<y.length; ++j) y[j].textContent = vars[x[i]];
+                }
+            }
+        </script>
+    <style type="text/css">
+body {
+font-family:helvetica;
+font-size:12;
+}
+
+
+.dest_address {
+margin-left:60%;
+font-size:12;
+}
+.header {
+margin-left:0;
+text-align:left;
+width:300px;
+font-size:12;
+}
+
+.title {
+font-size:16;
+font-weight: bold;
+
+}
+
+h1{padding-top: 40px;}
+
+.basic_table{
+text-align:center;
+border:0px solid  #4e4e4e;
+border-collapse: collapse;
+margin-bottom: 10px;
+}
+.basic_table td {
+border-bottom:1px solid  #4e4e4e;
+font-size:12;
+padding: 3px;
+
+}
+
+.basic_table tr:first-child > td{background: #4e4e4e;color:#eaeaea;}
+.basic_table tr:nth-child(even) {background: #efefef;}
+.basic_table tr:nth-child(odd)  {background: #FFF;}
+
+.list_table {
+border-color:black;
+text-align:center;
+border-collapse: collapse;
+
+}
+.list_table td {
+border-color:gray;
+border-top:1px solid gray;
+text-align:left;
+font-size:12;
+padding-right:3px;
+padding-left:3px;
+padding-top:3px;
+padding-bottom:3px;
+}
+
+.list_table th {
+border-bottom:2px solid black;
+text-align:left;
+font-size:12;
+font-weight:bold;
+padding-right:3px;
+padding-left:3px;
+}
+
+.list_tabe thead {
+    display:table-header-group;
+}
+
+
+.total {
+width:100%;
+}
+.lib {
+width:10.3%;
+}
+.tot {
+text-align:right;
+width:15%;
+}
+.lefttot {
+width:74%;
+}
+.tax {
+width:50%;
+} 
+
+
+			.list_sale_table {
+			border:thin solid #E3E4EA;
+			text-align:center;
+			border-collapse: collapse;
+			}
+			.list_sale_table td {
+			border-top : thin solid #EEEEEE;
+			text-align:right;
+			font-size:12;
+			padding-right:3px
+			padding-left:3px
+			padding-top:3px
+			padding-bottom:3px
+			}
+
+			.list_bank_table {
+			text-align:center;
+			border-collapse: collapse;
+			}
+			.list_bank_table td {
+			text-align:left;
+			font-size:12;
+			padding-right:3px
+			padding-left:3px
+			padding-top:3px
+			padding-bottom:3px
+			}
+
+			.list_bank_table th {
+			background-color: #EEEEEE;
+			text-align:left;
+			font-size:12;
+			font-weight:bold;
+			padding-right:3px
+			padding-left:3px
+			}
+			
+			.list_sale_table th {
+			background-color: #EEEEEE;
+			border: thin solid #000000;
+			text-align:center;
+			font-size:12;
+			font-weight:bold;
+			padding-right:3px
+			padding-left:3px
+			}
+			
+			.list_table thead {
+			    display:table-header-group;
+			}
+
+
+			.list_tax_table {
+			}
+			.list_tax_table td {
+			text-align:left;
+			font-size:12;
+			}
+			
+			.list_tax_table th {
+			}
+
+
+			.list_table thead {
+			    display:table-header-group;
+			}
+
+
+			.list_total_table {
+				border-collapse: collapse;
+			}
+			.list_total_table td {
+			text-align:right;
+			font-size:12;
+			}
+
+			.no_bloc {
+				border-top: thin solid  #ffffff ;
+			}
+
+			
+			.list_total_table th {
+				background-color: #F7F7F7;
+				border-collapse: collapse;
+			}
+
+            tfoot.totals tr:first-child td{
+                padding-top: 15px;
+            }
+
+
+
+			.right_table {
+			right: 4cm;
+			width:"100%";
+			}
+			
+			.std_text {
+				font-size:12;
+				}
+
+
+    </style>
+</head>
+
+
+<body>
+    <h1 style="clear:both;">KPI Dashboard</h1>
+
+    <table>
+      <tr>
+	<td> ${image.render('daily_phone_calls_funnel')} </td>
+	<td> ${image.render('phone_calls_funnel')} </td>
+	<td> ${table.render('last_week_funnel', 'ratio_table.html')} </td>
+	<td> </td>
+      </tr>
+
+      <tr>
+	<td> ${image.render('target_vs_actual_pie_chart_week')} </td>
+	<td> ${image.render('target_vs_actual_pie_chart')} </td>
+	<td colspan="2"> ${image.render('monthly_sales')} </td>
+	
+      </tr>
+
+      <tr>
+	<td> ${image.render('delivered_and_returned_weekly')} </td>
+	<td> ${image.render('delivered_and_returned_pie')} </td>
+	<td> ${image.render('reason_for_return')} </td>
+	<td> ${image.render('backorders')} </td>
+      </tr>
+
+
+    </table>
+</body>
+</html>

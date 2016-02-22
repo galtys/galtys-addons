@@ -1,0 +1,435 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+      <record id="analysis_access" model="res.groups">
+	<field name="name">Analysis</field>
+	<field name="comment">The user will have access to analysis configuration.</field>
+      </record>
+
+        <!-- Top menu item -->
+        <menuitem id='analysis_main' name='Analysis' sequence="100"/>
+        <menuitem id='analysis' name='Analysis' parent="analysis_main" sequence="100"/>
+
+        <menuitem id='analysis_config' name='Configuration' parent="analysis_main" sequence="100"/>
+
+        <!-- TAGS -->
+        <record id="view_analysis_tag_form" model="ir.ui.view">
+            <field name="name">analysis.tag.form</field>
+            <field name="model">analysis.tag</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Tags">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+			    <field name="model"/>
+			    <field name="type"/>
+			    <field name="var"/>
+			    <field name="res_id"/>
+			    <field name="label"/>
+			    <fiedd name="formula"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+        
+        <record id="view_analysis_tag_tree" model="ir.ui.view">
+          <field name="name">analysis.tree</field>
+          <field name="model">analysis.tag</field>
+          <field name="arch" type="xml">
+            <tree string="Tags">
+	      <field name="sequence"/>
+              <field name="name"/>
+	      <field name="model_id"/>
+	      <field name="type"/>
+	      <field name="var"/>
+	      <field name="res_id"/>
+	      <field name="label"/>
+	      <field name="formula"/>	      
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_analysis_tag_form">
+            <field name="name">Tags</field>
+            <field name="res_model">analysis.tag</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Analysis Tags" parent="analysis_config" id="menu_analysis_tags_form" action="action_analysis_tag_form" />
+
+	<!-- END TAGS -->
+
+	<!-- HEADER -->
+        <record id="view_analysis_header_form" model="ir.ui.view">
+            <field name="name">analysis.header.form</field>
+            <field name="model">analysis.header</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Headers">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+			    <field name="tag_ids"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+        
+        <record id="view_analysis_header_tree" model="ir.ui.view">
+          <field name="name">analysis.tree</field>
+          <field name="model">analysis.header</field>
+          <field name="arch" type="xml">
+            <tree string="Headers">
+              <field name="name"/>
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_analysis_header_form">
+            <field name="name">Headers</field>
+            <field name="res_model">analysis.header</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Analysis Headers" parent="analysis_config" id="menu_analysis_headers_form" action="action_analysis_header_form" />
+
+	<!-- END HEADER -->
+       
+
+	<!-- DATES -->
+        <record id="view_analysis_date_form" model="ir.ui.view">
+            <field name="name">analysis.date.form</field>
+            <field name="model">analysis.date</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Date">
+                    <sheet>
+                        <group>
+                            <field name="sequence"/>
+			    <field name="date"/>
+			    <field name="d"/>
+			    <field name="m"/>
+			    <field name="y"/>
+			    <field name="wk"/>
+                        </group>
+                        <group>
+			  <field name="weekend" />
+			  <field name="isoday" />
+			  <field name="period_id"/>
+			  <field name="period_code"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+	
+        <record id="view_analysis_date_tree" model="ir.ui.view">
+          <field name="name">analysis.date.tree</field>
+          <field name="model">analysis.date</field>
+          <field name="arch" type="xml">
+            <tree string="Date">
+              <field name="sequence"/>
+	      <field name="date"/>
+	      <field name="d"/>
+	      <field name="m"/>
+	      <field name="y"/>
+	      <field name="wk"/>
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_analysis_date_form">
+            <field name="name">Dates</field>
+            <field name="res_model">analysis.date</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Analysis Date" parent="analysis_config" id="menu_analysis_date_form" action="action_analysis_date_form" />
+
+	<!-- END DATES -->
+
+
+
+
+	<!-- WEEKS -->
+        <record id="view_analysis_week_form" model="ir.ui.view">
+            <field name="name">analysis.week.forecast.form</field>
+            <field name="model">analysis.week.forecast</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Date">
+                    <sheet>
+                        <group>
+			    <field name="year_id" readonly="1"/>
+			    <field name="wk" readonly="1"/>
+			    <field name="date_start" readonly="1"/>
+			    <field name="date_stop" readonly="1"/>
+			    <field name="sale_forecast"/>
+			    <field name="active"/>
+			    <field name="month1"/>
+			    <field name="daysmonth1"/>
+			    <field name="forecastmonth1"/>
+			    <field name="month2"/>
+			    <field name="daysmonth2"/>
+			    <field name="forecastmonth2"/>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+	
+        <record id="view_analysis_week_tree" model="ir.ui.view">
+          <field name="name">analysis.week.forecast.tree</field>
+          <field name="model">analysis.week.forecast</field>
+          <field name="arch" type="xml">
+            <tree string="Week" editable="bottom">
+			    <field name="year_id"  readonly="1"/>
+			    <field name="wk" readonly="1"/>
+			    <field name="date_start" readonly="1"/>
+			    <field name="date_stop" readonly="1"/>
+			    <field name="sale_forecast"/>
+			    <field name="month1"/>
+			    <field name="daysmonth1"/>
+			    <field name="forecastmonth1"/>
+			    <field name="month2"/>
+			    <field name="daysmonth2"/>
+			    <field name="forecastmonth2"/>
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_analysis_week_form">
+            <field name="name">Week</field>
+            <field name="res_model">analysis.week.forecast</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Weekly Targets" parent="analysis_config" id="menu_analysis_week_form" action="action_analysis_week_form" />
+
+	<!-- END  WEEKS -->
+
+
+
+
+
+
+	<!-- MONTHS -->
+        <record id="view_analysis_month_form" model="ir.ui.view">
+            <field name="name">analysis.month.target.form</field>
+            <field name="model">analysis.month.target</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Month Target">
+                    <sheet>
+                        <group>
+			    <field name="year_id" />
+			    <field name="month" />
+			    <field name="period_id" />
+			    <field name="sale_target"/>
+			    <field name="active"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+	
+        <record id="view_analysis_month_tree" model="ir.ui.view">
+          <field name="name">analysis.month.target.tree</field>
+          <field name="model">analysis.month.target</field>
+          <field name="arch" type="xml">
+            <tree string="Week" editable="bottom">
+			    <field name="year_id" readonly="1"/>
+			    <field name="month" readonly="1"/>
+			    <field name="period_id"  readonly="1"/>
+			    <field name="sale_target"/>
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_analysis_month_form">
+            <field name="name">Month</field>
+            <field name="res_model">analysis.month.target</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Monthly Targets" parent="analysis_config" id="menu_analysis_month_form" action="action_analysis_month_form" />
+
+	<!-- END  MONTHS -->
+
+
+
+
+
+	<!-- YEAR -->
+        <record id="view_analysis_year_form" model="ir.ui.view">
+            <field name="name">analysis.year.form</field>
+            <field name="model">analysis.year</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Year">
+                    <sheet>
+		      <button name="setup_weeks" string="Setup Weeks" type="object"/>
+		      <button name="setup_months" string="Setup Months via Periods" type="object"/>
+                        <group>
+			    <field name="y"/>
+			    <field name="week_ids"/>
+			    <field name="month_ids"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+	
+        <record id="view_analysis_year_tree" model="ir.ui.view">
+          <field name="name">analysis.year.tree</field>
+          <field name="model">analysis.year</field>
+          <field name="arch" type="xml">
+            <tree string="Week">
+			    <field name="y"/>
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_analysis_year_form">
+            <field name="name">Year</field>
+            <field name="res_model">analysis.year</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Years" parent="analysis_config" id="menu_analysis_year_form" action="action_analysis_year_form" />
+
+	<!-- END  YEAR -->
+
+
+
+
+	<!-- VALUES -->
+
+        <record id="view_analysis_value_tree" model="ir.ui.view">
+          <field name="name">analysis.value.tree</field>
+          <field name="model">analysis.value</field>
+          <field name="arch" type="xml">
+            <tree string="value">
+              <field name="date_id"/>
+	      <field name="tag_id"/>
+	      <field name="phase_id"/>
+	      <field name="model"/>
+	      <field name="res_id"/>
+	      <field name="value"/>
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_analysis_value_form">
+            <field name="name">Dates</field>
+            <field name="res_model">analysis.value</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Analysis Values" parent="analysis_config" id="menu_analysis_value_form" action="action_analysis_value_form" />
+
+	<!-- END VALUES -->
+
+
+	<!-- ANALYSIS SALES MONTHLY -->
+
+        <record id="view_analysis_sales_montly_tree" model="ir.ui.view">
+          <field name="name">analysis.sales.montly.tree</field>
+          <field name="model">analysis.sales.monthly</field>
+          <field name="arch" type="xml">
+            <tree string="value">
+              <field name="year_id"/>
+	      <!--   <field name="shop_id"/> -->
+	      <field name="categ_id"/>
+	      <field name="01"/>
+	      <field name="02"/>
+	      <field name="03"/>
+	      <field name="04"/>
+	      <field name="05"/>
+	      <field name="06"/>
+	      <field name="07"/>
+	      <field name="08"/>
+	      <field name="09"/>
+	      <field name="10"/>
+	      <field name="11"/>
+	      <field name="12"/>
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_analysis_sales_monthly_form">
+            <field name="name">Sales Montly</field>
+            <field name="res_model">analysis.sales.monthly</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Sales Montly" parent="analysis" id="menu_analysis_sales_monthly_form" action="action_analysis_sales_monthly_form" />
+
+	<!-- END ANALYSIS SALES MONTHLY -->
+
+
+
+
+	<!-- Wizard -->
+<!-- New analysis -->
+
+      <report id="account_generic_analysis_webkit"
+	      name="generic_analysis_webkit"
+	      auto="False"
+	      model="analysis.value"
+	      file="galtys_analysis/analysis.mako"
+	      string="Generic Analysis Webkit"
+	      report_type="webkit" 
+	      />
+      
+        <record id="account_generic_analysis_webkit" model="ir.actions.report.xml">
+	  <field name="webkit_header" ref="report_webkit.ir_header_webkit_basesample0"/>
+	  <field name="webkit_debug">True</field>
+        </record>
+
+
+	  <record id="galtys_analysis_wizard_form" model="ir.ui.view">
+            <field name="name">Analysis Wizard</field>
+            <field name="model">analysis.wizard</field>
+	    <field name="type">form</field>
+            <field name="arch" type="xml">
+	      <form string="Analysis Wizard">
+		<field name="fiscal_year"/>
+		<button name="button_run_analysis" string="Run" type="object"/>
+	      </form>
+            </field>
+	  </record>
+	  
+	  <record id="action_analysis_wizard_form" model="ir.actions.act_window">
+	    <field name="name">Analysis Wiz</field>
+	    <field name="res_model">analysis.wizard</field>
+	    <field name="type">ir.actions.act_window</field>
+	    <field name="view_type">form</field>
+	    <field name="view_mode">tree,form</field>
+	    <field name="view_id" ref="galtys_analysis_wizard_form"/>
+	    <field name="context">{}</field>
+	    <field name="target">new</field>
+	  </record>
+
+	  <menuitem icon="STOCK_PRINT"
+		    name="Reports"
+		    action="action_analysis_wizard_form"
+		    groups="account.group_account_manager,account.group_account_user"
+		    id="menu_analysis"
+		    parent="analysis"/>
+
+    </data>
+</openerp>
+

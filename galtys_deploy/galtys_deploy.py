@@ -410,8 +410,8 @@ def export_data(pool, cr, uid, model, fn, field_list, arg):
             if v['type'] in ['many2one', 'many2many']:
                 if v['relation'] in ['account.account', 'account.journal']:
                     header_export.append( "%s/code" % f )
-                elif v['relation'] in ['account.tax']:
-                    header_export.append( "%s/description" % f )
+                #elif v['relation'] in ['account.tax']:
+                #    header_export.append( "%s/description" % f )
                 else:
                     header_export.append( "%s/id" % f )
                 header.append(f)
@@ -480,6 +480,7 @@ class res_company(osv.osv):
                         v.append(f.name)
                 for tag,flds in tag_map.items():
                     path = os.path.join(c.export_module_repo)
+                    print path
                     if not os.path.isdir(path):
                         os.makedirs(path)
                    

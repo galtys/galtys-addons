@@ -108,15 +108,15 @@ def strip_keywords(data):
             d[k] = v
         out.append(d)
     return out
-def load_csv(fn, header=None, encoding='utf-8'):
+def load_csv(fn, header=None, encoding='utf-8', mode='rb'):
     if header:
         #header_str=",".join(['"%s"'%x for x in header]) + '\n'        
         #fp=StringIO.StringIO([header_str+file(fn).read()])
-        fp=open(os.path.join(fn))
+        fp=open(os.path.join(fn),mode)
         data=[x for x in csv.DictReader(fp, fieldnames=header)]
         fp.close()
     else:
-        fp=open(os.path.join(fn))
+        fp=open(os.path.join(fn),mode)
         data=[x for x in csv.DictReader(fp)]
         fp.close()
     data = strip_keywords(data)

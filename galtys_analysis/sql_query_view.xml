@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+	<!-- SQL Query -->
+        <record id="view_sql_query_form" model="ir.ui.view">
+            <field name="name">analysis.sql.query.form</field>
+            <field name="model">analysis.sql.query</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Date">
+                    <sheet>
+		      <header>
+			<button name="define_view" string="Define View" type="object" class="oe_highlight"/>
+			<button name="drop_view" string="Drop View" type="object" class="oe_highlight"/>
+
+		      </header>
+                      <group string="Parameters">		
+			<field name="name"/>
+			<field name="type"/>
+			<field name="ref"/>
+			<field name="description"/>
+
+			<field name="date_start"/>
+			<field name="date_end"/>
+
+			<field name="date_today"/>
+			<field name="year_today"/>
+			<field name="week_today"/>
+			<field name="month_today"/>
+		      </group>
+
+		      <group string="Query Template">
+			<field name="query_template"/>
+			<field name="query_template_limit"/>
+			<field name="query_template_offset"/>
+		      </group>
+
+		      <group string="Query">
+			<field name="query"/>
+			<field name="active"/>
+			<field name="sql_columns"/>
+		      </group>
+
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+	
+        <record id="view_sql_query_tree" model="ir.ui.view">
+          <field name="name">analysis.sql.query.tree</field>
+          <field name="model">analysis.sql.query</field>
+          <field name="arch" type="xml">
+            <tree string="SQL Query">
+	      <field name="name"/>
+	      <field name="type"/>
+	      <field name="ref"/>
+	      <field name="description"/>
+
+	      <field name="date_start"/>
+	      <field name="date_end"/>
+	      <field name="query"/>
+	      <field name="active"/>
+	      <field name="sql_columns"/>
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_sql_query_form">
+            <field name="name">SQL Query</field>
+            <field name="res_model">analysis.sql.query</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="SQL Queries" parent="analysis_config" id="menu_sql_query_form" action="action_sql_query_form" />
+
+	<!-- END  SQL Query -->
+
+	<!-- Chart -->
+        <record id="view_chart_form" model="ir.ui.view">
+            <field name="name">analysis.chart.form</field>
+            <field name="model">analysis.chart</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Date">
+                    <sheet>
+                      <group string="Parameters">		
+			<field name="name"/>
+			<field name="ref"/>
+			<field name="type"/>
+			<field name="image_file" readonly="1"/>
+		      </group>
+		      <group string="Chart Parameters">
+			<field name="xdata"/>
+			<field name="xtickstrftime"/>
+			<field name="xlabel"/>
+			<field name="ylabel"/>
+			<field name="figxsize"/>
+			<field name="figysize"/>
+			<field name="figdpi"/>
+			<field name="colors"/>
+			<field name="slice"/>
+		      </group>
+		      <separator string="SQL Queries"/>
+		      <field name="query_ids"/>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+	
+        <record id="view_chart_tree" model="ir.ui.view">
+          <field name="name">analysis.chart.tree</field>
+          <field name="model">analysis.chart</field>
+          <field name="arch" type="xml">
+            <tree string="Chart">
+	      <field name="name"/>
+	      <field name="type"/>
+
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_chart_form">
+            <field name="name">Chart</field>
+            <field name="res_model">analysis.chart</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Charts" parent="analysis_config" id="menu_chart_form" action="action_chart_form" />
+
+	<!-- END Chart -->
+
+
+
+    </data>
+</openerp>
+

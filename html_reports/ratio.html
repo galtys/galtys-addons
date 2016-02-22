@@ -1,0 +1,19 @@
+<%
+
+%>
+<table>
+  <tr>
+    %for col in columns:
+    <td> ${col} </td>
+    %endfor
+  </tr>
+
+  %for row in data:
+  <tr>
+      %for col in row:
+	<td> ${col} </td>
+      %endfor
+  </tr>
+  %endfor
+  
+</table>

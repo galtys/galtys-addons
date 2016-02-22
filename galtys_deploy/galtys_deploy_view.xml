@@ -11,10 +11,17 @@
 
       </record>
       
-      <record id="export_tag_base" model="deploy.export.tag">
-	<field name="name">base</field>
+      <record id="export_tag_fields" model="deploy.export.tag">
+	<field name="name">fields</field>
 	<field name="sequence">10</field>
       </record>
+
+
+      <record id="export_tag_base" model="deploy.export.tag">
+	<field name="name">base</field>
+	<field name="sequence">20</field>
+      </record>
+
 
       <record id="view_ir_model_fields_export_tag_form" model="ir.ui.view">
 	<field name="name">ir.model.fields.export_tag.form</field>

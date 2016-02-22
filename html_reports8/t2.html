@@ -1,0 +1,346 @@
+<html>
+
+<head>
+
+  <meta http-equiv="refresh" content="3600" >
+
+        <script>
+            function subst() {
+            var vars={};
+            var x=document.location.search.substring(1).split('&');
+            for(var i in x) {var z=x[i].split('=',2);vars[z[0]] = unescape(z[1]);}
+            var x=['frompage','topage','page','webpage','section','subsection','subsubsection'];
+            for(var i in x) {
+            var y = document.getElementsByClassName(x[i]);
+            for(var j=0; j<y.length; ++j) y[j].textContent = vars[x[i]];
+                }
+            }
+        </script>
+    <style type="text/css">
+body {
+font-family:helvetica;
+font-size:12;
+}
+
+
+.dest_address {
+margin-left:60%;
+font-size:12;
+}
+.header {
+margin-left:0;
+text-align:left;
+width:300px;
+font-size:12;
+}
+
+.title {
+font-size:16;
+font-weight: bold;
+
+}
+
+h1{padding-top: 40px;}
+
+.basic_table{
+text-align:center;
+border:0px solid  #4e4e4e;
+border-collapse: collapse;
+margin-bottom: 10px;
+}
+.basic_table td {
+border-bottom:1px solid  #4e4e4e;
+font-size:12;
+padding: 3px;
+
+}
+
+.basic_table tr:first-child > td{background: #4e4e4e;color:#eaeaea;}
+.basic_table tr:nth-child(even) {background: #efefef;}
+.basic_table tr:nth-child(odd)  {background: #FFF;}
+
+.list_table {
+border-color:black;
+text-align:center;
+border-collapse: collapse;
+
+}
+.list_table td {
+border-color:gray;
+border-top:1px solid gray;
+text-align:left;
+font-size:12;
+padding-right:3px;
+padding-left:3px;
+padding-top:3px;
+padding-bottom:3px;
+}
+
+.list_table th {
+border-bottom:2px solid black;
+text-align:left;
+font-size:12;
+font-weight:bold;
+padding-right:3px;
+padding-left:3px;
+}
+
+.list_tabe thead {
+    display:table-header-group;
+}
+
+
+.total {
+width:100%;
+}
+.lib {
+width:10.3%;
+}
+.tot {
+text-align:right;
+width:15%;
+}
+.lefttot {
+width:74%;
+}
+.tax {
+width:50%;
+} 
+
+
+			.list_sale_table {
+			border:thin solid #E3E4EA;
+			text-align:center;
+			border-collapse: collapse;
+			}
+			.list_sale_table td {
+			border-top : thin solid #EEEEEE;
+			text-align:right;
+			font-size:12;
+			padding-right:3px
+			padding-left:3px
+			padding-top:3px
+			padding-bottom:3px
+			}
+
+			.list_bank_table {
+			text-align:center;
+			border-collapse: collapse;
+			}
+			.list_bank_table td {
+			text-align:left;
+			font-size:12;
+			padding-right:3px
+			padding-left:3px
+			padding-top:3px
+			padding-bottom:3px
+			}
+
+			.list_bank_table th {
+			background-color: #EEEEEE;
+			text-align:left;
+			font-size:12;
+			font-weight:bold;
+			padding-right:3px
+			padding-left:3px
+			}
+			
+			.list_sale_table th {
+			background-color: #EEEEEE;
+			border: thin solid #000000;
+			text-align:center;
+			font-size:12;
+			font-weight:bold;
+			padding-right:3px
+			padding-left:3px
+			}
+			
+			.list_table thead {
+			    display:table-header-group;
+			}
+
+
+			.list_tax_table {
+			}
+			.list_tax_table td {
+			text-align:left;
+			font-size:12;
+			}
+			
+			.list_tax_table th {
+			}
+
+
+			.list_table thead {
+			    display:table-header-group;
+			}
+
+
+			.list_total_table {
+				border-collapse: collapse;
+			}
+			.list_total_table td {
+			text-align:right;
+			font-size:12;
+			}
+
+			.no_bloc {
+				border-top: thin solid  #ffffff ;
+			}
+
+			
+			.list_total_table th {
+				background-color: #F7F7F7;
+				border-collapse: collapse;
+			}
+
+            tfoot.totals tr:first-child td{
+                padding-top: 15px;
+            }
+
+
+
+			.right_table {
+			right: 4cm;
+			width:"100%";
+			}
+			
+			.std_text {
+				font-size:12;
+				}
+
+
+    </style>
+</head>
+
+<%def name="render_table(header,table)">
+    <table class="basic_table">
+        <tr>
+            %for hh in header:
+            <td style="font-weight:bold;">${hh}</td>
+	    %endfor
+        </tr>
+
+	%for categ,row in table:
+        <tr>    
+          <td style="font-weight:bold;"> ${categ.name}</td>
+	    %for col in row:	        
+	        <td align="right">${"%0.2f"%col}</td>
+	    %endfor
+        </tr>
+	%endfor
+
+    </table>
+</%def>
+
+<%def name="render_table3(header,table)">
+    <table class="basic_table">
+        <tr>
+             %for hh_name,hh_model,hh_id in header:
+            <td style="font-weight:bold;">${hh_name} </td>
+	    %endfor
+        </tr>
+
+        <tr>
+            %for hh_name,hh_model,hh_id in header:
+            <td style="font-weight:bold;">${hh_model} </td>
+	    %endfor
+        </tr>
+
+        <tr>
+            %for hh_name,hh_model,hh_id in header:
+            <td style="font-weight:bold;">${hh_id} </td>
+       	%endfor
+        </tr>
+
+
+	%for categ,row in table:
+        <tr>    
+          <td style="font-weight:bold;"> ${categ}</td>
+	    %for col in row:	        
+	        <td align="right">${"%0.2f"%col}</td>
+	    %endfor
+        </tr>
+	%endfor
+
+
+    </table>
+</%def>
+
+
+<%def name="render_table2(header,table)">
+    <table class="basic_table">
+        <tr>
+            %for hh in header:
+            <td style="font-weight:bold;">${hh}</td>
+	    %endfor
+        </tr>
+
+	%for row in table:
+        <tr>    
+	    %for col in row:	        
+	        <td align="right">${"%s"%col}</td>
+	    %endfor
+        </tr>
+	%endfor
+
+
+    </table>
+</%def>
+
+<body>
+    <h1 style="clear:both;">Data tables to be used for KPI Dashboard</h1>
+    <p>
+       See <a href="https://galtys.codebasehq.com/projects/analysis/tickets/8">KPI Dashboard</a> Ticket for more details.
+    </p>
+
+    <h2>Sales by Month (30 days window)</h2>
+    <img src="${sales_by_month_url}" alt="Sales By Month (30 days window)"/>
+
+    <h2>Bar Chart</h2>
+    <img src="${sales_bar_chart_url}" alt="Sales Bar Chart"/>
+
+    <h2>Sales by Week (7 days window)</h2>
+    <img src="${sales_by_7days_url}" alt="Sales By Week (7 days window)"/>
+
+    <h2>Target VS Actual </h2>
+    <h3>Current Week</h3>
+    <img src="${sale_Target_pie_url}" alt="Target VS Actual"/>
+    <h3>Current Month</h3>
+    <img src="${sale_Target_pie_month_url}" alt="Target VS Actual"/>
+
+    <h3>By Month Chart</h3>
+    <img src="${sales_total_by_month_url}" alt="Target VS Actual"/>
+
+    <h2>Logistic </h2>
+    <h3>Delivery and Returns</h3>
+    <img src="${delivery_and_returns_url}" alt="Delivery and Returns"/>
+
+    <h2>Date and time now</h2>
+    <p>
+    ${time_now}
+    </p>
+    <h2>Deliveries by Date Done and by Partner (last 80)</h2>
+    ${render_table2(header7, data7)}
+
+    <h2>Total deliveries by Partner</h2>
+    ${render_table2(header6, data6)}
+
+    <h2>Procurement Exceptions</h2>
+    ${render_table2(header5, data5)}
+
+    <h2>Phone Orders Closed Weekly</h2>
+    ${render_table2(header4, data4)}
+
+    <h2>TABLE</h2>
+    ${render_table3(header3, data3)}
+
+    <h2>Updating table every 5 seconds</h2>
+    ${render_table(header, data)}
+
+    <h2>Daily analysis</h2>
+    ${render_table2(header2, data2)}
+
+
+</body>
+</html>
