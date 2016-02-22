@@ -248,12 +248,17 @@ class deploy_file(osv.osv):
                         #'html_indent':html_indent,                                  
                          }
                     #print ctx
-                    #try:
-                    ret=render_mako_file(path,ctx)
+                    try:
+                        ret=render_mako_file(path,ctx)
+                    except:
+                        ret='%s,%s,%s,%s'%(t,obj,ctx,path)
                 elif t.type in ['python']:
                     ret=file(path).read()
                 ctx2={'o':obj }
-                out_file=render_mako_str(str(t.out_fn),ctx2)
+                try:
+                    out_file=render_mako_str(str(t.out_fn),ctx2)
+                except:
+                    out_file="%s,%s"%(t,ctx2)
                 file_ctx={'f':f,'o':obj}
                 res[f.id] = {'content_generated':ret,'source_fn':path,
                              'file_generated':out_file,
