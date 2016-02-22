@@ -413,6 +413,7 @@
             <field name="model">deploy.pg.user</field>
             <field name="arch" type="xml">
                 <tree string="Postgresql Users">
+		    <field name="id"/>
                     <field name="login"/>
                     <field name="cluster_id"/>
                     <field name="account_id"/>
