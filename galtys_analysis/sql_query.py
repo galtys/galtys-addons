@@ -374,10 +374,12 @@ class analysis_chart(osv.osv):
         dd=np.array(ctx['data']).transpose()
         s=eval(image.slice)
 
-        month=dd[0][0]
-        Target_month=sum(dd[1][s])
-        actual_month=sum(dd[2][s])
-
+        try:
+            month=dd[0][0]
+            Target_month=sum(dd[1][s])
+            actual_month=sum(dd[2][s])
+        except:
+            return
         #print [Target_month, actual_month]
         #by_month= orders_total_month_actual(cr)
         #Target_by_month= orders_total_month_Target(pool, cr, uid, y='2015')
