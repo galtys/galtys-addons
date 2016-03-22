@@ -228,6 +228,7 @@ class host_user(osv.osv):
         
 
         }
+import logging
 class deploy_file(osv.osv):
     _inherit = "deploy.file"
     _order = "template_id,user_id,sequence"
@@ -252,6 +253,7 @@ class deploy_file(osv.osv):
                     try:
                         ret=render_mako_file(path,ctx)
                     except:
+                        logging.exception('Got exception on main handler')
                         ret='%s,%s,%s,%s'%(t,obj,ctx,path)
                 elif t.type in ['python']:
                     ret=file(path).read()
