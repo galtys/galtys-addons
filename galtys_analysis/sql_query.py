@@ -419,10 +419,11 @@ class analysis_chart(osv.osv):
         #fig, ax = plt.subplots()
 
         plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%.1f%%', shadow=True)
+        #plt.pie(sizes, explode=explode,  colors=colors, autopct='%.1f%%', shadow=True)
         # Set aspect ratio to be equal so that pie is drawn as a circle.
         plt.axis('equal')
         d=datetime.date(tm_year, tm_mon, tm_mday)
-        plt.title( d.strftime(image.xtickstrftime ) )
+        #plt.title( d.strftime(image.xtickstrftime ) )
         #image_path=get_module_path('html_reports')
         #image_file=os.path.join(image_path,fn)
         print 'generate_pie_chart', [image.image_file]
@@ -517,21 +518,21 @@ class analysis_chart(osv.osv):
             r0.append( r[0] )
         if image.xdata=='week':
             ax.set_xticklabels( ["%d"%xx for xx in x] )
-            ax.legend( tuple(r0), tuple( columns[2:] ) )
+            #ax.legend( tuple(r0), tuple( columns[2:] ) )
         elif image.xdata=='day':
             xticks=[]
             for day in x:
                 d=datetime.datetime.strptime(day, DEFAULT_SERVER_DATE_FORMAT)
                 xticks.append( d.strftime(image.xtickstrftime) )
             ax.set_xticklabels( xticks )
-            ax.legend( tuple(r0), tuple( columns[2:] ) )
+            #ax.legend( tuple(r0), tuple( columns[2:] ) )
         else: #month
             xticks=[]
             for y,m in zip(year,x):
                 d=datetime.date(int(y),int(m),1)
                 xticks.append( d.strftime(image.xtickstrftime) )
             ax.set_xticklabels( xticks )
-            ax.legend( tuple(r0), tuple( columns[2:] ) )      
+            #ax.legend( tuple(r0), tuple( columns[2:] ) )      
 
         #ax.legend((rects1[0], rects2[0]), (columns[2], columns[3] ) )
         ax.grid()
