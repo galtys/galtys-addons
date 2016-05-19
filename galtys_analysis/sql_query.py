@@ -49,7 +49,7 @@ class sql_query(osv.osv):
     def drop_view(self, cr, uid, ids, ctx):
         for q in self.browse(cr, uid, ids):
             if q.type=='view':
-                cr.execute("drop view %s"%q.ref )
+                cr.execute("drop view %s cascade"%q.ref )
 
     def get_query_columns(self, cr, uid, query):
         if query:
