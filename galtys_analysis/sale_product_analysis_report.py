@@ -237,8 +237,8 @@ class analysis_report(report_sxw.rml_parse):
 
         pool=self.pool
 
-        ctx = product_sale_analysis(pool, cr, uid, context)
-        self.localcontext.update(ctx)
+        #ctx = product_sale_analysis(pool, cr, uid, context)
+        #self.localcontext.update(ctx)
 
         ctx = sale_shop_categ_analysis(pool, cr, uid, context)
         self.localcontext.update(ctx)

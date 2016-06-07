@@ -7,9 +7,10 @@
      """,
     'author': 'Galtys Ltd',
     'website': 'galtys.com',
-    'depends': ['sale'],
+    'depends': ['sale', 'stock_return', 'account_invoice_shop_id', 'report_webkit'],
     'data': [
         'galtys_analysis_view.xml',
+        'analysis_phase_data.xml',
         'sql_query_view.xml',
     ],
     'installable': True,

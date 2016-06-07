@@ -13,11 +13,11 @@ try:
 except ImportError:
     pass
 
-def create_empty_db(dbname):
+def create_empty_db(dbname, lang='en_US'):
     DB=dbname
     db=openerp.service.web_services.db(DB)
     #data = db.exp_dump('amdemo_template')
-    db_id=db.exp_create(DB, False, 'en_GB','admin')
+    db_id=db.exp_create(DB, False, lang,'admin')
     done=False
     while not done:
         complete, info = db.exp_get_progress(db_id)
@@ -172,7 +172,7 @@ def f64(header, data, fields64, files=False):
     for row in data:
         if files:
             for i,f in enumerate(row):
-                    if (f.endswith('rml') or f.endswith('html')) and os.path.isfile(f):
+                if (f.endswith('rml') or f.endswith('html')) and os.path.isfile(f):
                         row[i] = file(f).read()
         for f64 in fields64:
             i=header.index(f64)
