@@ -187,7 +187,7 @@ def f64(header, data, fields64, files=False):
                     pass
     return data
 
-def load_data(pool, cr, uid, fn, model, files=False):
+def load_data_old(pool, cr, uid, fn, model, files=False):
     print 'loading data for %s from %s' %( model, fn)
     lines = [x for x in csv.reader( file(fn).readlines() )]
     header = lines[0]
@@ -207,10 +207,16 @@ def load_data(pool, cr, uid, fn, model, files=False):
             cr.execute("update ir_model_data set noupdate=True where model='stock.location'")
     return ret
 def load_data(r, cr, uid, fn, model, files=False):
-    print 'loading data for %s from %s' %( model, fn)
-    lines = [x for x in csv.reader( file(fn).readlines() )]
-    header = lines[0]
-    data=lines[1:]
+    import os
+    if isinstance(fn,str) and os.path.isfile(fn):
+        print 'loading data for %s from %s' %( model, fn)
+        lines = [x for x in csv.reader( file(fn).readlines() )]
+        header = lines[0]
+        data=lines[1:]
+    else:
+        header,data=records2table(fn)
+        print 'loading data from records'
+        #print '   HEADER',header
     fields = r.get(model).fields_get(cr, uid)
     binary_fields = [f for f in fields if fields[f]['type']=='binary']
     fields64 = list( set(binary_fields).intersection( set(header) ) )
@@ -305,12 +311,18 @@ def dict2row(PCMRP,rec):
         out.append(rec[p])
     return out
 
-def save_csv(fn, data, HEADER=None):
+def records2table(records, HEADER=None):
+    data=records
+    print data
     if len(data)>0:
         if HEADER is None:
             HEADER=data[0].keys()
-    fp = open(fn, 'wb')
     out=[dict2row(HEADER, x) for x in data]
+    return HEADER,out
+
+def save_csv(fn, data, HEADER=None):
+    HEADER,out=records2table(data, HEADER=HEADER)
+    fp = open(fn, 'wb')
     csv_writer=csv.writer(fp)
     csv_writer.writerows( [HEADER]+out )
     fp.close()
@@ -455,7 +467,8 @@ def list_models(obj_pool, cr, uid, model_ids, fnout='model2.html',  mfm_map=None
     ir_model_obj=obj_pool.get('ir.model')
     #model_ids = ir_model_obj.search(cr, uid, [])
     #field_attrs=[]
-    import galtyslib.HTML as HTML
+    #import galtyslib.HTML as HTML
+    import HTML
     #model_field_module_map = {}
     def get_row(header, data_map):
         out=[]
@@ -512,14 +525,18 @@ def list_models(obj_pool, cr, uid, model_ids, fnout='model2.html',  mfm_map=None
         return out
     fp=open(fnout,'wb')
     rel_map={}
-    #mt_map
-    transient_ids=[x.id for x in ir_model_obj.browse(cr, uid, model_ids) if mt_map.get(x.model)]
-    db_ids=[x.id for x in ir_model_obj.browse(cr, uid, model_ids) if not mt_map.get(x.model)]
+    #mt_map={}
+    if mt_map is None:
+        mt_map={}
+    #print ir_model_obj.browse(cr, uid, model_ids)
+    transient_ids=[x.id for x in ir_model_obj.browse(cr, uid, model_ids) if mt_map.get(x.model,False)]
+    db_ids=[x.id for x in ir_model_obj.browse(cr, uid, model_ids) if not mt_map.get(x.model,True)]
     tmodels= sorted(ir_model_obj.browse(cr, uid, transient_ids),key=lambda a:a.model)
     dmodels= sorted(ir_model_obj.browse(cr, uid, db_ids),key=lambda a:a.model)
-    
-    for model in dmodels+tmodels:
-	#print 'model: ', model.model, model.name
+    #print dmodels
+    dmodels=ir_model_obj.browse(cr, uid, model_ids)
+    for model in dmodels:#+tmodels:
+	print 'model: ', model.model, model.name
         obj=obj_pool.get(model.model)
 	if not obj:
 	    #print "%s (%s)" % (model.model, model.name)
@@ -559,6 +576,16 @@ def list_models(obj_pool, cr, uid, model_ids, fnout='model2.html',  mfm_map=None
 
     fp.close()
     return rel_map
+
+def write_html_analysis(dbname):
+    model_field_module_map, model_transient_map, mod_dep_name, module_model_fields_map = module_dep(dbname)
+    mod_sorted, mm1,mm2=module_dep2(model_field_module_map, model_transient_map, mod_dep_name)
+    pool, cr, uid = get_connection(dbname)
+    model_ids = pool.get('ir.model').search(cr, uid, [])   
+    list_models(pool, cr, uid, model_ids, fnout='%s.html'%dbname, mfm_map=model_field_module_map, ms=mod_sorted, mt_map=model_transient_map )
+    cr.commit()
+    cr.close()
+
 def run_sql_via_psql(sql, dbname, port='5432'):
     import tempfile
     import subprocess
