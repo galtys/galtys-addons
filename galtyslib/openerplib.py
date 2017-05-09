@@ -215,7 +215,7 @@ def load_data(r, cr, uid, fn, model, files=False):
         data=lines[1:]
     else:
         header,data=records2table(fn)
-        print 'loading data from records'
+        print 'loading data from records, model', model
         #print '   HEADER',header
     fields = r.get(model).fields_get(cr, uid)
     binary_fields = [f for f in fields if fields[f]['type']=='binary']
@@ -319,11 +319,12 @@ def records2table(records, HEADER=None):
             HEADER=data[0].keys()
     out=[dict2row(HEADER, x) for x in data]
     return HEADER,out
+import unicodecsv
 
 def save_csv(fn, data, HEADER=None):
     HEADER,out=records2table(data, HEADER=HEADER)
     fp = open(fn, 'wb')
-    csv_writer=csv.writer(fp)
+    csv_writer=unicodecsv.writer(fp, encoding='utf-8')
     csv_writer.writerows( [HEADER]+out )
     fp.close()
 
