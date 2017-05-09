@@ -524,7 +524,6 @@ def list_models(obj_pool, cr, uid, model_ids, fnout='model2.html',  mfm_map=None
                 print 'missing ', [model_name, k]
             out[k]=v
         return out
-    fp=open(fnout,'wb')
     rel_map={}
     #mt_map={}
     if mt_map is None:
