@@ -24,6 +24,7 @@ def create_empty_db(dbname, lang='en_US'):
         time.sleep(2)
         if complete == 1.0:
             done=True
+
 def copy_db(dbname1, dbname2):
     db1=openerp.service.web_services.db(dbname1)
     data = db1.exp_dump(dbname1)
@@ -33,7 +34,31 @@ def copy_db(dbname1, dbname2):
 def drop_db(dbname):
     db1=openerp.service.web_services.db(dbname)
     return db1.exp_drop(dbname)
-    
+
+def connect(dbname='trunk', uid=1, context=None):
+    from odoo.modules.registry import RegistryManager
+    from odoo.api import Environment
+    r = RegistryManager.get(dbname)
+    cr = r.cursor()
+    Environment.reset()
+    env = Environment(cr, uid, context or {})
+    print('Connected to %s with user %s %s'
+          % (dbname, env.uid, env.user.name))
+    return env
+
+def install_modules10(env, modules, arg=None):
+    if arg is None:
+        arg=[('name','in',modules)]
+    module_obj=env['ir.module.module']
+    mod_upgrade_obj = env['base.module.upgrade']
+    install_ids=module_obj.search(arg)
+    #module_obj.button_install( install_ids )
+    for i in install_ids:
+        i.button_install()
+    ids=mod_upgrade_obj.get_module_list()
+    ret =mod_upgrade_obj.upgrade_module()
+    return ret
+
 def install_modules(obj_pool, cr, uid,  modules):
     user_obj = obj_pool.get('res.users')
     module_obj = obj_pool.get('ir.module.module')
@@ -313,7 +338,7 @@ def dict2row(PCMRP,rec):
 
 def records2table(records, HEADER=None):
     data=records
-    print data
+    #print data
     if len(data)>0:
         if HEADER is None:
             HEADER=data[0].keys()
