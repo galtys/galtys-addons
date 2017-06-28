@@ -279,6 +279,7 @@ class analysis_chart(osv.osv):
         #image_file=os.path.join(image_path,fn)
         print 'generate_pie3_chart', [image.image_file]
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
+        plt.close(fig)
 
     def generate_pie2_chart(self, cr, uid, image, fp):
         ctoday=time.gmtime()
@@ -353,7 +354,7 @@ class analysis_chart(osv.osv):
         #image_file=os.path.join(image_path,fn)
         print 'generate_pie2_chart', [image.image_file]
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
-
+        plt.close(fig)
     def generate_pie_chart(self, cr, uid, image, fp):
         ctoday=time.gmtime()
         tm_year = ctoday.tm_year
@@ -429,7 +430,7 @@ class analysis_chart(osv.osv):
         print 'generate_pie_chart', [image.image_file]
 
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
-
+        plt.close(fig)
 
     def generate_bar_chart(self, cr, uid, image, fp):
         #N=0
@@ -548,3 +549,4 @@ class analysis_chart(osv.osv):
             #autolabel(rects2)
         print 'generate_bar_chart', [image.image_file]
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
+        plt.close(fig)
