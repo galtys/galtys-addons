@@ -19,12 +19,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+
 import openerp.addons.web.http as oeweb
+from openerp import pooler
+
 import werkzeug.utils
 import werkzeug.wrappers
 
 import openerp
-from openerp import pooler
 from openerp import SUPERUSER_ID
 from werkzeug.wrappers import Response
 from mako.template import Template
