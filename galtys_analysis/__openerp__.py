@@ -7,13 +7,7 @@
      """,
     'author': 'Galtys Ltd',
     'website': 'galtys.com',
-<<<<<<< HEAD
-    #'depends': ['sale', 'stock_return', 'account_invoice_shop_id', 'report_webkit'],
-    'depends': ['sale', 'report_webkit'],
-=======
-#    'depends': ['sale', 'stock_return', 'account_invoice_shop_id', 'report_webkit'],
     'depends': ['sale',  'report_webkit'],
->>>>>>> 4108a106e5e4a57a21c7ea595f1d43ac94b5794e
     'data': [
         'galtys_analysis_view.xml',
         'analysis_phase_data.xml',
