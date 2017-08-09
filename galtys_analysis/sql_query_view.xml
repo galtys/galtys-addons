@@ -103,6 +103,10 @@
 		      </group>
 		      <separator string="SQL Queries"/>
 		      <field name="query_ids"/>
+		      <separator string="Graph"/>
+		      <field name="html_test"/>
+		      <field name="html_display" widget="html" colspan="4"/>
+		      
                     </sheet>
                 </form>
             </field>

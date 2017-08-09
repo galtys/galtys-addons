@@ -159,9 +159,20 @@ class analysis_chart(osv.osv):
         res={}
         for r in self.browse(cr, uid, ids):            
             pth=get_module_path('galtys_analysis')
+            #cnt=self.generate_chart(cr, uid, r.id)
+            val={'image_file': pth+'/%d.png'%r.id,
+                }
+            res[r.id] = val
 
-            val={'image_file': pth+'/%d.png'%r.id
-            }
+        return res
+    def _svg(self, cr, uid, ids,field_name,arg, context=None):
+        res={}
+        #cnt=file('/home/jan/github.com/matplotlib/examples/lines_bars_and_markers/csd_demo.svg').read()
+        for r in self.browse(cr, uid, ids):            
+            cnt=self.generate_chart(cr, uid, r.id)
+            val={
+                 'html_display': '%s'%cnt,
+                }
             res[r.id] = val
 
         return res
@@ -176,6 +187,9 @@ class analysis_chart(osv.osv):
         'figdpi':fields.integer('Figure DPI'),
         'slice':fields.char('Slice',size=44),
         'colors':fields.char("Colors",size=4444),
+        'html_test':fields.text("html test"),
+        'html_display':fields.function(_svg, type='text',multi='today',method=True,
+                                       string='displ html'),
         #'image_file':fields.char("image_file", size=444),
         'image_file':fields.function(_info, type='char', multi='today',method=True,string='image_file'),
         'xdata':fields.selection([('week','Week'),('month','Month'),('day','Day')],'xdata'),
@@ -195,22 +209,23 @@ class analysis_chart(osv.osv):
 
     def generate_chart(self, cr, uid, image_id):
         image = self.browse(cr, uid, image_id)
-        import StringIO
-        #fp = StringIO.StringIO()
-        fp=open(image.image_file,'wb')
+        #import StringIO
+        fp = StringIO()
+        #fp=open(image.image_file,'wb')
+        cnt=None
         if image.type=='bar':
-            self.generate_bar_chart(cr, uid, image,fp )
+            cnt=self.generate_bar_chart(cr, uid, image, fp)
         elif image.type=='pie':
             #try:
-            self.generate_pie_chart(cr, uid,  image,fp )
+            cnt=self.generate_pie_chart(cr, uid,  image, fp)
             #except:
             #    pass
         elif image.type=='pie2':
-            self.generate_pie2_chart(cr, uid,  image,fp )
+            cnt=self.generate_pie2_chart(cr, uid,  image, fp )
         elif image.type=='pie3':
-            self.generate_pie3_chart(cr, uid,  image,fp )
+            cnt=self.generate_pie3_chart(cr, uid,  image, fp )
         fp.close()
-        
+        return cnt
         #return fp.getvalue()
     def generate_pie3_chart(self, cr, uid, image, fp):
         COLOR_MAP={'picking_error':'#ff7865',
@@ -279,7 +294,14 @@ class analysis_chart(osv.osv):
         #image_file=os.path.join(image_path,fn)
         print 'generate_pie3_chart', [image.image_file]
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
+
+        fp=StringIO()
+        #plt.savefig('csd_demo.svg')
+        plt.savefig(fp, format='svg',dpi=figdpi)
+        cnt=fp.getvalue()
+
         plt.close(fig)
+        return cnt
 
     def generate_pie2_chart(self, cr, uid, image, fp):
         ctoday=time.gmtime()
@@ -354,7 +376,13 @@ class analysis_chart(osv.osv):
         #image_file=os.path.join(image_path,fn)
         print 'generate_pie2_chart', [image.image_file]
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
+        fp=StringIO()
+        #plt.savefig('csd_demo.svg')
+        plt.savefig(fp, format='svg',dpi=figdpi)
+        cnt=fp.getvalue()
         plt.close(fig)
+        return cnt
+
     def generate_pie_chart(self, cr, uid, image, fp):
         ctoday=time.gmtime()
         tm_year = ctoday.tm_year
@@ -430,7 +458,13 @@ class analysis_chart(osv.osv):
         print 'generate_pie_chart', [image.image_file]
 
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
+
+        fp=StringIO()
+        #plt.savefig('csd_demo.svg')
+        plt.savefig(fp, format='svg',dpi=figdpi)
+        cnt=fp.getvalue()
         plt.close(fig)
+        return cnt
 
     def generate_bar_chart(self, cr, uid, image, fp):
         #N=0
@@ -547,6 +581,12 @@ class analysis_chart(osv.osv):
         for r in rects:
             autolabel(r)
             #autolabel(rects2)
-        print 'generate_bar_chart', [image.image_file]
+        #print 'generate_bar_chart', [image.image_file]
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
+        fp=StringIO()
+        #plt.savefig('csd_demo.svg')
+        plt.savefig(fp, format='svg',dpi=figdpi)
+        cnt=fp.getvalue()
+
         plt.close(fig)
+        return cnt
