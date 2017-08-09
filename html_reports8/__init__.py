@@ -19,7 +19,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-
-import controllers
+import openerp.release
+if openerp.release.version in ['10.0']:
+    print 'WHAT TO DO HERE?'
+else:
+    import controllers
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
