@@ -289,8 +289,33 @@ class deploy_file(osv.osv):
         'who':fields.function(_get,type='char',size=4444,multi='content',method=True,string='who'),
 
         }
-    
+import bitcoin
+class deploy_account(osv.osv):
+    _inherit = "deploy.account"
+    #def _get(self, cr, uid, ids,field_name,arg, context=None):
+    def _compute_keys(self, cr, uid, ids, field_name, args, context=None):
+        res={}
+        for c in self.browse(cr, uid, ids, context=context):
+            pub_key = bitcoin.privtopub(c.secret_key)
+            val={'public_key': 'x', #pub_key,
+                 'code_fnct': '', #bitcoin.pubtoaddr( pub_key ),
+                 }
+            res[c.id]=val
+        return res
+    _columns = {
+        'public_key':fields.function(_compute_keys,
+                                     string="Public Key", 
+                                     type='char',
+                                     size=444,
+                                     method=True),
+        'code_fnct':fields.function(_compute_keys,
+                                    string="code", 
+                                    type='char',
+                                    size=444,
+                                     method=True),
 
+    }
+    
 class deploy_pg_cluster(osv.osv):
     _inherit = "deploy.pg.cluster"
     def _get_template(self, cr, uid, ids,field_name,arg, context=None):

@@ -5,7 +5,7 @@
     "author" : "Jan Troler",
     "website" : "http://www.galtys.com/",
     "category" : "Generic Modules/Others",
-    "depends" : ['base'],
+    "depends" : ['base','galtys_skynet'],
     "description" : "Deployment MGMT",
     "init_xml" : [],
     "demo_xml" : [],

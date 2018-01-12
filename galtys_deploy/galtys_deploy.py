@@ -1,18 +1,28 @@
 from openerp.osv import fields, osv, expression
 import openerp.addons.decimal_precision as dp
-
+import bitcoin
 #Steps
 #golive register
 #golive pull
 
 #Main menu: Deploy
 
-#Sub menu: Configuration
+def secret_random_key(a):
+    return bitcoin.random_key()
 
+#class SkynetCode(osv.osv):
+#    pass
+
+    
 class deploy_account(osv.osv):
     _order = "name"
     _name = "deploy.account"  #Accounts
+
     _columns = {
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         'name':fields.char('Name', size=444),
         #'login':fields.char('Login',size=444),
         #'host_ids':fields.many2many('deploy.host', 'deploy_account_deploy_host_rel', 'host_id', 'account_id', 'Hosts'),
@@ -25,6 +35,10 @@ class deploy_password(osv.osv):
     _columns = {
         'name':fields.char('Name',size=1000),
         'password':fields.text('Password'),#password encrypted
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
 
 class host(osv.osv):
@@ -45,6 +59,10 @@ class host(osv.osv):
         'ssmtp_authuser':fields.char("authuser", size=444),
         'ssmtp_authpass':fields.char("authpass", size=444),
         #'deploy_ids':fields.one2many('deploy.deploy','host_id','Deployments'),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
     _defaults ={
         'ip_forward':False,
@@ -72,6 +90,10 @@ class pg_cluster(osv.osv):
         'user_ids':fields.one2many("deploy.pg.user",'cluster_id','PG Users'),
        # 'database_ids':fields.one2many("deploy.pg.database",'cluster_id','Databases'),
         'hba_ids':fields.one2many("deploy.pg.hba",'cluster_id','HBA'),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
     _defaults = {
         'listen_addresses':'127.0.0.1',
@@ -95,6 +117,10 @@ class pg_user(osv.osv):
         'create_role':fields.boolean('Create Role'),
         'login':fields.char('Login',size=44),
         'type':fields.selection([('real','real'),('virtual','virtual'),('system','system')],'Type' ),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
 
 class pg_hba(osv.osv):
@@ -109,7 +135,12 @@ class pg_hba(osv.osv):
         'ip_address':fields.char('ip_address',size=444),
         'ip_mask':fields.char('ip_mask',size=444),
         'auth_method':fields.selection([('peer','peer'),('trust','trust'),('md5','md5')], 'auth_method'),
-        'auth_options':fields.char('auth_options',size=444),       
+        'auth_options':fields.char('auth_options',size=444),
+        
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
 }
 
 class host_group(osv.osv):
@@ -121,6 +152,10 @@ class host_group(osv.osv):
         'host_id':fields.many2one('deploy.host','Host'),
         'sftp':fields.boolean('Allow SFTP'),        
         'type':fields.selection([('user','user'),('system','system')],'Type'),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
 
 class host_user(osv.osv):
@@ -144,6 +179,10 @@ class host_user(osv.osv):
         'app_ids':fields.many2many('deploy.application', 'host_user_application_rel', 'user_id', 'app_id', 'Apps'),
         'validated_root':fields.char('Validated ROOT',size=444),
         'backup_subdir':fields.char('backup_subdir', size=444),
+
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
         
         #'user_id':fields.many2one('deploy.host.user','HostUser'),
         }
@@ -189,6 +228,10 @@ class repository(osv.osv):
         'root_directory':fields.char('Root Directory',size=100),
         #'clone_ids':fields.one2many('deploy.repository.clone','remote_id','Reposisoty Clones'),
         'clone_ids':fields.one2many('deploy.repository','remote_id','Reposisoty Clones'),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
     _defaults = {
         'delete':False,
@@ -220,6 +263,10 @@ class repository_clone(osv.osv): #will be likely deprecated
         'is_module_path_db':fields.boolean('Is Module Path'),
         'root_directory':fields.char('Root Directory',size=100),
         #'URL':fnc
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
 
 class application(osv.osv):
@@ -227,6 +274,10 @@ class application(osv.osv):
     _columns = {
         'repository_ids':fields.many2many('deploy.repository', 'application_repository_rel','app_id','repository_id', 'Repositories', domain=[('remote_id','=',False)]),
         'name':fields.char('Name',size=444),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
 
 class options(osv.osv):
@@ -237,6 +288,10 @@ class options(osv.osv):
         'xmlrpc_port':fields.integer('xmlrpc_port'),
         #'admin_password':fields.many2one('deploy.password','Admin Password'),
         'name':fields.char('Name',size=444),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         #'logfile':
         }
     
@@ -277,7 +332,11 @@ class deploy(osv.osv):
         'validated_server_path':fields.char('Validated Server Path',size=444),
         'validated_config_file':fields.char('Validated Config File',size=444),
         'validated_root':fields.char('Validated ROOT',size=444),
-        'db_ids':fields.one2many('deploy.pg.database','deploy_id',"db_ids"),        
+        'db_ids':fields.one2many('deploy.pg.database','deploy_id',"db_ids"),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
 
 class pg_database(osv.osv):
@@ -290,6 +349,10 @@ class pg_database(osv.osv):
         #'pg_user_id':fields.many2one('deploy.pg.user','PG USER'),
         'deploy_id':fields.many2one('deploy.deploy','Deployments'),
         'pg_user_id':fields.related('deploy_id', 'pg_user_id',  string="PG USER",type="many2one",relation="deploy.pg.user"),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
     }
 
 class mako_template(osv.osv):
@@ -313,6 +376,10 @@ class mako_template(osv.osv):
         'user_id':fields.many2one('deploy.host.user','HostUser'),
         'target_user':fields.char('target_user',size=444),
         'target_group':fields.char('target_group',size=444),
+        
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
 
     }
 
@@ -330,6 +397,10 @@ class deploy_file(osv.osv):
         'file_written':fields.char('File Written', size=444),
         'content_written':fields.text('Content Written'),
         'cmd_exit_code':fields.char('cmd_exit_code', size=444),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
 class export_tag(osv.osv):
     _name = "deploy.export.tag"
@@ -337,7 +408,12 @@ class export_tag(osv.osv):
         "name":fields.char("name", size=100),
         "sequence":fields.integer('sequence'),
         "parent_id":fields.many2one("deploy.export.tag", "Parent Tag"),
-        'field_ids':fields.many2many('ir.model.fields', 'deploy_export_tag_ir_model_fields_rel', 'tag_id', 'field_id', 'Tags'),        
+        'field_ids':fields.many2many('ir.model.fields', 'deploy_export_tag_ir_model_fields_rel', 'tag_id', 'field_id', 'Tags'),
+        
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
     _default = {
         'sequence':100,
@@ -349,6 +425,10 @@ class ir_model(osv.osv):
     _columns = {
         'sequence':fields.integer('Sequence'),
         'export_domain':fields.char("Export Domain", size=500),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
     def name_get2(self,cr, uid, ids, context=None):
         ret={}
@@ -366,6 +446,9 @@ class ir_model_fields(osv.osv):
     _columns = {
         'sequence':fields.integer('Sequence'),
         'export_tag_ids':fields.many2many('deploy.export.tag', 'deploy_export_tag_ir_model_fields_rel', 'field_id', 'tag_id', 'Export Tags'),        
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
         
         }
     def write(self, cr, uid, ids, vals, context=None):
@@ -453,6 +536,10 @@ class exported_file(osv.osv):
         'company_id':fields.many2one('res.company','Company'),
         'tag_id':fields.many2one('deploy.export.tag', 'Export Tag'),
         'sequence': fields.integer('sequence'),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
 
 class res_company(osv.osv):
@@ -461,6 +548,10 @@ class res_company(osv.osv):
         'export_module_name':fields.char('Export Module Name', size=100),
         'export_module_repo':fields.char('Export Module Repository', size=100),
         'exported_file_ids':fields.one2many('deploy.exported.file','company_id','Exported Files'),
+        'secret_key':fields.char("Secret Key"),
+        'code':fields.char("Code Stored"),
+        'signature':fields.text("Signature"),
+        
         }
     def set_external_ids(self, cr, uid, ids, context=None):
         for c in self.browse(cr, uid, ids):

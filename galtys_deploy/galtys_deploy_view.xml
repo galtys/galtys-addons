@@ -174,7 +174,11 @@
             <field name="model">deploy.account</field>
             <field name="arch" type="xml">
                 <tree string="Accounts">
-                    <field name="name"/>
+                  <field name="name"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
+		  <field name="public_key"/>
+		  <field name="code_fnct"/>
                 </tree>
             </field>
         </record>
@@ -217,6 +221,9 @@
                 <tree string="Passwords">
                     <field name="name"/>
                     <field name="password"/>
+		    <field name="secret_key"/>
+		    <field name="code"/>
+		    
                 </tree>
             </field>
         </record>
@@ -284,6 +291,8 @@
 			    <field name="memory_buffer_calc_mb"/>
 			    <field name="kernel_shmall"/>
 			    <field name="kernel_shmmax"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
 
                 </tree>
             </field>
@@ -371,6 +380,9 @@
                     <field name="name"/>
                     <field name="port"/>
                     <field name="version"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
+		    
                 </tree>
             </field>
         </record>
@@ -421,6 +433,9 @@
                     <field name="superuser"/>
                     <field name="create_db"/>
                     <field name="create_role"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
+		    
                 </tree>
             </field>
         </record>
@@ -465,6 +480,11 @@
 		    <field name="type"/>
                     <field name="host_id"/>
                     <field name="sftp"/>
+
+		  <field name="secret_key"/>
+		  <field name="code"/>
+		    
+		    
                 </tree>
             </field>
         </record>
@@ -536,6 +556,9 @@
                     <field name="home"/>
                     <field name="shell"/>
 		    <field name="validated_root"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
+		    
                 </tree>
             </field>
         </record>
@@ -628,6 +651,10 @@
 		    <field name="delete"/>
 		    <field name="push"/>
 		    <field name="pull"/>
+
+		  <field name="secret_key"/>
+		  <field name="code"/>
+		    
                 </tree>
             </field>
         </record>
@@ -709,6 +736,10 @@
         
                     <field name="remote_id"/>
 		    <field name="validated_addon_path"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
+
+		    
 <!--	
 		    <field name="url"/>
             <field name="local_host_id"/>
@@ -788,7 +819,9 @@
             <field name="model">deploy.application</field>
             <field name="arch" type="xml">
                 <tree string="Applications">
-                    <field name="name"/>
+                  <field name="name"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
                     <field name="repository_ids"/>
                 </tree>
             </field>
@@ -832,6 +865,9 @@
                     <field name="unaccent"/>
                     <field name="xmlrpc_interface"/>
                     <field name="xmlrpc_port"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
+		    
                 </tree>
             </field>
         </record>
@@ -932,6 +968,8 @@
                     <field name="Redirect"/>
 		    -->
                     <field name="mode"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
 
                     
                 </tree>
@@ -997,6 +1035,8 @@
 			    <field name="model"/>
 			    <field name="target_user"/>
 			    <field name="target_group"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
 
 <!--
 			    <field name="module"/>
@@ -1073,7 +1113,10 @@
 		  <field name="file_generated"/>
 		  <field name="file_written"/>
 -->
-		  <field name="sequence"/>
+                   <field name="sequence"/>
+		  <field name="secret_key"/>
+		  <field name="code"/>
+
                 </tree>
             </field>
         </record>
