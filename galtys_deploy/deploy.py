@@ -129,7 +129,7 @@ class deploy2(osv.osv):
         'addons_path':fields.function(_get, type='char', size=1000,multi='options',method=True,string='addons_path'),
 
         'clone_ids':fields.function(_get,type='one2many',relation='deploy.repository',multi='options',method=True,string="clone_ids"),
-        'db_ids':fields.one2many('deploy.pg.database','deploy_id',"db_ids"),
+        #'db_ids':fields.one2many('deploy.pg.database','deploy_id',"db_ids"),        
         }
 
 from openerp.modules.module import get_module_resource
@@ -192,15 +192,15 @@ class mako_template(osv.osv):
         res={}
         for t in self.browse(cr, uid, ids):
             #path = get_module_resource('hr', 'static/src/img', 'default_image.png')
-            path = get_module_resource(t.module, t.path, t.fn)
-            res[t.id] = {'source_fn':path}
-            print [path]
-            if os.path.isfile(path):
-                source=file(path).read()
+            if t.module and t.path and t.fn:
+                path = get_module_resource(t.module, t.path, t.fn)
+                if os.path.isfile(path):
+                    source=file(path).read()
+                else:
+                    source=''
+                res[t.id] = {'source':source,'source_fn':path}                
             else:
-                source=''
-            res[t.id] = {'source':source,'source_fn':path}
-
+                res[t.id] = {'source':'na','source_fn':'na'}                
         return res
     _columns = {
         #'model_id':fields.many2one('ir.model', 'Model Link')

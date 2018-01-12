@@ -277,6 +277,7 @@ class deploy(osv.osv):
         'validated_server_path':fields.char('Validated Server Path',size=444),
         'validated_config_file':fields.char('Validated Config File',size=444),
         'validated_root':fields.char('Validated ROOT',size=444),
+        'db_ids':fields.one2many('deploy.pg.database','deploy_id',"db_ids"),        
         }
 
 class pg_database(osv.osv):
