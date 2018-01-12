@@ -318,7 +318,7 @@
                                 <field name="host_id"/>
                                 <field name="port"/>
 				<field name="version"/>
-                                <field name="name"/>
+<!--                                <field name="name"/> -->
                                 <field name="description"/>
 				<field name="active"/>
                             </group>
@@ -336,7 +336,7 @@
 			<field name="user_ids"/>
 			<field name="hba_ids">
 			  <tree>
-			    <field name="name"/>
+<!--			    <field name="name"/> -->
 			    <field name="type"/>
 <!--			    <field name="database_ids" widget="many2many_tags"/> -->
 			    <field name="user"/>
@@ -354,18 +354,18 @@
 			    <field name="date"/>
 			  </tree>
 			</field>
--->
+
 			<field name="template_ids">
 			  <tree>
-			    <field name="model"/>
-			    <field name="module"/>
-			    <field name="path"/>
+			    <field name="model"/> 
+			    <field name="module"/> 
+			    <field name="path"/> 
 			    <field name="fn"/>
-			    <field name="name"/>
-			    <field name="out_fn"/>
+			    <field name="name"/> 
+			    <field name="out_fn"/> 
 			  </tree>
 			</field>
-
+-->
                     </sheet>
                 </form>
             </field>
@@ -894,7 +894,7 @@
 <!--                              <field name="account_id"/>  -->
                               <field name="password_id"/>
 			      <field name="user_id"/>		    		    		    
-			      <field name="host_id"/>
+<!--			      <field name="host_id"/>    -->
 			      <field name="who"/>
 <!--                              <field name="site_name"/> -->
 			      <field name="options_id"/>

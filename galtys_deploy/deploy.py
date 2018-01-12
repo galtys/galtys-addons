@@ -1,20 +1,20 @@
-from odoo import fields, models, expression
+from odoo import fields, models
 import openerp.addons.decimal_precision as dp
 import os
 
 class repository2(models.Model):
     _inherit = "deploy.repository"
-    def _get_url(self, cr, uid, ids,field_name,arg, context=None):
+    def _get_url(self,field_name,arg):
         #print 'BAFFF'
         res={}
-  #      models_data = self.pool.get('ir.model.data')
+  #      models_data = self.env['ir.model.data']
    #     cr.execute("select res_id,name,module from ir_model_data where model='deploy.repository.clone' and res_id in (%s)" % ",".join(map(str,ids)) )
     #    ext_map=dict([(x[0],'%s.%s'%(x[2],x[1])) for x in cr.fetchall()])
 
-        for r in self.browse(cr, uid, ids):
+        for r in self.browse(ids):
             #print [clone.name, clone.owner_id.name]
             
-            #dummy, form_view = models_data.get_object_reference(cr, uid, 'postcode_address_search', 'view_address_finder_form')
+            #dummy, form_view = models_data.get_object_reference('postcode_address_search', 'view_address_finder_form')
             if r.remote_id:
                 c=r.remote_id
             else:
@@ -52,14 +52,14 @@ class repository2(models.Model):
     mkdir = fields.Char(compute="_get_url", size=1000,multi='url',method=True,string='mkdir')
         #'type':fields.Char(compute="_get_url", size=1000,multi='url',method=True,string='type'),
     local_location_fnc = fields.Char(compute="_get_url", size=1000,multi='url',method=True,string='llf')
-        }
+#        }
 
 
 class deploy2(models.Model):
     _inherit = "deploy.deploy"
-    def _get(self, cr, uid, ids,field_name,arg, context=None):
+    def _get(self,field_name,arg):
         res={}
-        for d in self.browse(cr, uid, ids):
+        for d in self.browse(ids):
             OPTIONS=[('db_host', '127.0.0.1'),
                      ('db_port', str(d.pg_user_id.cluster_id.port)),
                      ('db_user', d.pg_user_id.login),
@@ -175,9 +175,9 @@ def render_mako_file(template, context, fn=None):
 
 class deploy_password(models.Model):
     _inherit = "deploy.password"
-    def _get(self, cr, uid, ids, field_name,arg,context=None):
+    def _get(self, field_name,arg,context=None):
         res={}
-        for p in self.browse(cr, uid, ids):
+        for p in self.browse(ids):
             tag="__PASS_%s_ID__%d__"%(self._name.replace('.','_'), p.id)
             res[p.id]={'pass_tag':tag}
         return res
@@ -188,9 +188,9 @@ class deploy_password(models.Model):
 class mako_template(models.Model):
     _inherit = "deploy.mako.template"
     _order = "sequence"
-    def _get(self, cr, uid, ids,field_name,arg, context=None):
+    def _get(self,field_name,arg):
         res={}
-        for t in self.browse(cr, uid, ids):
+        for t in self.browse(ids):
             #path = get_module_resource('hr', 'static/src/img', 'default_image.png')
             if t.module and t.path and t.fn:
                 path = get_module_resource(t.module, t.path, t.fn)
@@ -211,9 +211,9 @@ class mako_template(models.Model):
 
 class host_user(models.Model):
     _inherit = "deploy.host.user"
-    def _get(self, cr, uid, ids,field_name,arg, context=None):
+    def _get(self,field_name,arg):
         res={}
-        for u in self.browse(cr, uid, ids):
+        for u in self.browse(ids):
             res[u.id] = {'who':"%s@%s" % (u.login,u.host_id.name),
                          'info':"%s:%s" %( u.login, u.group_id.name ),
                          'numinfo': "%s:%s" %( u.uid, u.group_id.gid ),
@@ -232,14 +232,14 @@ import logging
 class deploy_file(models.Model):
     _inherit = "deploy.file"
     _order = "template_id,user_id,sequence"
-    def _get(self, cr, uid, ids,field_name,arg, context=None):
+    def _get(self,field_name,arg):
         res={}
-        for f in self.browse(cr, uid, ids):
+        for f in self.browse(ids):
             #path = get_module_resource('hr', 'static/src/img', 'default_image.png')
             t=f.template_id
             path = get_module_resource(t.module, t.path, t.fn)
             if 1:#'active_id' in context:
-                obj=self.pool.get(t.model).browse(cr, uid, f.res_id )
+                obj=self.env[t.model].browse(f.res_id )
                 if t.type in ['template','bash']:
                     ctx={#'context':context,
                          'o':obj,
@@ -280,7 +280,7 @@ class deploy_file(models.Model):
         return res
 
         #'model_id':fields.Many2one('ir.model', 'Model Link')
-        'file_generated':fields.Text(compute="_get",multi='content',method=True,string='file_generated'),       
+    file_generated = fields.Text(compute="_get",multi='content',method=True,string='file_generated')
     content_generated = fields.Text(compute="_get",multi='content',method=True,string='content_generated')
     source_fn = fields.Char(compute="_get",size=4444,multi='content',method=True,string='source_fn')
 
@@ -292,10 +292,10 @@ class deploy_file(models.Model):
 import bitcoin
 class deploy_account(models.Model):
     _inherit = "deploy.account"
-    #def _get(self, cr, uid, ids,field_name,arg, context=None):
-    def _compute_keys(self, cr, uid, ids, field_name, args, context=None):
+    #def _get(self,field_name,arg):
+    def _compute_keys(self, field_name, args):
         res={}
-        for c in self.browse(cr, uid, ids, context=context):
+        for c in self.browse(ids):
             pub_key = bitcoin.privtopub(c.secret_key)
             val={'public_key': 'x', #pub_key,
                  'code_fnct': '', #bitcoin.pubtoaddr( pub_key ),
@@ -303,29 +303,19 @@ class deploy_account(models.Model):
             res[c.id]=val
         return res
 
-    public_key = fields.Function(_compute_keys
-                                     string="Public Key", 
-                                     type='char',
-                                     size=444,
-                                     method=True),
-    code_fnct = fields.Function(_compute_keys
-                                    string="code", 
-                                    type='char',
-                                    size=444,
-                                     method=True),
-
-
+    public_key = fields.Char(compute="_compute_keys", string="Public Key")
+    code_fnct = fields.Char(compute="_compute_keys", string="code")
     
 class deploy_pg_cluster(models.Model):
     _inherit = "deploy.pg.cluster"
-    def _get_template(self, cr, uid, ids,field_name,arg, context=None):
+    def _get_template(self,field_name,arg):
         res={}
-        template_ids = self.pool.get('deploy.mako.template').search(cr, uid, [('model','=',self._name)])
-        for c in self.browse(cr, uid, ids):
+        template_ids = self.env['deploy.mako.template'].search([('model','=',self._name)])
+        for c in self.browse(ids):
             
             res[c.id] = {'template_ids':template_ids}
         return res
-    _columns = {
+
     template_ids = fields.One2many(compute="_get_template",relation='deploy.mako.template',multi='template',method=True)
     
 
@@ -352,13 +342,13 @@ def export_data(pool, cr, uid, model, fn, db_only=True, ext_ref=None,module=None
     #print obj._columns
 
     if db_only:
-        fields = dict([x for x in obj.fields_get(cr, uid).items() if db_field(obj, x[0])])
+        fields = dict([x for x in obj.fields_get(x[0])])
     else:
         fields = obj.fields_get(cr, uid)
-    id_ref_ids = pool.get('ir.model.data').search(cr, uid, [('model','=',model),('module','=',module)])   
-    ref_ids = [x.res_id for x in pool.get('ir.model.data').browse(cr, uid, id_ref_ids)]
+    id_ref_ids = pool.get('ir.model.data').search([('model','=',model),('module','=',module)])   
+    ref_ids = [x.res_id for x in pool.get('ir.model.data').browse(id_ref_ids)]
     #print fields.Keys()
-    ids = pool.get(model).search(cr, uid, [])
+    ids = pool.get(model).search([])
     if ext_ref is None:
         pass
     elif ext_ref is 'ref_only':
@@ -369,7 +359,7 @@ def export_data(pool, cr, uid, model, fn, db_only=True, ext_ref=None,module=None
     #    ids=ids[0:90]
     if os.path.isfile(fn):
         header_export=read_csv(fn)[0]
-        data = pool.get(model).export_data(cr, uid, ids,  header_export)
+        data = pool.get(model).export_data(ids,  header_export)
         out=[]
         for row in data['datas']:
             if 0:
@@ -422,7 +412,7 @@ def export_data(pool, cr, uid, model, fn, db_only=True, ext_ref=None,module=None
     #if 1:
         header_types = [fields[x]['type'] for x in header]
         #print [ids, header_export]
-        data = pool.get(model).export_data(cr, uid, ids,  header_export)
+        data = pool.get(model).export_data(ids,  header_export)
         out=[]
         for row in data['datas']:
             out_row=[row[0]]
@@ -444,8 +434,8 @@ def export_data(pool, cr, uid, model, fn, db_only=True, ext_ref=None,module=None
 import os
 class ir_module_module(models.Model):
     _inherit = "ir.module.module"
-    def master_data_export(self, cr, uid, ids, context=None):
-        for m in self.browse(cr, uid, ids):
+    def master_data_export(self):
+        for m in self.browse(ids):
             path = get_module_resource(m.name, '', '__openerp__.py')
             mod_meta=eval(file(path).read())
             files=mod_meta['update_xml']
@@ -454,16 +444,16 @@ class ir_module_module(models.Model):
                 #fn.split('.')
                 model = fn[:-4]#.split('.')
                 dest_fn=get_module_resource(m.name,p, fn)
-                export_data(self.pool, cr, uid, model, dest_fn, db_only=True, module=m.name)
+                export_data(self.env, cr, uid, model, dest_fn, db_only=True, module=m.name)
                 #print p,fn
             
         return {'ok':'done'}
     
 class host(models.Model):
     _inherit = 'deploy.host'
-    def _host(self, cr, uid, ids, field_name, arg, context=None):
+    def _host(self, field_name, arg):
         res={}
-        for h in self.browse(cr, uid, ids):
+        for h in self.browse(ids):
             b=int( h.memory_total*h.memory_pagesize*(h.memory_buffer_percent/100.0) )#BYTES
             #print [h.memory_total, h.memory_pagesize, h.memory_buffer_percent ]
             mb=2**20
@@ -478,12 +468,12 @@ class host(models.Model):
                        'kernel_shmall':shmall,
                        'kernel_shmmax':shmmax}
         return res
-    def _deploy(self, cr, uid, ids, field_name, arg, context=None):
+    def _deploy(self, field_name, arg):
         res={}
-        for h in self.browse(cr, uid, ids):
-            deploy_ids=self.pool.get('deploy.deploy').search(cr,uid, [])
+        for h in self.browse(ids):
+            deploy_ids=self.env['deploy.deploy'].search(cr,uid, [])
             d_ids=[]
-            for d in self.pool.get('deploy.deploy').browse(cr, uid, deploy_ids):
+            for d in self.env['deploy.deploy'].browse(deploy_ids):
                 if d.user_id.host_id.id==h.id:
                     d_ids.append(d.id)
 

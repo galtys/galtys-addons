@@ -1,5 +1,5 @@
-from odoo import fields, models, expression
-import openerp.addons.decimal_precision as dp
+from odoo import fields, models
+#import openerp.addons.decimal_precision as dp
 import bitcoin
 #Steps
 #golive register
@@ -34,12 +34,12 @@ class deploy_password(models.Model):
     _name = "deploy.password" #Passwords
 
     name = fields.Char('Name',size=1000)
-        'password':fields.Text('Password'),#password encrypted
+    password = fields.Text('Password') #password encrypted
     secret_key = fields.Char("Secret Key")
     code = fields.Char("Code Stored")
     signature = fields.Text("Signature")
         
-        }
+    
 
 class host(models.Model):
     _name = "deploy.host"   #Hosts
@@ -108,7 +108,7 @@ class pg_cluster(models.Model):
 class pg_user(models.Model):
     _name="deploy.pg.user"
     _rec_name='login'
-    _columns ={
+    #_columns ={
     cluster_id = fields.Many2one('deploy.pg.cluster','PG Cluster')
     account_id = fields.Many2one('res.users','Account')
     password_id = fields.Many2one('deploy.password','PG Password')
@@ -121,7 +121,7 @@ class pg_user(models.Model):
     code = fields.Char("Code Stored")
     signature = fields.Text("Signature")
         
-        }
+     #   }
 
 class pg_hba(models.Model):
     _name = "deploy.pg.hba"
@@ -141,16 +141,16 @@ class pg_hba(models.Model):
     code = fields.Char("Code Stored")
     signature = fields.Text("Signature")
         
-}
+#}
 
 class host_group(models.Model):
     _name = "deploy.host.group" #Host Groups
     _rec_name='name'
-    _columns = {
+ #   _columns = {
     name = fields.Char('Name',size=100)
     gid = fields.Integer('GID')
     host_id = fields.Many2one('deploy.host','Host')
-        'sftp':fields.Boolean('Allow SFTP'),        
+    sftp = fields.Boolean('Allow SFTP')
     type = fields.Selection([('user','user'),('system','system')],'Type')
     secret_key = fields.Char("Secret Key")
     code = fields.Char("Code Stored")
@@ -170,7 +170,7 @@ class host_user(models.Model):
         #'owner_id':fields.Many2one('res.users','Owner'),
     uid = fields.Integer('UID')
     ssh = fields.Boolean('Allow SSH')
-        'sudo_x':fields.Boolean('sudo_x'),    
+    sudo_x = fields.Boolean('sudo_x')
     host_id = fields.Many2one('deploy.host','Host')
     home = fields.Char('home',size=44)
     shell = fields.Char('shell',size=44)
@@ -186,14 +186,14 @@ class host_user(models.Model):
         
         #'user_id':fields.Many2one('deploy.host.user','HostUser'),
     
-    def name_get2(self,cr, uid, ids, context=None):
+    def name_get2(self,cr, uid, ids):
         ret={}
-        for u in self.browse(cr, uid, ids):
+        for u in self.browse(ids):
             if u.host_id:
                 ret[u.id]="%s@%s"%(u.login,u.host_id.name)
         return ret
-    _defaults = {
-        'backup_subdir':'backups',
+  #  _defaults = {
+   #     'backup_subdir':'backups',
 
 #Submenu: Applications
 class repository(models.Model):
@@ -216,10 +216,10 @@ class repository(models.Model):
         #'remote_account_id':fields.Many2one('res.users','Remote Account'),
     remote_login = fields.Char('Remote Login',size=122)
     remote_location = fields.Char('Remote Location',size=1111)
-        'remote_proto':fields.Selection([('git','git'),('bzr+ssh','bzr+ssh'),('http','http'),('https','https'),('ssh','ssh'),('lp','lp')],'Remote_Proto'),#not all supported
-        'remote_name':fields.Char('Remote Name',size=122), #used in git
+    remote_proto = fields.Selection([('git','git'),('bzr+ssh','bzr+ssh'),('http','http'),('https','https'),('ssh','ssh'),('lp','lp')],'Remote_Proto') #not all supported
+    remote_name = fields.Char('Remote Name',size=122) #used in git
 
-	'local_location':fields.Char('Local Location',size=1111),
+    local_location = fields.Char('Local Location',size=1111)
        
     branch = fields.Char('Branch',size=100)
     addon_subdir = fields.Char('Addon Subdir',size=100)
@@ -232,12 +232,12 @@ class repository(models.Model):
     code = fields.Char("Code Stored")
     signature = fields.Text("Signature")
         
-        }
-    _defaults = {
-        'delete':False,
-        'push':True,
-        'pull':True,
-        }
+    #    }
+    #_defaults = {
+    #    'delete':False,
+    #    'push':True,
+    #    'pull':True,
+    #    }
 #[root_directory, remote_host_id.name, local_location, remote_location]
 class repository_clone(models.Model): #will be likely deprecated
     _name ='deploy.repository.clone' #Repository clones
@@ -305,11 +305,13 @@ class deploy(models.Model):
     password_id = fields.Many2one('deploy.password','Admin Password')
         #'clone_ids':fields.Many2many('deploy.repository', 'application_repository','app_id','repository_id', 'Repositories'),
     name = fields.Char('Name',size=444)
-        #'host_id':fields.Many2one('deploy.host','Host'),#hostname
-    user_id = fields.Many2one('deploy.host.user','HostUser')
+#    host_id = fields.Many2one('deploy.host', related='user_id', string='Host') #hostname
+    user_id = fields.Many2one('deploy.host.user','User' )
         #'host_id_depr':fields.Many2one('deploy.host','HostDepr'),
         #'host_id':fields.Many2one('deploy.host','Host'),
-    host_id = fields.Related('user_id', 'host_id',  string="Host",type="many2one",relation="deploy.host")
+    #host_id = fields.Many2one('user_id', 'host_id',  string="Host",type="many2one",relation="deploy.host")
+#    host_id = fields.Many2one('user_id', 'host_id',  string="Host",type="many2one",relation="deploy.host")
+    
         #'ROOT':fields.Char('site_name',size=444),
     site_name = fields.Char('site_name',size=444)
     daemon = fields.Boolean('daemon')
@@ -318,9 +320,9 @@ class deploy(models.Model):
     parse_config = fields.Boolean('parse_config')
     ServerName = fields.Char('ServerName',size=444)
     IP = fields.Char('IP',size=100)
-        'PORT':fields.Integer('PORT'), 
+    PORT = fields.Integer('PORT') 
     IPSSL = fields.Char('IP',size=100)
-        'PORTSSL':fields.Integer('PORT'), 
+    PORTSSL = fields.Integer('PORT') 
 
     SSLCertificateFile = fields.Char('SSLCertificateFile',size=111)
     SSLCertificateKeyFile = fields.Char('SSLCertificateKeyFile',size=111)
@@ -342,13 +344,13 @@ class deploy(models.Model):
 class pg_database(models.Model):
     _name="deploy.pg.database"
 
-        'name':fields.Char("name",size=444),        
+    name = fields.Char("name",size=444)        
     type = fields.Selection([('live','live'),('virtual','virtual'),('system','system'),('demo','demo'),('snapshot','snapshot'),('replicated','replicated')], 'type')
     date = fields.Date('date')
     backup = fields.Boolean('backup needed')
         #'pg_user_id':fields.Many2one('deploy.pg.user','PG USER'),
     deploy_id = fields.Many2one('deploy.deploy','Deployments')
-    pg_user_id = fields.Related('deploy_id', 'pg_user_id',  string="PG USER",type="many2one",relation="deploy.pg.user")
+#    pg_user_id = fields.Related('deploy_id', 'pg_user_id',  string="PG USER",type="many2one",relation="deploy.pg.user")
     secret_key = fields.Char("Secret Key")
     code = fields.Char("Code Stored")
     signature = fields.Text("Signature")
@@ -362,9 +364,9 @@ class mako_template(models.Model):
     type = fields.Selection([('template','template'),('bash','bash'),('python','python')],'Type' )
     gl_command = fields.Char('GoLive Command',size=444)
     model = fields.Char('model',size=444)
-        'module':fields.Char('module',size=444), #to locate template
-        'path':fields.Char('path', size=444),    #to locate template
-        'fn':fields.Char('fn',size=4444),        #to locate template
+    module = fields.Char('module',size=444) #to locate template
+    path = fields.Char('path', size=444)    #to locate template
+    fn = fields.Char('fn',size=4444)        #to locate template
 
     domain = fields.Char('domain',size=444)
     out_fn = fields.Char('out_fn',size=444)
@@ -386,13 +388,13 @@ class mako_template(models.Model):
 class deploy_file(models.Model):
     _name = "deploy.file"
     _name_rec = "command"
-    _columns = {
+    #_columns = {
     command = fields.Char('Last Command',size=444)
         #'model':fields.Char('model',size=444),
     res_id = fields.Integer('res_id')
     template_id = fields.Many2one('deploy.mako.template', 'Template Used')
     encrypted = fields.Boolean('Encrypted')
-        'user_id':fields.Many2one('deploy.host.user','User'),        
+    user_id = fields.Many2one('deploy.host.user','User')        
     sequence = fields.Integer('Sequence')
     file_written = fields.Char('File Written', size=444)
     content_written = fields.Text('Content Written')
@@ -404,20 +406,16 @@ class deploy_file(models.Model):
     
 class export_tag(models.Model):
     _name = "deploy.export.tag"
-    _columns ={
+
     name = fields.Char("name", size=100)
     sequence = fields.Integer('sequence')
     parent_id = fields.Many2one("deploy.export.tag", "Parent Tag")
-    field_ids = fields_rel', 'tag_id', 'field_id', 'Tags')
+    field_ids = fields.Many2many('fields_rel', 'tag_id', 'field_id', 'Tags')
         
     secret_key = fields.Char("Secret Key")
     code = fields.Char("Code Stored")
     signature = fields.Text("Signature")
         
-        }
-    _default = {
-        'sequence':100,
-        }
 
 class ir_model(models.Model):
     _inherit = "ir.model"
@@ -430,38 +428,38 @@ class ir_model(models.Model):
     signature = fields.Text("Signature")
         
     
-    def name_get2(self,cr, uid, ids, context=None):
+    def name_get2(self,cr, uid, ids):
         ret={}
-        for m in self.browse(cr, uid, ids):
+        for m in self.browse(ids):
             ret[m.id]="%s[%s]"%(m.name,m.model)
         return ret
-    _default = {
-        'sequence':100,
-        'export_domain':'[]',
-        }
+    #_default = {
+    #    'sequence':100,
+    #    'export_domain':'[]',
+    #    }
 
 class ir_model_fields(models.Model):
     _inherit = "ir.model.fields"
     _order = "sequence"
 
     sequence = fields.Integer('Sequence')
-        'export_tag_ids':fields.Many2many('deploy.export.tag', 'deploy_export_tag_ir_model_fields_rel', 'field_id', 'tag_id', 'Export Tags'),        
+    export_tag_ids = fields.Many2many('deploy.export.tag', 'deploy_export_tag_ir_model_fields_rel', 'field_id', 'tag_id', 'Export Tags')        
     secret_key = fields.Char("Secret Key")
     code = fields.Char("Code Stored")
     signature = fields.Text("Signature")
         
     
-    def write(self, cr, uid, ids, vals, context=None):
+    def write(self, vals):
         if context is None:
             context = {}
         context['manual']='manual'
         prev={}
-        for f in self.browse(cr, uid, ids):
+        for f in self.browse(ids):
             prev[f.id]=f.state
             cr.execute("update ir_model_fields set state='manual' where id=%s", (f.id, ) )
         #    f.write({'state':'manual'})
-        res = super(ir_model_fields,self).write(cr, uid, ids, vals, context=context)
-        for f in self.browse(cr, uid, ids):
+        res = super(ir_model_fields,self).write(ids, vals)
+        for f in self.browse(ids):
             cr.execute("update ir_model_fields set state=%s where id=%s", (prev[f.id], f.id, ) )
         return res
     _default = {
@@ -482,10 +480,10 @@ def export_data(pool, cr, uid, model, fn, field_list, arg):
         if f in field_list:
             f_map[f]=v
     fields = f_map
-    #id_ref_ids = pool.get('ir.model.data').search(cr, uid, [('model','=',model)])   
-    #ref_ids = [x.res_id for x in pool.get('ir.model.data').browse(cr, uid, id_ref_ids)]
+    #id_ref_ids = pool.get('ir.model.data').search([('model','=',model)])   
+    #ref_ids = [x.res_id for x in pool.get('ir.model.data').browse(id_ref_ids)]
 
-    ids = pool.get(model).search(cr, uid, arg)
+    ids = pool.get(model).search(arg)
 
     header=[]
     header_export=['id']
@@ -505,7 +503,7 @@ def export_data(pool, cr, uid, model, fn, field_list, arg):
                 header.append(f)
                 header_export.append(f)
     header_types = [fields[x]['type'] for x in header]
-    data = pool.get(model).export_data(cr, uid, ids,  header_export)
+    data = pool.get(model).export_data(ids,  header_export)
     out=[]
     for row in data['datas']:
         out_row=[row[0]]
@@ -553,17 +551,17 @@ class res_company(models.Model):
     signature = fields.Text("Signature")
         
     
-    def set_external_ids(self, cr, uid, ids, context=None):
-        for c in self.browse(cr, uid, ids):
-            tag_ids = self.pool.get('deploy.export.tag').search(cr, uid, [])
+    def set_external_ids(self):
+        for c in self.browse(ids):
+            tag_ids = self.env['deploy.export.tag'].search([])
             model_ids = []
             tag_id_map={}
-            for tag in self.pool.get('deploy.export.tag').browse(cr, uid, tag_ids):
+            for tag in self.env['deploy.export.tag'].browse(tag_ids):
                 tag_id_map[tag.name]=tag
                 for f in tag.field_ids:
                     model_ids.append( f.model_id.id )
 
-            for m in self.pool.get('ir.model').browse(cr, uid, model_ids):
+            for m in self.env['ir.model'].browse(model_ids):
                 fields = m.field_id
                 tag_map = {}
                 for f in fields:
@@ -589,28 +587,28 @@ class res_company(models.Model):
                          ]
                     val=dict( [(x[0],x[2]) for x in arg] )
                     val['sequence']=sq
-                    ef_id = self.pool.get('deploy.exported.file').search(cr, uid,arg)
+                    ef_id = self.env['deploy.exported.file'].search(cr, uid,arg)
                     if not ef_id:
-                        ef_id = self.pool.get('deploy.exported.file').create(cr, uid, val)
-                    export_data(self.pool, cr, uid, m.model, file_path, flds, m.export_domain)
+                        ef_id = self.env['deploy.exported.file'].create(val)
+                    export_data(self.env, cr, uid, m.model, file_path, flds, m.export_domain)
                 
         return True
 
 class tag_wizzard(models.TransientModel):
     _name = 'deploy.export.tag.wizzard'
     _description="Export Tag"
-    _columns ={
+
     tag_ids = fields.Many2many('deploy.export.tag', 'tag_wizzard_tag_rel', 'wiz_id', 'tag_id', 'Export Tags')
         #'name':fields.Char('Name', size=444),
         #'start_period': fields.Many2one('account.period','Start Period', required=True),
         #'end_period': fields.Many2one('account.period','End Period', required=True),        
-        }
-    def set_tags(self, cr, uid, ids, context=None):
+
+    def set_tags(self):
         active_ids = context.get('active_ids', [])
         print active_ids
-        for w in self.browse(cr, uid, ids):
+        for w in self.browse(ids):
             val={'export_tag_ids':[(6,0,[t.id for t in w.tag_ids])]}
-            self.pool.get('ir.model.fields').write(cr, uid, active_ids, val, context=context)
+            self.env['ir.model.fields'].write(active_ids, val)
             
         return True
 
