@@ -1,0 +1,97 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+      <record id="skynet_access" model="res.groups">
+	<field name="name">Skynet Sync</field>
+	<field name="comment">The user will have access to skynet sync configuration.</field>
+      </record>
+
+        <!-- Top menu item -->
+        <menuitem id='skynet_main' name='Skynet' sequence="100"/>
+        <menuitem id='skynet' name='Skynet' parent="skynet_main" sequence="100"/>
+
+        <menuitem id='skynet_config' name='Configuration' parent="skynet_main" sequence="100"/>
+
+
+        <!-- SKYNET SCHEMA MODEL -->
+	
+        <record id="view_skynet_schema_model_form" model="ir.ui.view">
+            <field name="name">skynet.schema.model.form</field>
+            <field name="model">skynet.schema.model</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Skynet Schema Model">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+			    <field name="sequence"/>
+			    <field name="model_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+        
+        <record id="view_skynet_schema_model_tree" model="ir.ui.view">
+          <field name="name">analysis.tree</field>
+          <field name="model">skynet.schema.model</field>
+          <field name="arch" type="xml">
+            <tree string="Skynet Schema Model">
+<!--              <field name="name"/>   -->
+	      <field name="sequence"/>
+	      <field name="model_id"/>
+            </tree>
+          </field>
+        </record>
+
+	<!--
+        <record model="ir.actions.act_window" id="action_skynet_schema_model_form">
+            <field name="name">Skynet Schema Model</field>
+            <field name="res_model">skynet.schema.model</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Schema Model" parent="skynet_config" id="menu_skynet_schema_models_form" action="action_skynet_schema_model_form" />
+	-->
+
+	
+        <!-- SKYNET SCHEMA -->
+        <record id="view_skynet_schema_form" model="ir.ui.view">
+            <field name="name">skynet.schema.form</field>
+            <field name="model">skynet.schema</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Skynet">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+			    <field name="model_ids"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+        
+        <record id="view_skynet_schema_tree" model="ir.ui.view">
+          <field name="name">analysis.tree</field>
+          <field name="model">skynet.schema</field>
+          <field name="arch" type="xml">
+            <tree string="Skynet Schema">
+              <field name="name"/>
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_skynet_schema_form">
+            <field name="name">Skynet Schema</field>
+            <field name="res_model">skynet.schema</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Schema" parent="skynet_config" id="menu_skynet_schemas_form" action="action_skynet_schema_form" />
+
+	
+    </data>
+</openerp>
