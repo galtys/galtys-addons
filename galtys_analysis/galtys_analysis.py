@@ -92,6 +92,8 @@ class analysis_week(osv.osv):
             res[r.id] = val
         return res
     _columns = {
+        'code':fields.char("Code Stored"),
+        'secret_key':fields.text("Secret_Key"),        
         'year_id':fields.many2one("analysis.year", "Year"),
         'wk':fields.integer("Week"),
         "date_start":fields.date("Date Start"),
@@ -116,7 +118,8 @@ class analysis_year(osv.osv):
         "y":fields.integer("Year"),
         "week_ids":fields.one2many("analysis.week.forecast","year_id","Weeks"),
         "month_ids":fields.one2many("analysis.month.target","year_id","Month"),
-
+        'code':fields.char("Code Stored"),
+        'secret_key':fields.text("Secret_Key"),        
     }
     def setup_weeks(self, cr, uid, ids, context=None):
         c=calendar.Calendar(0)
@@ -155,6 +158,9 @@ class analysis_month_target(osv.osv):
         'month':fields.integer("Month"),
         'sale_target':fields.integer("Sale Target"),
         "active":fields.boolean("Active"),
+        'code':fields.char("Code Stored"),
+        'secret_key':fields.text("Secret_Key"),        
+        
     }
     _defaults = {
         "active":True,

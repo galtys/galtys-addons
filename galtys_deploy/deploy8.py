@@ -1,20 +1,20 @@
-from odoo import fields, models
+from openerp.osv import fields, osv, expression
 import openerp.addons.decimal_precision as dp
 import os
 
-class repository2(models.Model):
+class repository2(osv.osv):
     _inherit = "deploy.repository"
-    def _get_url(self): #,field_name,arg):
+    def _get_url(self, cr, uid, ids,field_name,arg, context=None):
         #print 'BAFFF'
         res={}
-  #      models_data = self.env['ir.model.data']
+  #      models_data = self.pool.get('ir.model.data')
    #     cr.execute("select res_id,name,module from ir_model_data where model='deploy.repository.clone' and res_id in (%s)" % ",".join(map(str,ids)) )
     #    ext_map=dict([(x[0],'%s.%s'%(x[2],x[1])) for x in cr.fetchall()])
 
-        for r in self: #.browse(ids):
+        for r in self.browse(cr, uid, ids):
             #print [clone.name, clone.owner_id.name]
             
-            #dummy, form_view = models_data.get_object_reference('postcode_address_search', 'view_address_finder_form')
+            #dummy, form_view = models_data.get_object_reference(cr, uid, 'postcode_address_search', 'view_address_finder_form')
             if r.remote_id:
                 c=r.remote_id
             else:
@@ -45,21 +45,21 @@ class repository2(models.Model):
                        'mkdir':"mkdir -p %s" % local}
 
         return res
+    _columns = {
+        'url':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='URL'),
+#        'extid':fields.function(_get_url, type="char",size=333,multi='url',method=True,string='EXTID'),
+        'git_clone':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='GIT CLONE'),
+        'mkdir':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='mkdir'),
+        #'type':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='type'),
+        'local_location_fnc':fields.function(_get_url, type='char', size=1000,multi='url',method=True,string='llf'),
+        }
 
-    url = fields.Char(compute="_get_url", size=1000,multi='url',method=True,string='URL')
-#    extid = fields.Char(compute="_get_url",size=333,multi='url',method=True,string='EXTID')
-    git_clone = fields.Char(compute="_get_url", size=1000,multi='url',method=True,string='GIT CLONE')
-    mkdir = fields.Char(compute="_get_url", size=1000,multi='url',method=True,string='mkdir')
-        #'type':fields.Char(compute="_get_url", size=1000,multi='url',method=True,string='type'),
-    local_location_fnc = fields.Char(compute="_get_url", size=1000,multi='url',method=True,string='llf')
-#        }
 
-
-class deploy2(models.Model):
+class deploy2(osv.osv):
     _inherit = "deploy.deploy"
-    def _get(self): #,field_name,arg):
+    def _get(self, cr, uid, ids,field_name,arg, context=None):
         res={}
-        for d in self: #.browse(ids):
+        for d in self.browse(cr, uid, ids):
             OPTIONS=[('db_host', '127.0.0.1'),
                      ('db_port', str(d.pg_user_id.cluster_id.port)),
                      ('db_user', d.pg_user_id.login),
@@ -108,31 +108,31 @@ class deploy2(models.Model):
                        #'bzr_branch':"bzr branch %s"%url,
                        #'mkdir':"mkdir -p %s" % local,
         return res
+    _columns = {
+        'options':fields.function(_get, type='char', size=1000,multi='options',method=True),
+       # 'implicit_clone_ids':fields.function(_get, type='one2many',relation='deploy.repository.clone',method=True,multi='options',string='Implicit Clones'),
+       # 'config_clone_ids':fields.function(_get, type='one2many',relation='deploy.repository.clone',method=True,multi='options',string='Config Clones'),
 
-    options = fields.Char(compute="_get", size=1000,multi='options',method=True)
-       # 'implicit_clone_ids':fields.One2many(compute="_get",relation='deploy.repository.clone',method=True,multi='options',string='Implicit Clones'),
-       # 'config_clone_ids':fields.One2many(compute="_get",relation='deploy.repository.clone',method=True,multi='options',string='Config Clones'),
+        'db_password':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'wsgi_script':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'odoo_config':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'odoo_log':fields.function(_get, type='char', size=1000,multi='options',method=True),
 
-    db_password = fields.Char(compute="_get", size=1000,multi='options',method=True)
-    wsgi_script = fields.Char(compute="_get", size=1000,multi='options',method=True)
-    odoo_config = fields.Char(compute="_get", size=1000,multi='options',method=True)
-    odoo_log = fields.Char(compute="_get", size=1000,multi='options',method=True)
+        'apache_log':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'apache_errlog':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'user':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'group':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'processes':fields.function(_get, type='char', size=1000,multi='options',method=True),
 
-    apache_log = fields.Char(compute="_get", size=1000,multi='options',method=True)
-    apache_errlog = fields.Char(compute="_get", size=1000,multi='options',method=True)
-    user = fields.Char(compute="_get", size=1000,multi='options',method=True)
-    group = fields.Char(compute="_get", size=1000,multi='options',method=True)
-    processes = fields.Char(compute="_get", size=1000,multi='options',method=True)
+        'admin_password':fields.function(_get, type='char', size=1000,multi='options',method=True),
+        'who':fields.function(_get, type='char', size=1000,multi='options',method=True,string='ByWho'),
+        'addons_path':fields.function(_get, type='char', size=1000,multi='options',method=True,string='addons_path'),
 
-    admin_password = fields.Char(compute="_get", size=1000,multi='options',method=True)
-    who = fields.Char(compute="_get", size=1000,multi='options',method=True,string='ByWho')
-    addons_path = fields.Char(compute="_get", size=1000,multi='options',method=True,string='addons_path')
+        'clone_ids':fields.function(_get,type='one2many',relation='deploy.repository',multi='options',method=True,string="clone_ids"),
+        #'db_ids':fields.one2many('deploy.pg.database','deploy_id',"db_ids"),        
+        }
 
-    clone_ids = fields.One2many(compute="_get",relation='deploy.repository',multi='options',method=True,string="clone_ids")
-        #'db_ids':fields.One2many('deploy.pg.database','deploy_id',"db_ids"),        
-    
-
-from odoo.modules.module import get_module_resource
+from openerp.modules.module import get_module_resource
 from mako.template import Template
 from mako.runtime import Context
 import os
@@ -173,24 +173,24 @@ def render_mako_file(template, context, fn=None):
     else:
         return None
 
-class deploy_password(models.Model):
+class deploy_password(osv.osv):
     _inherit = "deploy.password"
-    def _get(self): #, field_name,arg,context=None):
+    def _get(self, cr, uid, ids, field_name,arg,context=None):
         res={}
-        for p in self: #.browse(ids):
+        for p in self.browse(cr, uid, ids):
             tag="__PASS_%s_ID__%d__"%(self._name.replace('.','_'), p.id)
             res[p.id]={'pass_tag':tag}
         return res
+    _columns = {
+        'pass_tag':fields.function(_get,type='char',size=4444,multi='pass_tag',method=True,string='pass_tag'),
+        }
 
-    pass_tag = fields.Char(compute="_get",size=4444,multi='pass_tag',method=True,string='pass_tag')
-    
-
-class mako_template(models.Model):
+class mako_template(osv.osv):
     _inherit = "deploy.mako.template"
     _order = "sequence"
-    def _get(self): #,field_name,arg):
+    def _get(self, cr, uid, ids,field_name,arg, context=None):
         res={}
-        for t in self: #.browse(ids):
+        for t in self.browse(cr, uid, ids):
             #path = get_module_resource('hr', 'static/src/img', 'default_image.png')
             if t.module and t.path and t.fn:
                 path = get_module_resource(t.module, t.path, t.fn)
@@ -202,45 +202,44 @@ class mako_template(models.Model):
             else:
                 res[t.id] = {'source':'na','source_fn':'na'}                
         return res
+    _columns = {
+        #'model_id':fields.many2one('ir.model', 'Model Link')
+#        'out_file':fields.function(_get,type='text',multi='content',method=True,string='out_file'),       
+        'source':fields.function(_get,type='text',multi='content',method=True,string='source'),
+        'source_fn':fields.function(_get,type='char',size=4444,multi='content',method=True,string='source_fn'),
+        }
 
-        #'model_id':fields.Many2one('ir.model', 'Model Link')
-#        'out_file':fields.Text(compute="_get",multi='content',method=True,string='out_file'),       
-    source = fields.Text(compute="_get",multi='content',method=True,string='source')
-    source_fn = fields.Char(compute="_get",size=4444,multi='content',method=True,string='source_fn')
-    
-
-class host_user(models.Model):
+class host_user(osv.osv):
     _inherit = "deploy.host.user"
-    def _get(self): #,field_name,arg):
+    def _get(self, cr, uid, ids,field_name,arg, context=None):
         res={}
-        for u in self: #.browse(ids):
+        for u in self.browse(cr, uid, ids):
             res[u.id] = {'who':"%s@%s" % (u.login,u.host_id.name),
                          'info':"%s:%s" %( u.login, u.group_id.name ),
                          'numinfo': "%s:%s" %( u.uid, u.group_id.gid ),
                          'group':u.group_id.name}
         return res
+    _columns = {
+        'info':fields.function(_get,type='char',size=4444,multi='content',method=True,string='info'),
+        'numinfo':fields.function(_get,type='char',size=4444,multi='content',method=True,string='numinfo'),
 
-    info = fields.Char(compute="_get",size=4444,multi='content',method=True,string='info')
-    numinfo = fields.Char(compute="_get",size=4444,multi='content',method=True,string='numinfo')
-
-    group = fields.Char(compute="_get",size=4444,multi='content',method=True,string='group')
-    who = fields.Char(compute="_get",size=4444,multi='content',method=True,string='who')
+        'group':fields.function(_get,type='char',size=4444,multi='content',method=True,string='group'),
+        'who':fields.function(_get,type='char',size=4444,multi='content',method=True,string='who'),
         
 
-    
+        }
 import logging
-class deploy_file(models.Model):
+class deploy_file(osv.osv):
     _inherit = "deploy.file"
     _order = "template_id,user_id,sequence"
-    def _get(self):#,field_name,arg):
+    def _get(self, cr, uid, ids,field_name,arg, context=None):
         res={}
-        for f in self:#.browse(ids):
+        for f in self.browse(cr, uid, ids):
             #path = get_module_resource('hr', 'static/src/img', 'default_image.png')
             t=f.template_id
             path = get_module_resource(t.module, t.path, t.fn)
-            if t.model:#'active_id' in context:
-                print 'file _get: f.res_id', [t.model, f.res_id]
-                obj=self.env[t.model].browse(f.res_id )
+            if 1:#'active_id' in context:
+                obj=self.pool.get(t.model).browse(cr, uid, f.res_id )
                 if t.type in ['template','bash']:
                     ctx={#'context':context,
                          'o':obj,
@@ -270,55 +269,65 @@ class deploy_file(models.Model):
                              'user':render_mako_str(f.template_id.target_user, file_ctx),
                              'group':render_mako_str(f.template_id.target_group, file_ctx),}
             else:
-                res[f.id] = {'content_generated':'', #file(path).read(),
-                             'source_fn':'', #path,
+                res[f.id] = {'content_generated':file(path).read(),
+                             'source_fn':path,
                              'file_generated':'',
                              'who':f.user_id.who,
-                             'user':'', #render_mako_str(f.template_id.target_user, file_ctx),
-                             'group':'', #render_mako_str(f.template_id.target_group, file_ctx)}
-                             }
+                             'user':render_mako_str(f.template_id.target_user, file_ctx),
+                             'group':render_mako_str(f.template_id.target_group, file_ctx)}
+
             #fp = misc.file_open(pathname)
         return res
+    _columns = {
+        #'model_id':fields.many2one('ir.model', 'Model Link')
+        'file_generated':fields.function(_get,type='text',multi='content',method=True,string='file_generated'),       
+        'content_generated':fields.function(_get,type='text',multi='content',method=True,string='content_generated'),
+        'source_fn':fields.function(_get,type='char',size=4444,multi='content',method=True,string='source_fn'),
 
-        #'model_id':fields.Many2one('ir.model', 'Model Link')
-    file_generated = fields.Text(compute="_get",multi='content',method=True,string='file_generated')
-    content_generated = fields.Text(compute="_get",multi='content',method=True,string='content_generated')
-    source_fn = fields.Char(compute="_get",size=4444,multi='content',method=True,string='source_fn')
+        'user':fields.function(_get,type='char',size=4444,multi='content',method=True,string='user'),
+        'group':fields.function(_get,type='char',size=4444,multi='content',method=True,string='group'),
+        'who':fields.function(_get,type='char',size=4444,multi='content',method=True,string='who'),
 
-    user = fields.Char(compute="_get",size=4444,multi='content',method=True,string='user')
-    group = fields.Char(compute="_get",size=4444,multi='content',method=True,string='group')
-    who = fields.Char(compute="_get",size=4444,multi='content',method=True,string='who')
-
-    
+        }
 import bitcoin
-class deploy_account(models.Model):
+class deploy_account(osv.osv):
     _inherit = "deploy.account"
-    #def _get(self,field_name,arg):
-    def _compute_keys(self):#, field_name, args):
+    #def _get(self, cr, uid, ids,field_name,arg, context=None):
+    def _compute_keys(self, cr, uid, ids, field_name, args, context=None):
         res={}
-        for c in self:#.browse(ids):
+        for c in self.browse(cr, uid, ids, context=context):
             pub_key = bitcoin.privtopub(c.secret_key)
             val={'public_key': 'x', #pub_key,
                  'code_fnct': '', #bitcoin.pubtoaddr( pub_key ),
                  }
             res[c.id]=val
         return res
+    _columns = {
+        'public_key':fields.function(_compute_keys,
+                                     string="Public Key", 
+                                     type='char',
+                                     size=444,
+                                     method=True),
+        'code_fnct':fields.function(_compute_keys,
+                                    string="code", 
+                                    type='char',
+                                    size=444,
+                                     method=True),
 
-    public_key = fields.Char(compute="_compute_keys", string="Public Key")
-    code_fnct = fields.Char(compute="_compute_keys", string="code")
+    }
     
-class deploy_pg_cluster(models.Model):
+class deploy_pg_cluster(osv.osv):
     _inherit = "deploy.pg.cluster"
-    def _get_template(self): #,field_name,arg):
+    def _get_template(self, cr, uid, ids,field_name,arg, context=None):
         res={}
-        template_ids = self.env['deploy.mako.template'].search([('model','=',self._name)])
-        for c in self: #.browse(ids):
+        template_ids = self.pool.get('deploy.mako.template').search(cr, uid, [('model','=',self._name)])
+        for c in self.browse(cr, uid, ids):
             
             res[c.id] = {'template_ids':template_ids}
         return res
-
-    template_ids = fields.One2many(compute="_get_template",relation='deploy.mako.template',multi='template',method=True)
-    
+    _columns = {
+        'template_ids':fields.function(_get_template, type='one2many',relation='deploy.mako.template',multi='template',method=True),
+        }
 
 import csv
 def read_csv(fn):
@@ -343,13 +352,13 @@ def export_data(pool, cr, uid, model, fn, db_only=True, ext_ref=None,module=None
     #print obj._columns
 
     if db_only:
-        fields = dict([x for x in obj.fields_get(x[0])])
+        fields = dict([x for x in obj.fields_get(cr, uid).items() if db_field(obj, x[0])])
     else:
         fields = obj.fields_get(cr, uid)
-    id_ref_ids = pool.get('ir.model.data').search([('model','=',model),('module','=',module)])   
-    ref_ids = [x.res_id for x in pool.get('ir.model.data').browse(id_ref_ids)]
-    #print fields.Keys()
-    ids = pool.get(model).search([])
+    id_ref_ids = pool.get('ir.model.data').search(cr, uid, [('model','=',model),('module','=',module)])   
+    ref_ids = [x.res_id for x in pool.get('ir.model.data').browse(cr, uid, id_ref_ids)]
+    #print fields.keys()
+    ids = pool.get(model).search(cr, uid, [])
     if ext_ref is None:
         pass
     elif ext_ref is 'ref_only':
@@ -360,7 +369,7 @@ def export_data(pool, cr, uid, model, fn, db_only=True, ext_ref=None,module=None
     #    ids=ids[0:90]
     if os.path.isfile(fn):
         header_export=read_csv(fn)[0]
-        data = pool.get(model).export_data(ids,  header_export)
+        data = pool.get(model).export_data(cr, uid, ids,  header_export)
         out=[]
         for row in data['datas']:
             if 0:
@@ -394,7 +403,7 @@ def export_data(pool, cr, uid, model, fn, db_only=True, ext_ref=None,module=None
         header=[]
         header_export=['id']
         #print model
-        for f, v in fields.Items():
+        for f, v in fields.items():
             #print '  ',f,v
             if 'function' not in v:            
                 if v['type'] in ['many2one', 'many2many']:
@@ -413,7 +422,7 @@ def export_data(pool, cr, uid, model, fn, db_only=True, ext_ref=None,module=None
     #if 1:
         header_types = [fields[x]['type'] for x in header]
         #print [ids, header_export]
-        data = pool.get(model).export_data(ids,  header_export)
+        data = pool.get(model).export_data(cr, uid, ids,  header_export)
         out=[]
         for row in data['datas']:
             out_row=[row[0]]
@@ -433,10 +442,10 @@ def export_data(pool, cr, uid, model, fn, db_only=True, ext_ref=None,module=None
         fp.close()
         return out
 import os
-class ir_module_module(models.Model):
+class ir_module_module(osv.osv):
     _inherit = "ir.module.module"
-    def master_data_export(self):
-        for m in self.browse(ids):
+    def master_data_export(self, cr, uid, ids, context=None):
+        for m in self.browse(cr, uid, ids):
             path = get_module_resource(m.name, '', '__openerp__.py')
             mod_meta=eval(file(path).read())
             files=mod_meta['update_xml']
@@ -445,16 +454,16 @@ class ir_module_module(models.Model):
                 #fn.split('.')
                 model = fn[:-4]#.split('.')
                 dest_fn=get_module_resource(m.name,p, fn)
-                export_data(self.env, cr, uid, model, dest_fn, db_only=True, module=m.name)
+                export_data(self.pool, cr, uid, model, dest_fn, db_only=True, module=m.name)
                 #print p,fn
             
         return {'ok':'done'}
     
-class host(models.Model):
+class host(osv.osv):
     _inherit = 'deploy.host'
-    def _host(self):#, field_name, arg):
+    def _host(self, cr, uid, ids, field_name, arg, context=None):
         res={}
-        for h in self:# .browse(ids):
+        for h in self.browse(cr, uid, ids):
             b=int( h.memory_total*h.memory_pagesize*(h.memory_buffer_percent/100.0) )#BYTES
             #print [h.memory_total, h.memory_pagesize, h.memory_buffer_percent ]
             mb=2**20
@@ -469,22 +478,22 @@ class host(models.Model):
                        'kernel_shmall':shmall,
                        'kernel_shmmax':shmmax}
         return res
-    def _deploy(self):#, field_name, arg):
+    def _deploy(self, cr, uid, ids, field_name, arg, context=None):
         res={}
-        for h in self: #.browse(ids):
-            deploy_ids=self.env['deploy.deploy'].search([])
+        for h in self.browse(cr, uid, ids):
+            deploy_ids=self.pool.get('deploy.deploy').search(cr,uid, [])
             d_ids=[]
-            for d in deploy_ids: #self.env['deploy.deploy'].browse(deploy_ids):
+            for d in self.pool.get('deploy.deploy').browse(cr, uid, deploy_ids):
                 if d.user_id.host_id.id==h.id:
                     d_ids.append(d.id)
 
             res[h.id]={'deploy_ids':d_ids}
         return res
+    _columns = {
+        'memory_buffer_calc':fields.function(_host,type='integer',multi='host',method=True,string="Calc buff size"),
+        'memory_buffer_calc_mb':fields.function(_host,type='integer',multi='host',method=True,string="Calc buff size MB"),
+        'kernel_shmall':fields.function(_host,type='integer',multi='host',method=True,string="shmall"),
+        'kernel_shmmax':fields.function(_host,type='integer',multi='host',method=True,string="shmmax"),
+        'deploy_ids':fields.function(_deploy,type='one2many',relation='deploy.deploy',multi='host',method=True,string="deploy"),
 
-    memory_buffer_calc = fields.Integer(compute="_host",multi='host',method=True,string="Calc buff size")
-    memory_buffer_calc_mb = fields.Integer(compute="_host",multi='host',method=True,string="Calc buff size MB")
-    kernel_shmall = fields.Integer(compute="_host",multi='host',method=True,string="shmall")
-    kernel_shmmax = fields.Integer(compute="_host",multi='host',method=True,string="shmmax")
-    deploy_ids = fields.One2many(compute="_deploy",relation='deploy.deploy',multi='host',method=True,string="deploy")
-
-    
+        }
