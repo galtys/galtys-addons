@@ -64,9 +64,11 @@
                 <form version="7.0" string="Skynet">
                     <sheet>
                         <group>
-                            <field name="name"/>
-			    <field name="model_ids"/>
+                          <field name="name"/>
+			  <button name="store_registry_json" string="Store Registry Json" type="object" />
                         </group>
+			<field name="model_ids"/>
+			<field name="registry_json"/>
                     </sheet>
                 </form>
             </field>
