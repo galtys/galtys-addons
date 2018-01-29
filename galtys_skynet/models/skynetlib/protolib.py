@@ -1,5 +1,5 @@
-from pydir.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry,Magic,Header,Record
-import pydir.odoopb_pb2 as odoopb
+from odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry,Magic,Header,Record
+import odoopb_pb2 as odoopb
 
 import optparse
 import os

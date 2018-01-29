@@ -9,9 +9,9 @@ import google.protobuf.json_format
 import base64
 import json
 import pprint
-from pydir.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
-from protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
-import odoo2proto
+from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
+from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
+import skynetlib.odoo2proto as odoo2proto
 #from odoo2proto import odoo2pbmsg
 
 
