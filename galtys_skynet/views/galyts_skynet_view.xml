@@ -65,9 +65,18 @@
                     <sheet>
                         <group>
                           <field name="name"/>
+			  <field name="settings_id"/>o
 			  <button name="store_registry_json" string="Store Registry Json" type="object" />
+			  <button name="store_pb" string="Store PB" type="object"/>
+			  <button name="store_proto" string="Store proto" type="object"/>
+			  <button name="init_code"  string="init code" type="object"/>
+			  <button name="add_code_column" string="add code column" type="object"/>
                         </group>
+			<separator string = "Models"/>
 			<field name="model_ids"/>
+			<separator string = "Registry proto"/>
+			<field name="registry_proto"/>
+			<separator string = "Registry json"/>
 			<field name="registry_json"/>
                     </sheet>
                 </form>
