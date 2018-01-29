@@ -90,28 +90,54 @@ erp_type_to_pb = {
 }
 odoo_custom_pbfields = [FieldDef.REFERENCE,FieldDef.BINARY,FieldDef.MANY2ONE]
 
+HOMEDIR=os.environ['HOME']
+PROTODIR='protodir'
+
+REPOSDIR='codebasehq.com'
+PRJDIR='pjbrefct'
+PBDIR='pbdir'
+PYDIR='pydir'
+
+DEFAULT_PRJDIR=os.path.join(HOMEDIR,REPOSDIR,PRJDIR)
+
+DEFAULT_PROTODIR=os.path.join(DEFAULT_PRJDIR, PROTODIR)
+DEFAULT_PBDIR=os.path.join(DEFAULT_PRJDIR, PBDIR)
+DEFAULT_PYDIR=os.path.join(DEFAULT_PRJDIR, PYDIR)
+
 def add_OdooPB_group(parser):
     odoopb_group = optparse.OptionGroup(parser, "OdooPB")
-    odoopb_group.add_option("--protodir",
-                            dest='protodir',
-                            help="Default: [%default]",
-                            default='protodir'
-    )
     odoopb_group.add_option("--deployment-name",
                             dest='deployment_name',
                             help="Default: [%default]",
                             default='sales_actual'
     )
+    odoopb_group.add_option("--homedir",
+                            dest='homedir',
+                            help="Default: [%default]",
+                            default=HOMEDIR
+    )    
+    odoopb_group.add_option("--prjdir",
+                            dest='prjdir',
+                            help="<homedir>/<reposdir>/<prjdir> Default: [%default]",
+                            default=DEFAULT_PRJDIR,
+    )
+    
+
+    odoopb_group.add_option("--protodir",
+                            dest='protodir',
+                            help="Default: [%default]",
+                            default=DEFAULT_PROTODIR
+    )
     
     odoopb_group.add_option("--pbdir",
                             dest='pbdir',
                             help="Default: [%default]",
-                            default='pbdir'
+                            default=DEFAULT_PBDIR
     )
     odoopb_group.add_option("--pydir",
                             dest='pydir',
                             help="Default: [%default]",
-                            default='pydir'
+                            default=DEFAULT_PYDIR
     )
     odoopb_group.add_option("--protoc",
                             dest='protoc',
