@@ -97,6 +97,12 @@ def add_OdooPB_group(parser):
                             help="Default: [%default]",
                             default='protodir'
     )
+    odoopb_group.add_option("--deployment-name",
+                            dest='deployment_name',
+                            help="Default: [%default]",
+                            default='sales_actual'
+    )
+    
     odoopb_group.add_option("--pbdir",
                             dest='pbdir',
                             help="Default: [%default]",
