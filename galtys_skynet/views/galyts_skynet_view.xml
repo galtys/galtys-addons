@@ -76,6 +76,10 @@
 			<field name="model_ids"/>
 			<separator string = "Registry proto"/>
 			<field name="registry_proto"/>
+			
+			<separator string = "Registry dict"/>
+			<field name="registry_dict"/>
+			
 			<separator string = "Registry json"/>
 			<field name="registry_json"/>
                     </sheet>

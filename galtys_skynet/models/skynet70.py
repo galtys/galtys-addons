@@ -7,11 +7,12 @@ import datetime
 
 import google.protobuf.json_format
 import base64
-
+import json
+import pprint
 from pydir.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
 from protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
 import odoo2proto
-from odoo2proto import odoo2pbmsg
+#from odoo2proto import odoo2pbmsg
 
 
 def get_pb_fields_to_store(m):
@@ -85,6 +86,7 @@ class SkynetSchema(osv.osv):
         'name':fields.char("Name"),
         'settings_id':fields.many2one("skynet.settings",string="Settings"),
         'registry_json':fields.text("Registry Json"),
+        'registry_dict':fields.text("Registry dict"),
         'model_ids':fields.one2many("skynet.schema.model","schema_id","Schema Model"),
         'registry_pb':fields.binary("Registry PB"),
         'registry_proto':fields.text("Registry Proto"),
@@ -96,8 +98,18 @@ class SkynetSchema(osv.osv):
             models = []
             for sm in schema.model_ids:
                 models.append( sm.model_id.model )
-            registry_json = odoo2pbmsg(self.pool, cr, uid, models)
-            schema.write( {"registry_json":registry_json} )
+            print models
+            registry_dict = odoo2proto.odoo2pbmsg_dict(self.pool, cr, uid, models)
+            registry_json = json.dumps( registry_dict )
+            import StringIO
+            fp=StringIO.StringIO()
+            pprint.pprint(registry_dict, stream=fp)
+            
+            registry_dict_pprint=fp.getvalue()
+            
+            print 'ocas', registry_dict_pprint, registry_dict
+            schema.write( {"registry_json":registry_json,
+                           "registry_dict":registry_dict_pprint} )
         
     def store_pb(self, cr, uid, ids, context=None):
         for schema in self.browse(cr, uid, ids):

@@ -87,7 +87,7 @@ def erpmodel2dict(p, cr, uid):
     m['_fields']=fields
     return m
 
-def odoo2pbmsg(pool, cr, uid, models):
+def odoo2pbmsg_dict(pool, cr, uid, models):
     out=[]
     for model in models:
         model=pool.get(model)
@@ -98,5 +98,9 @@ def odoo2pbmsg(pool, cr, uid, models):
     out_dict = {'models':out}
     #import pprint
     #pprint.pprint(out_dict)
+    return out_dict
+
+def odoo2pbmsg(pool, cr, uid, models):
+    out_dict = odoo2pbmsg_dict(pool, cr, uid, models)
     registry_json = json.dumps( out_dict )
     return registry_json
