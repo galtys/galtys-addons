@@ -113,6 +113,7 @@ message FieldDef {
   string depends = 29;
   string company_dependent = 30;
   bool sortable = 31;
+  string group_operator = 32;
 }
 
 message Field {
