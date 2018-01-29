@@ -179,14 +179,14 @@ def main():
     if cmd in ['diff', 'd']:
         
         fp=sys.stdin
-        segments = protolib.stream2pb(fp, DEPLOYMENT_NAME)
+        segments = protolib.stream2pb(opt,fp, DEPLOYMENT_NAME)
         fp.close()
         seg=protolib.pb2op(segments, opt)
         protolib.segments2file(seg, sys.stdout)
         sys.stdout.close()    
     elif cmd in ['json','j']:
         fp=sys.stdin
-        segments = protolib.stream2pb(fp, DEPLOYMENT_NAME)
+        segments = protolib.stream2pb(opt,fp, DEPLOYMENT_NAME)
         fp.close()
         protolib.segments2json(segments, sys.stdout, opt)
         sys.stdout.close()
@@ -335,7 +335,7 @@ def main():
 
         field_relation_map = protolib.relation_map(pbr)
         fp=sys.stdin
-        segments = protolib.stream2pb(fp, DEPLOYMENT_NAME)
+        segments = protolib.stream2pb(opt,fp, DEPLOYMENT_NAME)
         fp.close()
         #print segments
         ret = protolib.segments2dict(segments)

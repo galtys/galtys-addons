@@ -255,12 +255,8 @@ def traverse_preorder(records, parent_field = 'parent_id', key_field='id',parent
     ret= [ recs2_map[tt] for tt,dd in tp.traverse_preorder() ]
     return ret
 
-def get_pb_class(cl_name, appname='pjbrefct'):
-    pjbrefct_module=importlib.import_module('pydir.%s_pb2'%appname)
-    res_partner_class = getattr(pjbrefct_module,  cl_name)
-    return res_partner_class
 
-def stream2pb(stream, appname):
+def stream2pb(opt,stream, appname):
     out=[]
     def read_magic(stream): #TBD, EOF does not work?        
         try:
@@ -285,7 +281,7 @@ def stream2pb(stream, appname):
         header.ParseFromString( stream.read(magic.header_size) )
         messages = []
         for record in header.record:
-            msg_class = get_pb_class( header._table, appname=appname )
+            msg_class = get_pb_class(opt, header._table, appname=appname )
             msg = msg_class()
             msg.ParseFromString( stream.read(record.size) )
             messages.append( msg )
@@ -472,8 +468,11 @@ def pb2stream(m, pb_messages):
     segment2stream(s, segment )
     return s.getvalue()
 
-def get_pb_class(cl_name, appname='pjbrefct'):
-    pjbrefct_module=importlib.import_module('pydir.%s_pb2'%appname)
+def get_pb_class(opt,cl_name, appname='pjbrefct'):
+    #print [opt.pydir]
+    if opt.pydir not in sys.path:
+        sys.path.append( opt.pydir )
+    pjbrefct_module=importlib.import_module('%s_pb2'%(appname) )
     res_partner_class = getattr(pjbrefct_module,  cl_name)
     return res_partner_class
 
@@ -585,7 +584,7 @@ def next_id(cr, sequence):
     return ret[0]
 def serialize_records(m, records, opt, hash_map, id2code_map, appname=''):
     _table = m._table
-    res_partner_class = get_pb_class(m._table, appname=appname)   
+    res_partner_class = get_pb_class(opt,m._table, appname=appname)   
     out=[]
     for ret in records:
         ret_js = get_pb_json(m, ret, opt, hash_map, id2code_map)
