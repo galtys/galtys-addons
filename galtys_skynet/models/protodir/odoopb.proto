@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package odoopb;
+
+message Magic {
+   fixed32 magic=1;
+   fixed32 header_size=2;
+}
+enum OPERATION {
+   NOTUSED=0;
+   SNAPSHOT=1;
+   CREATE=2;
+   UPDATE=3;
+   DELETE=4;
+   STACK=5;
+}
+
+message Record {
+   uint64 size= 1;
+   string code = 2;
+   bytes sha256=3;  //can be outside of the stream
+   bytes prev_sha256=4; //can be outside of the stream
+   OPERATION operation=5;
+}
+message Header {
+   string model = 1;
+   string _table = 2;
+   uint64 records = 3;		
+   repeated Record record = 4;
+   OPERATION operation=5;
+   string _sequence = 6;
+}
+
+message Reference {
+    string model = 1;
+    uint64 res_id = 2;
+}
+message Many2one {
+    uint64 id=1;
+    string code=2;
+    string cnt_hash=3;
+}
+
+message Binary {
+    enum Stored {
+         CONTENT=0;
+         CONTENT_HASH=1;
+    }
+    Stored stored = 1;
+    bytes content = 2;
+    string content_hash = 3;
+}
+
+message Digits {
+  sfixed32 precision = 1;
+  sfixed32 scale = 2; // Example (16, 2) tuple is (precision, scale)
+}
+
+message SelectionOption {
+  string name = 1;
+  string label = 2;
+}
+
+message FieldDef {
+  string string = 1;
+  enum FieldType  {
+     BOOLEAN = 0;
+     INTEGER = 1;
+     REFERENCE = 2;
+     CHAR = 3;
+     HTML = 4;
+     FLOAT = 5;
+     DATE = 6;
+     DATETIME = 7;
+     BINARY = 8;
+     SELECTION = 9;
+     MANY2ONE = 10;
+     ONE2MANY = 11;
+     MANY2MANY = 12;
+     FUNCTION = 13;
+     SERIALIZED = 14;
+     PROPERTY = 15;
+     TEXT= 16;
+  }
+  FieldType type = 2;
+//  string selection = 3; // seen in type=reference ... string=string, size=size, selection=selection
+  sfixed32 size = 4;
+  Digits digits = 5; // for float
+  repeated SelectionOption selection = 6;
+  string function = 7;
+  string fnct_inv = 8;
+  string fnct_inv_arg = 9;
+  string fnct_search = 10;
+  string relation = 11;
+  bool store = 12;
+  bool readonly = 13;
+  string context = 14;
+  string domain = 15;
+  string help = 16;
+  string relation_field = 17;
+  sfixed32 select = 18;
+  bool required = 19;
+  bool invisible = 20;
+  bool selectable = 21;
+  bool change_default = 22;
+  string deprecated = 23;
+  string m2m_join_columns = 24;
+  string m2m_join_table = 25;
+  bool translate = 26;
+// odoo8
+  bool searchable  = 27;
+  bool manual = 28;
+  string depends = 29;
+  string company_dependent = 30;
+  bool sortable = 31;
+  string group_operator = 32;
+}
+
+message Field {
+  FieldDef field_def = 1;
+  string name = 2;
+  bool indb = 3;
+}
+
+message Model {
+  string _name = 1;
+  string _description = 2;
+  bool _transient = 3;
+  string _inherit = 4;
+  string _inherits = 5;
+  string _table = 6;
+  string _sequence = 7;
+  repeated Field _fields = 8;
+}
+
+message Registry {
+  repeated Model models = 1;
+
+}

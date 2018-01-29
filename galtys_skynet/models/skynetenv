@@ -1,0 +1,4 @@
+PYTHONPATH=/home/jan/github.com/galtys_addons/galtys_skynet/models
+export PYTHONPATH
+PATH=$PATH:$PYTHONPATH/bin
+export PATH
