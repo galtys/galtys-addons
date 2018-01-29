@@ -132,3 +132,50 @@ def odoo2pbmsg_dict10(env, models):
     #import pprint
     #pprint.pprint(out_dict)
     return out_dict
+
+def get_pb_fields_to_store(m):
+    out=[]
+    for f in m._fields:
+        #fname, fd = f.name, f.field_def
+        #fnct_field = has_att_list(fd, ['function', 'fnct_inv'])
+        #r_field = fd.type in [FieldDef.SERIALIZED,FieldDef.FUNCTION,
+        #                      FieldDef.MANY2MANY,FieldDef.ONE2MANY,
+        #                      FieldDef.PROPERTY]
+        #if (not fnct_field) and (not r_field):
+        #        out.append(fname)
+        if f.indb:
+            out.append(f.name)
+    return out
+
+def get_proto_for_model(m, pb_fields_to_store=None):
+    pb_model_name = m._table
+    if pb_fields_to_store is None:
+        pb_fields_to_store = []
+    out="message %s {\n" % pb_model_name
+    count=1
+    for f in m._fields:
+        fname, fd = f.name, f.field_def
+        if fname in pb_fields_to_store:
+                pb_type=erp_type_to_pb[fd.type]
+                if fd.type in odoo_custom_pbfields:
+                    pb_item = "   odoopb.%s %s = %d;\n" % (pb_type, fname, count)
+                else:
+                    pb_item = "   %s %s = %d;\n" % (pb_type, fname, count)
+                out+=pb_item
+                count+=1
+    out+='} \n'
+    return out
+
+
+def pbmsg2proto(pbmsg, appname):
+    out="""syntax = "proto3";
+package %s;
+
+import "odoopb.proto";
+
+""" % appname
+    for m in pbmsg.models:
+        cols_pb = get_pb_fields_to_store(m)
+        out = out +  get_proto_for_model(m, cols_pb)
+    return out
+
