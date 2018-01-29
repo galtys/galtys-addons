@@ -14,6 +14,8 @@ from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_cus
 import skynetlib.odoo2proto as odoo2proto
 #from odoo2proto import odoo2pbmsg
 
+#for v8,v7
+from openerp.modules.module import get_module_resource
 
 def get_pb_fields_to_store(m):
     out=[]
@@ -66,8 +68,14 @@ class SkynetSettings(osv.osv):
     
     _columns={
         'name':fields.char("Name"),
+        'odoopb_proto':fields.text("odoopb proto"),
     }
-
+    def load_odoopb_proto(self, cr, uid, ids, context=None):
+        
+        for settings in self.browse(cr, uid, ids):
+            fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
+            settings.write( {'odoopb_proto': file(fn).read() } )
+            
 class SkynetModel(osv.osv):
     _name = "skynet.schema.model"
     _order = "sequence"

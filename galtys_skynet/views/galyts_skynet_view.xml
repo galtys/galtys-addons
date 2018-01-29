@@ -44,7 +44,7 @@
           </field>
         </record>
 
-	<!--
+	
         <record model="ir.actions.act_window" id="action_skynet_schema_model_form">
             <field name="name">Skynet Schema Model</field>
             <field name="res_model">skynet.schema.model</field>
@@ -53,7 +53,7 @@
         </record>
 
 	<menuitem name="Schema Model" parent="skynet_config" id="menu_skynet_schema_models_form" action="action_skynet_schema_model_form" />
-	-->
+	
 
 	
         <!-- SKYNET SCHEMA -->
@@ -107,6 +107,43 @@
 
 	<menuitem name="Schema" parent="skynet_config" id="menu_skynet_schemas_form" action="action_skynet_schema_form" />
 
+
+	<!-- SKYNET SETTINGS -->
+        <record id="view_skynet_settings_form" model="ir.ui.view">
+            <field name="name">skynet.settings.form</field>
+            <field name="model">skynet.settings</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Skynet">
+                    <sheet>
+                        <group>
+                          <field name="name"/>
+			  <button name="load_odoopb_proto" string="load odoopb proto" type="object"/>
+                        </group>
+			<field name="odoopb_proto"/>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+        
+        <record id="view_skynet_settings_tree" model="ir.ui.view">
+          <field name="name">skynet.settings.tree</field>
+          <field name="model">skynet.settings</field>
+          <field name="arch" type="xml">
+            <tree string="Skynet Setting">
+              <field name="name"/>
+            </tree>
+          </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_skynet_settings_form">
+            <field name="name">Skynet Settings</field>
+            <field name="res_model">skynet.settings</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Settings" parent="skynet_config" id="menu_skynet_settingss_form" action="action_skynet_settings_form" />
 	
     </data>
 </openerp>
