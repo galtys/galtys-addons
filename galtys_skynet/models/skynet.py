@@ -20,44 +20,183 @@ import bitcoin #bitcoin tools
 #    DEFAULT_SERVER_DATE_FORMAT,
 #    DEFAULT_SERVER_TIME_FORMAT)
 
-def secret_random_key(a):
-    return bitcoin.random_key()
+import google.protobuf.json_format
+import base64
+import json
+import pprint
+from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
+from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
+import skynetlib.odoo2proto as odoo2proto
+#from odoo2proto import odoo2pbmsg
 
-class SkynetCode(models.Model):
-    _name = "skynet.code"
-    _description = "Skynet Code"
-    _rec_name = 'code'
+#for v8,v7
+from odoo.modules.module import get_module_resource
 
-    @api.depends('secret_key')    
-    def _compute_keys(self):
-        for c in self:
-            c.public_key=bitcoin.privtopub(c.secret_key)
-            c.code=bitcoin.pubtoaddr( c.public_key )
+def get_pb_fields_to_store(m):
+    out=[]
+    for f in m._fields:
+        #fname, fd = f.name, f.field_def
+        #fnct_field = has_att_list(fd, ['function', 'fnct_inv'])
+        #r_field = fd.type in [FieldDef.SERIALIZED,FieldDef.FUNCTION,
+        #                      FieldDef.MANY2MANY,FieldDef.ONE2MANY,
+        #                      FieldDef.PROPERTY]
+        #if (not fnct_field) and (not r_field):
+        #        out.append(fname)
+        if f.indb:
+            out.append(f.name)
+    return out
 
-    secret_key=fields.Char("Secret Key", default=secret_random_key)
-    public_key=fields.Char("Public Key", compute='_compute_keys', store=True)
-    code=fields.Char("Code", compute='_compute_keys', store=True)
+def get_proto_for_model(m, pb_fields_to_store=None):
+    pb_model_name = m._table
+    if pb_fields_to_store is None:
+        pb_fields_to_store = []
+    out="message %s {\n" % pb_model_name
+    count=1
+    for f in m._fields:
+        fname, fd = f.name, f.field_def
+        if fname in pb_fields_to_store:
+                pb_type=erp_type_to_pb[fd.type]
+                if fd.type in odoo_custom_pbfields:
+                    pb_item = "   odoopb.%s %s = %d;\n" % (pb_type, fname, count)
+                else:
+                    pb_item = "   %s %s = %d;\n" % (pb_type, fname, count)
+                out+=pb_item
+                count+=1
+    out+='} \n'
+    return out
 
-    #signature=fields.Text("Signature")
-    prev_msg=fields.Many2one('skynet.code')
-    next_msg=fields.Many2one('skynet.code')
 
-class SkynetTransition(models.Model):
-    _name = "skynet.transition"
-    _description = "Skynet transition"
-    _rec_name = ''
+def pbmsg2proto(pbmsg, appname):
+    out="""syntax = "proto3";
+package %s;
 
-    code=fields.Many2one("skynet.code")
-    public_key_copy=fields.Char("Public Key (copy)")
-    message=fields.Text("Message")
-    signature=fields.Text("Signature")
-    signature_required=fields.Selection([('record','Record Level'),
-                                         ('user', 'User Level'),
-                                         ('admin', 'Admin'),
-                                         ('group', 'Group'),
-                                         ('model', 'Model'),] )
-    action = fields.Selection( [('create','Create'),
-                                ('update','Update'),
-                                ('delete','Delete'),
-                                ('merge','Merge')] )
+import "odoopb.proto";
+
+""" % appname
+    for m in pbmsg.models:
+        cols_pb = get_pb_fields_to_store(m)
+        out = out +  get_proto_for_model(m, cols_pb)
+    return out
+
+class SkynetSettings(models.Model):
+    _name = "skynet.settings"
+    _description = "Skynet Settings"
+
+    name = fields.Char("Name")
+    odoopb_proto = fields.Text("odoopb proto")
+
+    def load_odoopb_proto(self):
+        
+        for settings in self:
+            fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
+            #settings.write( {'odoopb_proto': file(fn).read() } )
+            settings.odoopb_proto = file(fn).read()
+            
+class SkynetModel(models.Model):
+    _name = "skynet.schema.model"
+    _order = "sequence"
+
+    name = fields.Char("name")
+    sequence = fields.Integer("sequence")
+    model_id = fields.Many2one("ir.model", "ERP MODEL")
+    schema_id = fields.Many2one("skynet.schema")
     
+class SkynetSchema(models.Model):
+    _name = "skynet.schema"
+    _description = "skynet.schema"
+
+    name = fields.Char("Name")
+    settings_id = fields.Many2one("skynet.settings",string="Settings")
+    registry_json = fields.Text("Registry Json")
+    registry_dict = fields.Text("Registry dict")
+    model_ids = fields.One2many("skynet.schema.model","schema_id","Schema Model")
+    registry_pb = fields.Binary("Registry PB")
+    registry_proto = fields.Text("Registry Proto")
+
+
+    def store_registry_json(self):
+
+        for schema in self:
+            models = []
+            for sm in schema.model_ids:
+                models.append( sm.model_id.model )
+            print models
+            uid = 1
+            registry_dict = odoo2proto.odoo2pbmsg_dict10(self.env, models)
+            registry_json = json.dumps( registry_dict )
+            import StringIO
+            fp=StringIO.StringIO()
+            pprint.pprint(registry_dict, stream=fp)
+            
+            registry_dict_pprint=fp.getvalue()
+            
+            #print 'ocas', registry_dict_pprint, registry_dict
+            #schema.write( {"registry_json":registry_json,
+            #               "registry_dict":registry_dict_pprint} )
+            schema.registry_json = registry_json
+            schema.registry_dict = registry_dict_pprint
+            #print registry_dict_pprint
+        
+    def store_pb(self):
+        for schema in self:
+            
+            pbmsg=google.protobuf.json_format.Parse(schema.registry_json, Registry() )
+            
+            x=base64.b64encode( pbmsg.SerializeToString() )
+            #schema.write( {"registry_pb":x})
+            schema.registry_pb=x
+    
+    def store_proto(self):
+        for schema in self:
+            x=schema.registry_pb
+            pbmsg=base64.b64decode( x )
+
+            pbr = Registry()
+            pbr.ParseFromString( pbmsg )
+            
+            registry_proto = pbmsg2proto(pbr, schema.settings_id.name)
+            #schema.write( {"registry_proto":registry_proto})
+            schema.registry_proto= registry_proto
+            
+    def add_code_column(self):
+        
+        for schema in self:
+            x=schema.registry_pb
+            pbmsg=base64.b64decode( x )
+
+            pbr = Registry()
+            pbr.ParseFromString( pbmsg )
+
+            for m in pbr.models:
+                cols=odoo2proto.get_columns_from_db(self.env.cr, m._table)
+
+                if 'code' not in cols:
+                    self.env.cr.execute("ALTER TABLE %s ADD COLUMN code varchar"%m._table)
+                    #print cols
+                #else:
+                #    cr.execute("alter table %s drop column %s"%(m._table, 'code'))
+                               
+                if 'secret_key' not in cols:
+                    self.env.cr.execute("ALTER TABLE %s ADD COLUMN secret_key varchar"%m._table)
+                #else:
+                #    cr.execute("alter table %s drop column %s"%(m._table, 'secret_key') )
+        
+    def init_code(self):
+        import bitcoin
+        for schema in self:
+            x=schema.registry_pb
+            pbmsg=base64.b64decode( x )
+
+            pbr = Registry()
+            pbr.ParseFromString( pbmsg )
+
+            for m in pbr.models:
+                cr.execute("select id from %s where code is Null"%m._table)
+                for rec in cr.fetchall():
+                    id_=rec[0]
+                    secret_key = bitcoin.random_key()
+                    pub_key = bitcoin.privtopub(secret_key)
+                    code = bitcoin.pubtoaddr( pub_key )
+                    sql_update="update %s set " % m._table
+                    self.env.cr.execute( sql_update+"code=%s,secret_key=%s where id=%s", (code,secret_key,id_) )
+

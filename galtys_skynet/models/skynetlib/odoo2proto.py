@@ -104,3 +104,31 @@ def odoo2pbmsg(pool, cr, uid, models):
     out_dict = odoo2pbmsg_dict(pool, cr, uid, models)
     registry_json = json.dumps( out_dict )
     return registry_json
+
+def erpmodel2dict10(p, env):
+    m={'_name': p._name,
+       '_description': p._description,
+       '_transient': p._transient,
+       '_table': p._table,
+       '_sequence': p._sequence,
+       #'_inherit' : str(p._inherit),
+       #'_inherits':str(p._inherits),
+    }
+    fields7=p.fields_get()
+    columns7=get_columns_from_db(env.cr, p._table)
+    fields = convert_fields(fields7, columns7)
+    m['_fields']=fields
+    return m
+
+def odoo2pbmsg_dict10(env, models):
+    out=[]
+    for model in models:
+        model=env[model] #pool.get(model)
+        model_dict=erpmodel2dict10(model,env)
+        #import pprint
+        #pprint.pprint(model_dict)
+        out.append( model_dict )
+    out_dict = {'models':out}
+    #import pprint
+    #pprint.pprint(out_dict)
+    return out_dict
