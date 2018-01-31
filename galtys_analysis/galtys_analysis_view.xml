@@ -170,6 +170,7 @@
 			    <field name="date_start" readonly="1"/>
 			    <field name="date_stop" readonly="1"/>
 			    <field name="sale_forecast"/>
+			    <field name="sale_actual" readonly="1"/>
 			    <field name="active"/>
 			    <field name="month1"/>
 			    <field name="daysmonth1"/>
@@ -195,6 +196,7 @@
 			    <field name="date_start" readonly="1"/>
 			    <field name="date_stop" readonly="1"/>
 			    <field name="sale_forecast"/>
+			    <field name="sale_actual"  readonly="1"/>
 			    <field name="month1"/>
 			    <field name="daysmonth1"/>
 			    <field name="forecastmonth1"/>
@@ -233,6 +235,7 @@
 			    <field name="month" />
 			    <field name="period_id" />
 			    <field name="sale_target"/>
+			    <field name="sale_actual"  readonly="1"/>
 			    <field name="active"/>
                         </group>
                     </sheet>
@@ -250,6 +253,7 @@
 			    <field name="month" readonly="1"/>
 			    <field name="period_id"  readonly="1"/>
 			    <field name="sale_target"/>
+			    <field name="sale_actual" readonly="1"/>
             </tree>
           </field>
         </record>
