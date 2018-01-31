@@ -100,7 +100,7 @@ class analysis_week(osv.osv):
         "date_stop":fields.date("Date Stop"),
         "sale_forecast":fields.float("Sale Forecast"),
         "sale_actual":fields.float("Sale Actual (stored)"),
-        "active":fields.boolean("Active"),
+#        "active":fields.boolean("Active"),
         'month1':fields.function(_calc, type='float', multi='calc',method=True,string='Month1'),
         'daysmonth1':fields.function(_calc, type='float', multi='calc',method=True,string='DaysMonth1'),
         'forecastmonth1':fields.function(_calc, type='float', multi='calc',method=True,string='forecastmonth1'),
@@ -109,9 +109,9 @@ class analysis_week(osv.osv):
         'forecastmonth2':fields.function(_calc, type='float', multi='calc',method=True,string='forecastmonth2'),
         'wk_title':fields.function(_calc, type='float', multi='calc',method=True,string='wk_title'),
     }
-    _defaults = {
-        "active":True,
-        }
+#    _defaults = {
+ #       "active":True,
+  #      }
 
 class analysis_year(osv.osv):
     _name = "analysis.year"
@@ -159,14 +159,14 @@ class analysis_month_target(osv.osv):
         'month':fields.integer("Month"),
         'sale_target':fields.integer("Sale Target"),
         'sale_actual':fields.integer("Sale Actual (stored)"),
-        "active":fields.boolean("Active"),
+#        "active":fields.boolean("Active"),
         'code':fields.char("Code Stored"),
         'secret_key':fields.text("Secret_Key"),        
         
     }
-    _defaults = {
-        "active":True,
-        }
+ #   _defaults = {
+  #      "active":True,
+   #     }
 
             
 class analysis_tag(osv.osv):
