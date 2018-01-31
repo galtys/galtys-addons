@@ -17,8 +17,10 @@ import base64
 import time
 import psycopg2
 from skynetlib.protolib import add_OdooPB_group
-
-ssl._create_default_https_context = ssl._create_unverified_context
+import lsb_release_ex
+lsb_info = lsb_release_ex.get_lsb_information()
+if lsb_info['RELEASE'] in ['16.04']:
+    ssl._create_default_https_context = ssl._create_unverified_context
 
 from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,traverse_preorder,get_output_file,get_input_file
 import skynetlib.protolib as protolib
