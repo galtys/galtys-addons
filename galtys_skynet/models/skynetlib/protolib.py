@@ -3,6 +3,7 @@ import odoopb_pb2 as odoopb
 
 import optparse
 import os
+import math 
 import hashlib
 import StringIO
 import google.protobuf.json_format
@@ -21,6 +22,9 @@ MAGIC_CONSTANT=437899321
 LEN_SHA256_DIGEST=32 # len( hashlib.sha256('').digest() )
 DATETIME_EPOCH = datetime.datetime(1970,1,1)
 EPOCH_SECONDS=0
+DEFAULT_FLOAT_DECIMAL=2
+
+DEFAULT_FLOAT_POW=math.pow(10, DEFAULT_FLOAT_DECIMAL)
 
 def str_to_seconds(t,f=DEFAULT_SERVER_DATETIME_FORMAT): #supports str type, datetime and date type
     if type(t) == datetime.date:
@@ -92,7 +96,8 @@ erp_type_to_pb = {
     FieldDef.REFERENCE:'Reference',
     FieldDef.CHAR:'string',
     FieldDef.HTML:'string',
-    FieldDef.FLOAT:'uint64',
+    FieldDef.FLOAT:'int64',
+    #FieldDef.FLOAT:'',
     #FieldDef.DATE:'google.protobuf.Timestamp',
     #FieldDef.DATETIME:'google.protobuf.Timestamp',
     FieldDef.DATE:'uint64',
@@ -560,8 +565,12 @@ def get_pb_dict(m, rec, opt, hash_map, id2code_map):
         elif fd.type in [FieldDef.SELECTION]:
             if v:
                 out.append( (k,v) )
-        elif fd.type in [FieldDef.INTEGER, FieldDef.FLOAT]:
+        elif fd.type in [FieldDef.INTEGER]:
             out.append( (k,v) )
+        elif fd.type in [FieldDef.FLOAT]:
+            vv=int( DEFAULT_FLOAT_POW * v )
+            out.append( (k,vv) )
+            
     out_dict = dict(out)
     return out_dict
 def relation_map(pbr):
@@ -610,8 +619,13 @@ def pbdict2dbdict(m, rec, opt, code2id_map, field_relation_map):
         elif fd.type in [FieldDef.SELECTION]:
             if v:
                 out.append( (k,v) )
-        elif fd.type in [FieldDef.INTEGER, FieldDef.FLOAT]:
+        elif fd.type in [FieldDef.INTEGER]:
             out.append( (k,int(v)) )
+        elif fd.type in [FieldDef.FLOAT]:
+            vv=float( v/DEFAULT_FLOAT_POW )
+            out.append( (k,vv) )
+            
+
             
     out_dict = dict(out)
 #    if 'code' in out_dict:
