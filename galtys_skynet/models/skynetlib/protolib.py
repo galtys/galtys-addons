@@ -9,6 +9,7 @@ import google.protobuf.json_format
 import importlib
 import json
 import datetime
+import dateutil
 import sys
 DEFAULT_SERVER_DATE_FORMAT = "%Y-%m-%d"
 DEFAULT_SERVER_TIME_FORMAT = "%H:%M:%S"
@@ -18,6 +19,8 @@ DEFAULT_SERVER_DATETIME_FORMAT = "%s %s" % (
 MAGIC_SIZE=10
 MAGIC_CONSTANT=437899321
 LEN_SHA256_DIGEST=32 # len( hashlib.sha256('').digest() )
+DATETIME_EPOCH = datetime.datetime(1970,1,1)
+EPOCH_SECONDS=0
 
 def str_to_seconds(t,f=DEFAULT_SERVER_DATETIME_FORMAT): #supports str type, datetime and date type
     if type(t) == datetime.date:
@@ -27,9 +30,16 @@ def str_to_seconds(t,f=DEFAULT_SERVER_DATETIME_FORMAT): #supports str type, date
     else:
         tt=t.split('.')
         t=datetime.strptime(tt[0], f)        
-        ret = (t-datetime.datetime(1970,1,1)).total_seconds()
+        ret = (t-DATETIME_EPOCH).total_seconds()
     return 
 
+def seconds_to_datetime(sec):
+    return dateutil.relativedelta.relativedelta(seconds=sec) + DATETIME_EPOCH
+
+def seconds_to_date(sec):
+    x = seconds_to_datetime(sec)
+    return datetime.date(x.year, x.month, x.day)
+                   
 PB2MYSQL_MAP = {FieldDef.BOOLEAN:'BOOLEAN',
                 FieldDef.INTEGER:'INTEGER',
                 FieldDef.CHAR:   'VARCHAR(255)',
@@ -516,15 +526,27 @@ def get_pb_dict(m, rec, opt, hash_map, id2code_map):
         elif fd.type in [FieldDef.CHAR, FieldDef.TEXT]:
             if v:
                 out.append( (k,v) )
-#        elif fd.type in [FieldDef.DATE]:
-#            if v:
-#                vv=str_to_seconds(v,f=DEFAULT_SERVER_DATE_FORMAT)
-#                out.append( (k,vv) )
-                
-#        elif fd.type in [FieldDef.DATETIME]:
-#            if v:
-#                vv=str_to_seconds(v,f=DEFAULT_SERVER_DATETIME_FORMAT)
-#                out.append( (k,vv) )                
+        elif fd.type in [FieldDef.DATE]:
+            if v:
+                vv=str_to_seconds(v,f=DEFAULT_SERVER_DATE_FORMAT)
+            else:
+                vv=EPOCH_SECONDS
+            out.append( (k,vv) )
+               
+        elif fd.type in [FieldDef.DATETIME]:
+            if v:
+                vv=str_to_seconds(v,f=DEFAULT_SERVER_DATETIME_FORMAT)
+                out.append( (k,vv) )
+            else:
+                vv=EPOCH_SECONDS
+            out.append( (k,vv) )                
+        #elif fd.type in [FieldDef.BOOLEAN]:
+        #    if type(v)==str and v in [u'', '']:
+        #        vv=False
+        #    else:
+        #        vv=v
+        #    out.append( (k, vv) )
+        
         #elif fd.type in [FieldDef.BINARY]:
         #    if v:
         #        vv={'content':'','content_hash':''}
@@ -564,15 +586,20 @@ def pbdict2dbdict(m, rec, opt, code2id_map, field_relation_map):
             else:
                 vv = v
                 out.append( (k,vv) )
- #       elif fd.type in [FieldDef.DATE]:
- #           if v:
- #               vv=seconds_to_str(v,f=DEFAULT_SERVER_DATE_FORMAT)
- #               out.append( (k,vv) )
-                
- #       elif fd.type in [FieldDef.DATETIME]:
- #           if v:
- #               vv=seconds_to_str(v,f=DEFAULT_SERVER_DATETIME_FORMAT)
- #               out.append( (k,vv) )                
+        elif fd.type in [FieldDef.DATE]:
+            if v==EPOCH_SECONDS:
+                vv=None
+            else:
+                vv = seconds_to_date(v)
+            out.append( (k,vv) )
+            
+        elif fd.type in [FieldDef.DATETIME]:
+            if v==EPOCH_SECONDS:
+                vv=None
+            else:
+                vv = seconds_to_datetime(v)
+            out.append( (k,vv) )
+            
         elif fd.type in [FieldDef.SELECTION]:
             if v:
                 out.append( (k,v) )
