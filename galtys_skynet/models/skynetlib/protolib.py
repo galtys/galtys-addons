@@ -30,6 +30,15 @@ def str_to_seconds(t,f=DEFAULT_SERVER_DATETIME_FORMAT): #supports str type, date
         ret = (t-datetime.datetime(1970,1,1)).total_seconds()
     return 
 
+PB2MYSQL_MAP = {FieldDef.BOOLEAN:'BOOLEAN',
+                FieldDef.INTEGER:'INTEGER',
+                FieldDef.CHAR:   'VARCHAR(255)',
+                FieldDef.FLOAT:   'DECIMAL(10,2)',
+                FieldDef.SELECTION:'VARCHAR(255)',
+                FieldDef.MANY2ONE: 'VARCHAR(255)'}
+
+
+
 
 FieldTypes = {'boolean':FieldDef.BOOLEAN,
               'integer':FieldDef.INTEGER,

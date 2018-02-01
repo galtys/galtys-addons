@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
+import StringIO
 from lxml import etree
 
 from odoo import api, fields, models, tools, SUPERUSER_ID, _
@@ -41,11 +41,9 @@ class SkynetSettings(models.Model):
     name = fields.Char("Name")
     odoopb_proto = fields.Text("odoopb proto")
 
-    def load_odoopb_proto(self):
-        
+    def load_odoopb_proto(self):        
         for settings in self:
             fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
-            #settings.write( {'odoopb_proto': file(fn).read() } )
             settings.odoopb_proto = file(fn).read()
             
 class SkynetModel(models.Model):
@@ -80,26 +78,18 @@ class SkynetSchema(models.Model):
             uid = 1
             registry_dict = odoo2proto.odoo2pbmsg_dict10(self.env, models)
             registry_json = json.dumps( registry_dict )
-            import StringIO
+
             fp=StringIO.StringIO()
             pprint.pprint(registry_dict, stream=fp)
             
-            registry_dict_pprint=fp.getvalue()
-            
-            #print 'ocas', registry_dict_pprint, registry_dict
-            #schema.write( {"registry_json":registry_json,
-            #               "registry_dict":registry_dict_pprint} )
+            registry_dict_pprint=fp.getvalue()            
             schema.registry_json = registry_json
             schema.registry_dict = registry_dict_pprint
-            #print registry_dict_pprint
         
     def store_pb(self):
         for schema in self:
-            
-            pbmsg=google.protobuf.json_format.Parse(schema.registry_json, Registry() )
-            
+            pbmsg=google.protobuf.json_format.Parse(schema.registry_json, Registry() )           
             x=base64.b64encode( pbmsg.SerializeToString() )
-            #schema.write( {"registry_pb":x})
             schema.registry_pb=x
     
     def store_proto(self):
@@ -111,7 +101,6 @@ class SkynetSchema(models.Model):
             pbr.ParseFromString( pbmsg )
             
             registry_proto = pbmsg2proto(pbr, schema.settings_id.name)
-            #schema.write( {"registry_proto":registry_proto})
             schema.registry_proto= registry_proto
             
     def add_code_column(self):
@@ -147,8 +136,8 @@ class SkynetSchema(models.Model):
             pbr.ParseFromString( pbmsg )
 
             for m in pbr.models:
-                cr.execute("select id from %s where code is Null"%m._table)
-                for rec in cr.fetchall():
+                self.env.cr.execute("select id from %s where code is Null"%m._table)
+                for rec in self.env.cr.fetchall():
                     id_=rec[0]
                     secret_key = bitcoin.random_key()
                     pub_key = bitcoin.privtopub(secret_key)
