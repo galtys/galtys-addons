@@ -568,8 +568,9 @@ def get_pb_dict(m, rec, opt, hash_map, id2code_map):
         elif fd.type in [FieldDef.INTEGER]:
             out.append( (k,v) )
         elif fd.type in [FieldDef.FLOAT]:
-            vv=int( DEFAULT_FLOAT_POW * v )
-            out.append( (k,vv) )
+            if v is not None:
+                vv=int( DEFAULT_FLOAT_POW * v )
+                out.append( (k,vv) )
             
     out_dict = dict(out)
     return out_dict
@@ -622,7 +623,8 @@ def pbdict2dbdict(m, rec, opt, code2id_map, field_relation_map):
         elif fd.type in [FieldDef.INTEGER]:
             out.append( (k,int(v)) )
         elif fd.type in [FieldDef.FLOAT]:
-            vv=float( v/DEFAULT_FLOAT_POW )
+            
+            vv=float( int(v)/DEFAULT_FLOAT_POW )
             out.append( (k,vv) )
             
 
