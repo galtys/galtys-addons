@@ -9,7 +9,7 @@ import google.protobuf.json_format
 import importlib
 import json
 import datetime
-import dateutil
+import dateutil.relativedelta
 import sys
 DEFAULT_SERVER_DATE_FORMAT = "%Y-%m-%d"
 DEFAULT_SERVER_TIME_FORMAT = "%H:%M:%S"
