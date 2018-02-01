@@ -31,7 +31,7 @@ def str_to_seconds(t,f=DEFAULT_SERVER_DATETIME_FORMAT): #supports str type, date
         tt=t.split('.')
         t=datetime.strptime(tt[0], f)        
         ret = (t-DATETIME_EPOCH).total_seconds()
-    return 
+    return ret
 
 def seconds_to_datetime(sec):
     return dateutil.relativedelta.relativedelta(seconds=sec) + DATETIME_EPOCH
@@ -527,18 +527,23 @@ def get_pb_dict(m, rec, opt, hash_map, id2code_map):
             if v:
                 out.append( (k,v) )
         elif fd.type in [FieldDef.DATE]:
+            #sys.stderr.write( str( [k,v] ) )
+            #raise
             if v:
                 vv=str_to_seconds(v,f=DEFAULT_SERVER_DATE_FORMAT)
             else:
-                vv=EPOCH_SECONDS
+                vv=EPOCH_SECONDS 
+            #sys.stderr.write( str( [k,vv] ) )
             out.append( (k,vv) )
                
         elif fd.type in [FieldDef.DATETIME]:
+            #sys.stderr.write( str( [k,v] ) )
+            #vv=str_to_seconds(v,f=DEFAULT_SERVER_DATETIME_FORMAT)
             if v:
                 vv=str_to_seconds(v,f=DEFAULT_SERVER_DATETIME_FORMAT)
-                out.append( (k,vv) )
+                out.append( (k,vv) ) 
             else:
-                vv=EPOCH_SECONDS
+                vv=EPOCH_SECONDS 
             out.append( (k,vv) )                
         #elif fd.type in [FieldDef.BOOLEAN]:
         #    if type(v)==str and v in [u'', '']:
@@ -587,6 +592,7 @@ def pbdict2dbdict(m, rec, opt, code2id_map, field_relation_map):
                 vv = v
                 out.append( (k,vv) )
         elif fd.type in [FieldDef.DATE]:
+            v=int(v)
             if v==EPOCH_SECONDS:
                 vv=None
             else:
@@ -594,6 +600,7 @@ def pbdict2dbdict(m, rec, opt, code2id_map, field_relation_map):
             out.append( (k,vv) )
             
         elif fd.type in [FieldDef.DATETIME]:
+            v=int(v)
             if v==EPOCH_SECONDS:
                 vv=None
             else:
@@ -604,7 +611,7 @@ def pbdict2dbdict(m, rec, opt, code2id_map, field_relation_map):
             if v:
                 out.append( (k,v) )
         elif fd.type in [FieldDef.INTEGER, FieldDef.FLOAT]:
-            out.append( (k,v) )
+            out.append( (k,int(v)) )
             
     out_dict = dict(out)
 #    if 'code' in out_dict:
@@ -642,7 +649,10 @@ def segments2json(segments, fp, opt):
         fp.write(js)
                 
         for msg in out:
+            
             js=google.protobuf.json_format.MessageToJson(msg, including_default_value_fields=True, preserving_proto_field_name=True)
+            #d=google.protobuf.json_format.MessageToDict(msg, including_default_value_fields=True, preserving_proto_field_name=True)
+            #sys.stderr.write( str(d) )
             fp.write(js)
 
 def segments2dict(segments):
