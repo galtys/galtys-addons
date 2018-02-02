@@ -306,6 +306,7 @@ def main():
             #    pb_messages2=protolib.serialize_records(m, records2, opt, hash_map, id2code_map)
             #    #for pb_m2 in pb_messages2: 
             #print records[0]['parent_id']
+            #sys.stderr.write( str(records) )
             pb_messages=protolib.serialize_records(m, records,opt, hash_map, id2code_map, appname=DEPLOYMENT_NAME)
             pbstream = protolib.pb2stream(m, pb_messages)
             fp.write( pbstream )

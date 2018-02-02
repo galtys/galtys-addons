@@ -5,18 +5,19 @@ from lxml import etree
 import datetime
 #import pydir
 
-import google.protobuf.json_format
+#import google.protobuf.json_format
 import base64
 import json
 import pprint
-from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
-from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
-import skynetlib.odoo2proto as odoo2proto
+if 0:
+  from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
+  from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
+  import skynetlib.odoo2proto as odoo2proto
 #from odoo2proto import odoo2pbmsg
 
 #for v8,v7
-from openerp.modules.module import get_module_resource
-from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict, erpmodel2dict
+  from openerp.modules.module import get_module_resource
+  from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict, erpmodel2dict
 
 class SkynetSettings(osv.osv):
     _name = "skynet.settings"
