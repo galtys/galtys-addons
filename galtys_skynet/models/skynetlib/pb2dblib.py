@@ -16,6 +16,7 @@ import hashlib
 import base64
 import time
 import psycopg2
+
 from skynetlib.protolib import add_OdooPB_group
 import lsb_release_ex
 lsb_info = lsb_release_ex.get_lsb_information()
@@ -313,6 +314,44 @@ def main():
         fp.close()
         cr.close()
         conn.commit()
+    elif cmd in ['msnapshot','ms', 'mis']:
+        #conn=get_connection(opt.config_file, dbname)
+        #cr=conn.cursor()
+        sys.stderr.write("connecting to mysql on google")
+        import mysql.connector
+        conn = mysql.connector.connect(user='root',password='test123',
+                                host='35.198.165.160',
+                                database='pjb_no_tr')
+        sys.stderr.write("getting cursor")
+        cr=conn.cursor()
+        sys.stderr.write("connected")
+        pb_fn = os.path.join(opt.pbdir, DEPLOYMENT_NAME + '.pb' )
+        pbr = Registry()
+        pbr.ParseFromString( file(pb_fn).read() )
+        
+        fp=sys.stdout
+        if cmd=='mis':
+            fp.write( sys.stdin.read() )
+        hash_map = {}
+        id2code_map = {}
+        for m in pbr.models:
+            id_map=id2code_map.setdefault(m._name, {})
+            records=read_from_db(cr, m, limit='')
+            for r in records:
+                id_map[ r['id'] ] = r['code']
+            #if len(parents)>0:
+            #    records2 = traverse_preorder(records, parent_field = parents[0], key_field='id')
+            #    pb_messages2=protolib.serialize_records(m, records2, opt, hash_map, id2code_map)
+            #    #for pb_m2 in pb_messages2: 
+            #print records[0]['parent_id']
+            #sys.stderr.write( str(records) )
+            pb_messages=protolib.serialize_records(m, records,opt, hash_map, id2code_map, appname=DEPLOYMENT_NAME)
+            pbstream = protolib.pb2stream(m, pb_messages)
+            fp.write( pbstream )
+        fp.close()
+        cr.close()
+        conn.commit()
+        
     elif cmd in ['deleteall','da']:
         conn=get_connection(opt.config_file, dbname)
         cr=conn.cursor()
@@ -405,6 +444,7 @@ def main():
         cr.close()
         conn.commit()
     elif cmd in ['mapply','ma']:
+        import mysql.connector
         conn = mysql.connector.connect(user='root',password='test123',
                                 host='35.198.165.160',
                                 database='pjb_no_tr')
