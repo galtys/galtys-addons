@@ -387,8 +387,95 @@ def main():
                     #if m._name == 'deploy.deploy':
 
                     
-                    pprint.pprint(ret)
+                    #pprint.pprint(ret)
                     insert_record(cr, m._table, ret)
+
+
+                    #cr.execute("select nextval('deploy_account_id_seq') ")
+                    #print 
+                    #print ret
+                elif op_map[code] == odoopb.UPDATE:
+                    ret = protolib.pbdict2dbdict(m, msg, opt, code2id_map, field_relation_map)
+                    update_record(cr, m._table, ret, code)
+                elif op_map[code] == odoopb.DELETE:
+                    ret_id = code2id_map[ header.model ] [code]
+                    sql = "delete from %s " % m._table
+                    cr.execute( sql + "where id=%s", (ret_id, ))
+        cr.close()
+        conn.commit()
+    elif cmd in ['mapply','ma']:
+        conn = mysql.connector.connect(user='root',password='test123',
+                                host='35.198.165.160',
+                                database='pjb_no_tr')
+        cr=conn.cursor()
+        
+        #conn=get_connection(opt.config_file, dbname)
+        #cr=conn.cursor()
+        pb_fn = os.path.join(opt.pbdir, DEPLOYMENT_NAME + '.pb' )
+        pbr = Registry()
+        pbr.ParseFromString( file(pb_fn).read() )
+        pbr_map = dict( [ (m._name, m) for m in pbr.models] )
+
+        field_relation_map = protolib.relation_map(pbr)
+        fp=sys.stdin
+        segments = protolib.stream2pb(opt,fp, DEPLOYMENT_NAME)
+        fp.close()
+        #print segments
+        ret = protolib.segments2dict(segments)
+        #print ret
+        import pprint
+        code2id_map = {}
+        for m in pbr.models:
+            #print [header.model, header._sequence]
+            v = code2id_map.setdefault( m._name, {})
+            cr.execute("select code,id from %s" % m._table)
+            vout=dict( [x for x in cr.fetchall()] )
+            v.update( vout )
+        #print code2id_map
+        #print ret
+        for header, msg_dicts in ret:
+            m=pbr_map[ header.model ]
+            #print 'update', msg_dicts
+            #print [header.model, header._sequence]
+            v = code2id_map.setdefault( header.model, {})
+            if m._name == 'res.company':
+                continue
+            parents = get_parent_fields(m)
+            if parents:
+                #assert len(parents)==1
+                out=[]
+                parent_field = parents[0]
+                records2 = traverse_preorder(msg_dicts, parent_field = parent_field,
+                                             key_field='code',parent_field_option='code')
+            else:
+                records2 = msg_dicts
+            op_map={}
+            for record in header.record:
+                op_map[record.code] = record.operation
+                
+            for msg in records2:                
+            #for record,msg in zip(header.record, records2):
+                code=msg['code']
+                secret_key=msg['secret_key']
+                if op_map[code] == odoopb.CREATE:
+                    #ret_id = protolib.next_id(cr, header._sequence)
+                    
+                    
+                    #val = { 'id':ret_id }
+                    
+                    #val['code'] = code
+                    #val['secret_key']=secret_key
+                    ret = protolib.pbdict2dbdict(m, msg, opt, code2id_map, field_relation_map)
+                    insert_record(cr, m._table, ret)
+                    cr.execute("select last_insert_id()")
+                    ret_id = [x[0] for x in cr.fetchall()]
+                    v[code] = ret_id
+                    #ret.update(val)
+                    #if m._name == 'deploy.deploy':
+
+                    
+                    #pprint.pprint(ret)
+                    
 
 
                     #cr.execute("select nextval('deploy_account_id_seq') ")
