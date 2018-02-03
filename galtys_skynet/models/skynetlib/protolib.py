@@ -121,12 +121,14 @@ REPOSDIR='codebasehq.com'
 PRJDIR='pjbrefct'
 PBDIR='pbdir'
 PYDIR='pydir'
+CONFIG='.hashsync.conf'
 
 DEFAULT_PRJDIR=os.path.join(HOMEDIR,REPOSDIR,PRJDIR)
 
 DEFAULT_PROTODIR=os.path.join(DEFAULT_PRJDIR, PROTODIR)
 DEFAULT_PBDIR=os.path.join(DEFAULT_PRJDIR, PBDIR)
 DEFAULT_PYDIR=os.path.join(DEFAULT_PRJDIR, PYDIR)
+DEFAULT_CONFIG=os.path.join(HOMEDIR, CONFIG)
 
 def add_OdooPB_group(parser):
     odoopb_group = optparse.OptionGroup(parser, "OdooPB")
@@ -135,6 +137,12 @@ def add_OdooPB_group(parser):
                             help="Default: [%default]",
                             default='sales_actual'
     )
+    odoopb_group.add_option("--config",
+                            dest='config',
+                            help="Default: [%default]",
+                            default=DEFAULT_CONFIG
+    )
+    
     odoopb_group.add_option("--homedir",
                             dest='homedir',
                             help="Default: [%default]",
@@ -183,9 +191,9 @@ def add_OdooPB_group(parser):
                             help="Use stdin stdout for pb messages. Default: [%default]",
                             default='yes'
     )
-    odoopb_group.add_option("--config",
+    odoopb_group.add_option("--config-file",
                             dest='config_file',
-                            help="Config file.  Default: [%default]",
+                            help="Deprecated. Config file.  Default: [%default]",
                             default='/home/jan/projects/server_pjbrefct.conf'
     )
     
@@ -313,17 +321,17 @@ def stream2pb(opt,stream, appname):
         assert header.records == len(messages)
         eof,magic = read_magic(stream)
     return out
+class Stack(object):
+    def __init__(self):
+        self.items=[]
+    def push(self, item):
+        self.items.append(item)
+    def pop(self):
+        return self.items.pop()
+    def isEmpty(self):
+        return self.items==[]
 
 def pb2op(segments, opt):
-    class Stack(object):
-        def __init__(self):
-            self.items=[]
-        def push(self, item):
-            self.items.append(item)
-        def pop(self):
-            return self.items.pop()
-        def isEmpty(self):
-            return self.items==[]
         
     def copy_segment(segment, op, op_header_only=True):
         header,messages = segment

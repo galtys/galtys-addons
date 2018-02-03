@@ -139,5 +139,10 @@ message Model {
 
 message Registry {
   repeated Model models = 1;
+  string schema_name = 2;
+}
 
+message Schema {
+  Registry registry = 1;
+  string schema_sha256 = 2;
 }
