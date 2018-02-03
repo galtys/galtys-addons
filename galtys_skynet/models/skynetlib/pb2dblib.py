@@ -64,24 +64,6 @@ def get_parent_fields(m): #ie fields that point toitself as many2one rel
     return out
 
 
-def read_sql(cr, _table, cols, ids=None, limit='', offset=''):
-    #print _table, cols
-    if ids is None:
-        where = ''
-    elif isinstance(ids, list):
-        where = " where id in (%s)" % ",".join(ids)
-    else:
-        where = " where id=%s" % ids
-    cols_quote=['"%s"'%c for c in cols]
-    cols_sql = ','.join(cols_quote)
-    #print [cols_sql]
-    sql="select %s from %s"%(cols_sql,_table) + where + offset + limit
-    #print sql
-    cr.execute(sql)
-    records=[]
-    for r in cr.fetchall():
-        records.append( dict(zip(cols,r)) )
-    return records
 def read_by_code(cr, _table, cols, code):
     cols_sql = ','.join(cols)
     sql = "select %s from %s where code = '%s'" % (cols_sql, _table, code )
@@ -89,19 +71,23 @@ def read_by_code(cr, _table, cols, code):
     ret = [x for x in cr.fetchall()]
     assert len(ret)==1
     return ret
-def update_record(cr, _table, val, code):
+def update_record(cr, _table, val, code, mysql=True):
     sql_update = "update %s " % _table
     sql_set = []
     par=[]
     
     for k,v in val.items():
-        s = ' "%s" = '%k +  " %s "
+        if not mysql:
+            s = ' "%s" = '%k +  " %s "
+        else:
+            s = ' %s = '%k +  " %s "
         sql_set.append( s )
         par.append(v)
     where = " where code = %s "
     sql = sql_update + "set "+ ",".join(sql_set) +where
     arg = par + [code]
     #print sql, arg
+    #print [sql, arg]
     cr.execute(sql, arg)
     
     #b=google.protobuf.json_format.MessageToJson(r, including_default_value_fields=True, preserving_proto_field_name=True)
@@ -130,9 +116,32 @@ def insert_record(cr, _table, val):
     #c=json.loads(b)
     #msg=google.protobuf.json_format.Parse(xxjson, Registry() )
 
-def read_from_db(cr, m, limit=' limit 80'):
+def read_sql(cr, _table, cols, ids=None, limit='', offset='', mysql=False):
+    #print _table, cols
+    if ids is None:
+        where = ''
+    elif isinstance(ids, list):
+        where = " where id in (%s)" % ",".join(ids)
+    else:
+        where = " where id=%s" % ids
+    if not mysql:
+        cols_quote=['"%s"'%c for c in cols]
+    else:
+        cols_quote=['%s'%c for c in cols]
+    cols_sql = ','.join(cols_quote)
+    #print [cols_sql]
+    sql="select %s from %s"%(cols_sql,_table) + where + offset + limit
+    #print sql
+    cr.execute(sql)
+    ret = [x for x in cr.fetchall()]
+    records=[]
+    for r in ret:
+        records.append( dict(zip(cols,r)) )
+    return records
+
+def read_from_db(cr, m, limit=' limit 80', mysql=True):
     cols_hash = get_pb_fields_to_hash(m)
-    retsql = read_sql(cr, m._table, cols_hash, limit=limit)
+    retsql = read_sql(cr, m._table, cols_hash, limit=limit, mysql=True)
     return retsql
 
 
@@ -146,6 +155,13 @@ def get_connection(config_file,dbname):
     db_password = Config.get('options','db_password')
     dsn="dbname='%s' user='%s' port='%s' host='%s' password='%s'"%(dbname,db_user,db_port,db_host,db_password)
     conn = psycopg2.connect(dsn)
+    return conn
+
+def get_connection_mysql():
+    import mysql.connector
+    conn = mysql.connector.connect(user='root',password='mysql123',
+                                   host='127.0.0.1',
+                                   database='pjb_no_tr_data')
     return conn
 
 def parse_argv(parser, argv):
@@ -164,6 +180,10 @@ def parse_argv(parser, argv):
     else:
         cmd = ''
     return opt, cmd, dbname
+def next_id(cr, sequence):
+    cr.execute("select nextval('%s') " % sequence)
+    ret=[x[0] for x in cr.fetchall()]
+    return ret[0]
 
 def main():
     usage = "usage: python %prog [options] dbname csv_fn\n"
@@ -315,16 +335,9 @@ def main():
         cr.close()
         conn.commit()
     elif cmd in ['msnapshot','ms', 'mis']:
-        #conn=get_connection(opt.config_file, dbname)
-        #cr=conn.cursor()
-        sys.stderr.write("connecting to mysql on google")
-        import mysql.connector
-        conn = mysql.connector.connect(user='root',password='test123',
-                                host='35.198.165.160',
-                                database='pjb_no_tr')
-        sys.stderr.write("getting cursor")
+        conn=get_connection_mysql()
         cr=conn.cursor()
-        sys.stderr.write("connected")
+
         pb_fn = os.path.join(opt.pbdir, DEPLOYMENT_NAME + '.pb' )
         pbr = Registry()
         pbr.ParseFromString( file(pb_fn).read() )
@@ -336,7 +349,7 @@ def main():
         id2code_map = {}
         for m in pbr.models:
             id_map=id2code_map.setdefault(m._name, {})
-            records=read_from_db(cr, m, limit='')
+            records=read_from_db(cr, m, limit='', mysql=True)
             for r in records:
                 id_map[ r['id'] ] = r['code']
             #if len(parents)>0:
@@ -417,7 +430,7 @@ def main():
                 code=msg['code']
                 secret_key=msg['secret_key']
                 if op_map[code] == odoopb.CREATE:
-                    ret_id = protolib.next_id(cr, header._sequence)
+                    ret_id = next_id(cr, header._sequence)
                     val = { 'id':ret_id }
                     v[code] = ret_id
                     #val['code'] = code
@@ -444,14 +457,8 @@ def main():
         cr.close()
         conn.commit()
     elif cmd in ['mapply','ma']:
-        import mysql.connector
-        conn = mysql.connector.connect(user='root',password='test123',
-                                host='35.198.165.160',
-                                database='pjb_no_tr')
+        conn=get_connection_mysql()
         cr=conn.cursor()
-        
-        #conn=get_connection(opt.config_file, dbname)
-        #cr=conn.cursor()
         pb_fn = os.path.join(opt.pbdir, DEPLOYMENT_NAME + '.pb' )
         pbr = Registry()
         pbr.ParseFromString( file(pb_fn).read() )
@@ -524,7 +531,7 @@ def main():
                     #print ret
                 elif op_map[code] == odoopb.UPDATE:
                     ret = protolib.pbdict2dbdict(m, msg, opt, code2id_map, field_relation_map)
-                    update_record(cr, m._table, ret, code)
+                    update_record(cr, m._table, ret, code, mysql=True)
                 elif op_map[code] == odoopb.DELETE:
                     ret_id = code2id_map[ header.model ] [code]
                     sql = "delete from %s " % m._table

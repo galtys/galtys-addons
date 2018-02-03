@@ -637,10 +637,6 @@ def pbdict2dbdict(m, rec, opt, code2id_map, field_relation_map):
     if 'id' in out_dict:
         out_dict.pop('id')
     return out_dict
-def next_id(cr, sequence):
-    cr.execute("select nextval('%s') " % sequence)
-    ret=[x[0] for x in cr.fetchall()]
-    return ret[0]
 def serialize_records(m, records, opt, hash_map, id2code_map, appname=''):
     _table = m._table
     res_partner_class = get_pb_class(opt,m._table, appname=appname)   
