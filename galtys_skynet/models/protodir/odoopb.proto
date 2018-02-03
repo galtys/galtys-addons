@@ -12,7 +12,8 @@ enum OPERATION {
    CREATE=2;
    UPDATE=3;
    DELETE=4;
-   STACK=5;
+   STACK=5; //not used?
+   SCHEMA=6; // class is then always Registry
 }
 
 message Record {
@@ -29,6 +30,9 @@ message Header {
    repeated Record record = 4;
    OPERATION operation=5;
    string _sequence = 6;
+   uint64 timestamp = 7;
+   string schema_name = 8;
+   string schema_sha256 = 9;
 }
 
 message Reference {
