@@ -96,8 +96,6 @@ def odoo2pbmsg_dict(pool, cr, uid, models):
         #pprint.pprint(model_dict)
         out.append( model_dict )
     out_dict = {'models':out}
-    #import pprint
-    #pprint.pprint(out_dict)
     return out_dict
 
 def odoo2pbmsg(pool, cr, uid, models):

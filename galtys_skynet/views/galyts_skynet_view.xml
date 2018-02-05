@@ -77,11 +77,23 @@
 			<separator string = "Registry proto"/>
 			<field name="registry_proto"/>
 			
-			<separator string = "Registry dict"/>
-			<field name="registry_dict"/>
+			<notebook>
+			  <page string="Schema">
+			    <separator string = "Schema dict"/>
+			    <field name="schema_dict"/>
 			
-			<separator string = "Registry json"/>
-			<field name="registry_json"/>
+			    <separator string = "Schema json"/>
+			    <field name="schema_json"/>
+			  </page>
+
+			  <page string="Registry">
+			    <separator string = "Registry dict"/>
+			    <field name="registry_dict"/>
+			
+			    <separator string = "Registry json"/>
+			    <field name="registry_json"/>
+			  </page>
+			</notebook>
                     </sheet>
                 </form>
             </field>

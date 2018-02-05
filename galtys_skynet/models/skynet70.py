@@ -4,12 +4,13 @@ from openerp.osv import fields, osv
 from lxml import etree
 import datetime
 #import pydir
+import StringIO
 
-#import google.protobuf.json_format
 import base64
 import json
 import pprint
-if 0:
+if 1:
+  import google.protobuf.json_format
   from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
   from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
   import skynetlib.odoo2proto as odoo2proto
@@ -49,12 +50,19 @@ class SkynetSchema(osv.osv):
 
     _columns={
         'name':fields.char("Name"),
+        'model_ids':fields.one2many("skynet.schema.model","schema_id","Schema Model"),
+
         'settings_id':fields.many2one("skynet.settings",string="Settings"),
         'registry_json':fields.text("Registry Json"),
         'registry_dict':fields.text("Registry dict"),
-        'model_ids':fields.one2many("skynet.schema.model","schema_id","Schema Model"),
         'registry_pb':fields.binary("Registry PB"),
         'registry_proto':fields.text("Registry Proto"),
+
+        'schema_json':fields.text("Schema Json"),
+        'schema_dict':fields.text("Schema dict"),
+        'schema_pb':fields.binary("Schema PB"),
+        'schema_proto':fields.text("Schema Proto"),
+
     }
 
     def store_registry_json(self, cr, uid, ids, context=None):
@@ -65,16 +73,29 @@ class SkynetSchema(osv.osv):
                 models.append( sm.model_id.model )
             print models
             registry_dict = odoo2proto.odoo2pbmsg_dict(self.pool, cr, uid, models)
-            registry_json = json.dumps( registry_dict )
-            import StringIO
+
             fp=StringIO.StringIO()
-            pprint.pprint(registry_dict, stream=fp)
-            
+            pprint.pprint(registry_dict, stream=fp)            
             registry_dict_pprint=fp.getvalue()
+
+            schema_dict = {'registry':registry_dict,
+                           'schema_name': str(schema.name),
+                           'app_name': str(schema.settings_id.name)}
+
+            fp=StringIO.StringIO()
+            pprint.pprint(schema_dict, stream=fp)            
+            schema_dict_pprint=fp.getvalue()
+
+            registry_json = json.dumps( registry_dict )
+            schema_json = json.dumps( schema_dict )
+
             
-            print 'ocas', registry_dict_pprint, registry_dict
+            
+            #print 'ocas', registry_dict_pprint, registry_dict
             schema.write( {"registry_json":registry_json,
-                           "registry_dict":registry_dict_pprint} )
+                           "registry_dict":registry_dict_pprint,
+                           "schema_dict":schema_dict_pprint,
+                           "schema_json":schema_json} )
         
     def store_pb(self, cr, uid, ids, context=None):
         for schema in self.browse(cr, uid, ids):

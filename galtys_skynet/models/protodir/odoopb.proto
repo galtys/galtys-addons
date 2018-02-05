@@ -145,4 +145,6 @@ message Registry {
 message Schema {
   Registry registry = 1;
   string schema_sha256 = 2;
+  string schema_name = 3;
+  string app_name =4;
 }
