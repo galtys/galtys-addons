@@ -22,7 +22,7 @@ if 1:
 
 class SkynetSettings(osv.osv):
     _name = "skynet.settings"
-    _description = "Skynet Settings"
+    _description = "HashSync Settings"
     
     _columns={
         'name':fields.char("Name"),
@@ -36,6 +36,7 @@ class SkynetSettings(osv.osv):
             
 class SkynetModel(osv.osv):
     _name = "skynet.schema.model"
+    _description = "hashsync schema model"
     _order = "sequence"
     _columns = {
         'name':fields.char("name"),
@@ -46,7 +47,7 @@ class SkynetModel(osv.osv):
     
 class SkynetSchema(osv.osv):
     _name = "skynet.schema"
-    _description = "skynet.schema"
+    _description = "hashsync schema"
 
     _columns={
         'name':fields.char("Name"),

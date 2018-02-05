@@ -2,39 +2,6 @@ syntax = "proto3";
 
 package odoopb;
 
-message Magic {
-   fixed32 magic=1;
-   fixed32 header_size=2;
-}
-enum OPERATION {
-   NOTUSED=0;
-   SNAPSHOT=1;
-   CREATE=2;
-   UPDATE=3;
-   DELETE=4;
-   STACK=5; //not used?
-   SCHEMA=6; // class is then always Registry
-}
-
-message Record {
-   uint64 size= 1;
-   string code = 2;
-   bytes sha256=3;  //can be outside of the stream
-   bytes prev_sha256=4; //can be outside of the stream
-   OPERATION operation=5;
-}
-message Header {
-   string model = 1;
-   string _table = 2;
-   uint64 records = 3;		
-   repeated Record record = 4;
-   OPERATION operation=5;
-   string _sequence = 6;
-   uint64 timestamp = 7;
-   string schema_name = 8;
-   string schema_sha256 = 9;
-}
-
 message Reference {
     string model = 1;
     uint64 res_id = 2;
@@ -147,4 +114,39 @@ message Schema {
   string schema_sha256 = 2;
   string schema_name = 3;
   string app_name =4;
+}
+
+message Magic {
+   fixed32 magic=1;
+   fixed32 header_size=2;
+   fixed32 schema_size=3;
+   fixed64 timestamp = 4;	
+}
+enum OPERATION {
+   NOTUSED=0;
+   SNAPSHOT=1;
+   CREATE=2;
+   UPDATE=3;
+   DELETE=4;
+   STACK=5; //not used?
+   SCHEMA=6; // class is then always Registry
+}
+
+message Record {
+   uint64 size= 1;
+   string code = 2;
+   bytes sha256=3;  //can be outside of the stream
+   bytes prev_sha256=4; //can be outside of the stream
+   OPERATION operation=5;
+}
+message Header {
+   string model = 1;
+   string _table = 2;
+   uint64 records = 3;		
+   repeated Record record = 4;
+   OPERATION operation=5;
+   string _sequence = 6;
+   uint64 timestamp = 7;
+   string schema_name = 8;
+   string schema_sha256 = 9;
 }

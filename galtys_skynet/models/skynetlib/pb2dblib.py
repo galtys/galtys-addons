@@ -500,7 +500,32 @@ def op_out(opt, stack):
         _logger.debug("op_out, writing %s bytes from stack to stdout", len(data) )
         fp.write(data)
     fp.close()
+def op_dict2json(opt, stack):
+    _logger = logging.getLogger(__name__)
+    _logger.debug("op_dict2json, reading str(dict) schema from stack and writing json back to stack")
+    schema_dict=stack.pop()
+    schema_json = json.dumps( eval(schema_dict) )
+    stack.push( schema_json )
 
+def op_json2dict(opt, stack):
+    _logger = logging.getLogger(__name__)
+    _logger.debug("op_json2dict, reading json schema from stack and writing str(dict) back to stack")
+    schema_json=stack.pop()
+    schema_dict = json.loads( schema_json )
+    stack.push( str(schema_dict) )
+
+def op_json2pb(opt, stack):
+    _logger = logging.getLogger(__name__)
+    _logger.debug("op_json2pb, reading json schema from stack and writing serialized Schema() message back to stack")
+    schema_json = stack.pop()
+    pbmsg=google.protobuf.json_format.Parse(schema_json, Schema() )
+            
+    #x=base64.b64encode( pbmsg.SerializeToString() )
+    #schema.write( {"registry_pb":x})
+    #schema_json=stack.pop()
+    #schema_dict = json.loads( schema_json )
+    stack.push(pbmsg )
+    
 OP=[('diff',op_diff),
     ('d',op_diff),
     ('json',op_json),
@@ -513,7 +538,12 @@ OP=[('diff',op_diff),
     ('apply',op_apply),
     ('a',op_apply),
     ('in',op_in),
-    ('out', op_out)]
+    ('out', op_out),
+    ('dict2json', op_dict2json),
+    ('json2dict', op_json2dict),
+    ('json2pb', op_json2pb),
+    ('pb2proto', op_pb2proto),
+]
 OP_MAP=dict(OP)
 
 def main():
