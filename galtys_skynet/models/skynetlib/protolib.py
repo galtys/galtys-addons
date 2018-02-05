@@ -290,27 +290,31 @@ def traverse_preorder(records, parent_field = 'parent_id', key_field='id',parent
     ret= [ recs2_map[tt] for tt,dd in tp.traverse_preorder() ]
     return ret
 
+def read_magic(stream): #TBD, EOF does not work?        
+    try:
+        magic_str = stream.read(MAGIC_SIZE)
+        eof = False
+    except EOFError:
+        eof = True
+
+    if not (len(magic_str)==MAGIC_SIZE):
+        eof = True
+    if not eof:
+        magic = Magic()
+        magic.ParseFromString( magic_str  )
+        assert magic.magic==MAGIC_CONSTANT
+        magic_descriptor_str = stream.read(magic.magic_descriptor_size)
+        magic_descriptor=MagicDescriptor()
+        magic_descriptor.ParseFromString(magic_descriptor_str)
+        ret = eof, magic, magic_descriptor
+    else:
+        ret = eof, False, False
+    return ret    
 
 def stream2pb(opt,stream, appname):
     out=[]
-    def read_magic(stream): #TBD, EOF does not work?        
-        try:
-            magic_str = stream.read(MAGIC_SIZE)
-            eof = False
-        except EOFError:
-            eof = True
-
-        if not (len(magic_str)==MAGIC_SIZE):
-            eof = True
-        if not eof:
-            magic = Magic()
-            magic.ParseFromString( magic_str  )
-            assert magic.magic==MAGIC_CONSTANT
-            ret = eof, magic
-        else:
-            ret = eof, False
-        return ret    
-    eof,magic = read_magic(stream)
+    eof,magic,magic_descriptor = read_magic(stream)
+    assert magic_descriptor.message_type==MagicDescriptor.DATA
     while not eof:        
         header = Header()
         header.ParseFromString( stream.read(magic.header_size) )
@@ -323,7 +327,15 @@ def stream2pb(opt,stream, appname):
         out.append( (header, messages) )
         assert header.records == len(messages)
         eof,magic = read_magic(stream)
+    #else:
     return out
+def stream2schema(opt, stream):
+    eof,magic,magic_descriptor = read_magic(stream)
+    assert magic_descriptor.message_type==MagicDescriptor.SCHEMA
+    schema=Schema()
+    schema.ParseFromString( stream.read(magic.schema_size) )
+    return schema
+    
 class Stack(object):
     def __init__(self):
         self.items=[]

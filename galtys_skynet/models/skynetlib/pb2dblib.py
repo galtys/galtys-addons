@@ -149,8 +149,11 @@ def read_from_db(cr, m, limit=' limit 80', mysql=True):
 
 import mysql.connector
 def get_connection(opt,dbname):
+    _logger = logging.getLogger(__name__)
     import ConfigParser
     Config=ConfigParser.ConfigParser()
+    _logger.debug("get database connection")
+    _logger.debug("  reading hashsync config file: %s", opt.config)
     Config.read(opt.config)
     sections = Config.sections()
     def split_dbname(dbname):
@@ -179,16 +182,20 @@ def get_connection(opt,dbname):
                                            host=db_host, database=database)
         else:
             dsn="dbname='%s' user='%s' port='%s' host='%s' password='%s'"%(database,db_user,db_port,db_host,db_password)
+            _logger.debug("  psycopg2.connect, dsn: %s", dsn)
             conn = psycopg2.connect(dsn)
         return conn
     
     tp,db=split_dbname(dbname)
+    _logger.debug("  sections in config file: %s", sections)
+    _logger.debug("  split_dbname, tp: %s, db: %s", tp, db)
     if db in sections:
+        _logger.debug("    db_in_sections")
         conn=get_conn(Config, dbname)
     elif tp=='mysql':
         conn=get_conn(Config, 'mysql', tp='mysql', dbname=dbname)
     elif tp=='pg':
-        conn=get_conn(Config, 'mysql', tp='mysql', dbname=dbname)
+        conn=get_conn(Config, 'pg', tp='pg', dbname=dbname)
     return conn, tp
 
 def get_connection_mysql():
@@ -262,6 +269,8 @@ def op_json(opt, stack):
     stack.push( ret  )
     _logger.debug("  converted to json, bytes to stack: %s", len(ret) )
 def op_proto(opt, stack):
+    _logger = logging.getLogger(__name__)
+    _logger.debug("op_proto")
     dbname=stack.pop()
     appname=stack.pop()
     conn,tp=get_connection(opt, dbname)
@@ -270,6 +279,7 @@ def op_proto(opt, stack):
     cr=conn.cursor()
 
     if not os.path.isdir(opt.protodir):
+        _logger.debug("   os.makedirs %s", opt.protodir )
         os.makedirs(opt.protodir)
     if not os.path.isdir(opt.pydir):
         os.makedirs(opt.pydir)
@@ -281,6 +291,7 @@ def op_proto(opt, stack):
 
     cr.execute("select id,odoopb_proto from skynet_settings where name=%s",(appname,) )
     ret=[x for x in cr.fetchall()]
+    _logger.debug("project name %s, number of skynet_settings records in db %s",appname,len(ret))
     assert len(ret)==1
     settings_id,odoopb_proto = ret[0]
     #if not os.path.isfile( odoo_proto_fn):
@@ -292,17 +303,18 @@ def op_proto(opt, stack):
     cr.execute("select ss.name,ss.registry_proto,ss.registry_pb from skynet_schema ss,skynet_settings sset where ss.settings_id=sset.id and sset.id=%s", (settings_id,) )
     ret = [x for x in cr.fetchall()]
 
-
     for name,registry_proto,registry_pb in ret:
         fn = os.path.join( opt.protodir, name+'.proto' )
+        _logger.debug("schema: %s, writing proto file: %s", name, fn)
         file(fn,'wb').write(registry_proto)
 
         arg=['protoc', '--proto_path=%s'%opt.protodir, '--python_out=%s'%opt.pydir, fn]
-
+        
         if opt.protoc=='yes':
-            print
-            print 'Running:'
-            print " ".join(arg)
+            #print
+            #print 'Running:'
+            #print " ".join(arg)
+            _logger.debug("running: %s", ' '.join(arg)) 
             subprocess.call(arg)
 
             py_init_fn=os.path.join( opt.pydir, '__init__.py' )
