@@ -333,7 +333,7 @@ def stream2pb(opt,stream, appname):
             messages.append( msg )
         out.append( (header, messages) )
         assert header.records == len(messages)
-        eof,magic = read_magic(stream)
+        eof,magic,magic_descriptor = read_magic(stream)
     #else:
     return out
 def stream2schema(opt, stream):

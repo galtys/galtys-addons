@@ -253,9 +253,14 @@ def op_diff(opt, stack):
 def op_json(opt, stack):
     _logger = logging.getLogger(__name__)
 
-    DEPLOYMENT_NAME=opt.deployment_name
+    #DEPLOYMENT_NAME=opt.deployment_name
+    schema_data = stack.pop()    
     data_in = stack.pop()
     
+    schema = protolib.stream2schema(opt, StringIO.StringIO(schema_data) )
+    DEPLOYMENT_NAME=schema.schema_name
+
+
     fp=StringIO.StringIO( data_in )
 
     _logger.debug("running op_json with %s bytes in, DEPLOYMENT_NAME: %s", len(data_in), DEPLOYMENT_NAME)
@@ -268,6 +273,7 @@ def op_json(opt, stack):
     ret=fp.getvalue()
     stack.push( ret  )
     _logger.debug("  converted to json, bytes to stack: %s", len(ret) )
+
 def op_proto(opt, stack):
     _logger = logging.getLogger(__name__)
     
@@ -405,10 +411,10 @@ def op_snapshot(opt, stack):
     conn.commit()
     ret=fp.getvalue()
     fp.close()
+    _logger.debug("pushing data segments, %s bytes onto stack", len(ret) )
+    stack.push(ret)
     _logger.debug("pushing schema back to stack, %s bytes", len(schema_data) )
     stack.push(schema_data)
-    _logger.debug("pushing %s bytes onto stack", len(ret) )
-    stack.push(ret)
     
 def op_deleteall(opt, stack):
     dbname=stack.pop()
