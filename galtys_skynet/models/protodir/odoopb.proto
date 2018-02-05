@@ -118,9 +118,19 @@ message Schema {
 
 message Magic {
    fixed32 magic=1;
-   fixed32 header_size=2;
+   fixed32 magic_descriptor_size=2;
    fixed32 schema_size=3;
-   fixed64 timestamp = 4;	
+   fixed32 header_size=4;  
+   fixed32 version=5;
+   fixed64 timestamp = 6;
+}
+message MagicDescriptor {
+   enum MESSAGE_TYPE {
+        DATA=0;
+	SCHEMA=1;
+   }
+   MESSAGE_TYPE message_type=1;
+   bytes schema_sha256=2;
 }
 enum OPERATION {
    NOTUSED=0;
@@ -146,7 +156,6 @@ message Header {
    repeated Record record = 4;
    OPERATION operation=5;
    string _sequence = 6;
-   uint64 timestamp = 7;
-   string schema_name = 8;
-   string schema_sha256 = 9;
+   string schema_name = 7;
+   string schema_sha256 = 8;
 }

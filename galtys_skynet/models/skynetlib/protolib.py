@@ -1,5 +1,6 @@
 from odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry,Magic,Header,Record
 import odoopb_pb2 as odoopb
+from odoopb_pb2 import MagicDescriptor
 
 import optparse
 import os
@@ -18,8 +19,8 @@ DEFAULT_SERVER_DATETIME_FORMAT = "%s %s" % (
     DEFAULT_SERVER_DATE_FORMAT,
     DEFAULT_SERVER_TIME_FORMAT)
 #MAGIC_SIZE=10
-MAGIC_SIZE=2+4+4+4+8
-
+MAGIC_SIZE=2+4+4+4+4+4+8
+MAGIC_VERSION=1
 MAGIC_CONSTANT=437899321
 LEN_SHA256_DIGEST=32 # len( hashlib.sha256('').digest() )
 DATETIME_EPOCH = datetime.datetime(1970,1,1)
@@ -451,6 +452,7 @@ def get_header(m, pb_messages): #including magic
     header.model = m._name
     header._table = m._table
     header._sequence = m._sequence
+    #header.message_type = Header.DATA
     for rp_msg in pb_messages:
         pb_msg = rp_msg.SerializeToString()
         record=header.record.add()
@@ -468,16 +470,23 @@ def get_magic(header):
     header_str = header.SerializeToString()   
     magic=Magic()# the size of magic msg is fixed to 10
     magic.magic=MAGIC_CONSTANT
+    magic_descriptor=MagicDescriptor()
+    magic_descriptor.message_type= MagicDescriptor.DATA
+    magic.magic_descriptor_size = len( magic_descriptor.SerializeToString() )
+    magic.schema_size=0
+    magic.version=MAGIC_VERSION
+    magic.timestamp= str_to_seconds(datetime.datetime.now(), f=DEFAULT_SERVER_DATETIME_FORMAT)
     magic.header_size = len(header_str)
     assert MAGIC_SIZE == len(magic.SerializeToString())
-    return magic
+    return magic, magic_descriptor
 
 def segment2stream(s, segment):
     #print type(segment)
     #print segment[0]
     header, messages = segment
-    magic = get_magic(header)
+    magic, magic_descriptor = get_magic(header)
     s.write( magic.SerializeToString() )
+    s.write( magic_descriptor.SerializeToString() )
     s.write( header.SerializeToString() )
     for rp_msg in messages:
         pb_msg = rp_msg.SerializeToString()

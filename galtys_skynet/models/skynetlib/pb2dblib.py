@@ -26,8 +26,10 @@ if lsb_info['RELEASE'] in ['16.04']:
 
 from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,traverse_preorder,get_output_file,get_input_file
 import skynetlib.protolib as protolib
-from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry,Magic,Header
+from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry,Magic,Header, Schema
 import skynetlib.odoopb_pb2 as odoopb    
+
+from skynetlib.odoo2proto import pbmsg2proto
 
 def has_att_list(fd, att_list=None): #OR
     if att_list is None:
@@ -475,7 +477,7 @@ def op_apply(opt, stack):
 
             elif op_map[code] == odoopb.UPDATE:
                 ret = protolib.pbdict2dbdict(m, msg, opt, code2id_map, field_relation_map)
-                mysql= tp=='mysql':
+                mysql = tp=='mysql'
                 update_record(cr, m._table, ret, code, mysql=mysql)
             elif op_map[code] == odoopb.DELETE:
                 ret_id = code2id_map[ header.model ] [code]
@@ -524,7 +526,35 @@ def op_json2pb(opt, stack):
     #schema.write( {"registry_pb":x})
     #schema_json=stack.pop()
     #schema_dict = json.loads( schema_json )
-    stack.push(pbmsg )
+    stack.push(pbmsg.SerializeToString() )
+    
+def op_pb2proto(opt, stack):
+    _logger = logging.getLogger(__name__)
+    _logger.debug("op_pb2proto, reading binary Schema() message from stack and writing proto definition back to stack")
+    pbmsg = stack.pop()
+    pbr = Schema()
+    _logger.debug("  op_pb2proto, len(pbmsg): %s", len(pbmsg))
+    
+    pbr.ParseFromString( pbmsg )
+    reg_proto = pbmsg2proto(pbr.registry, pbr.schema_name)
+    stack.push( reg_proto )
+    
+def op_add(opt, stack):
+    _logger = logging.getLogger(__name__)
+    arg1=stack.pop()
+    arg2=stack.pop()
+    res=int(arg1)+int(arg2)
+    _logger.debug("op_add arg1: %s, arg2: %s, result back to stack:%s", arg1,arg2,res)
+    stack.push(str(res))
+    
+def op_sub(opt, stack):
+    _logger = logging.getLogger(__name__)
+    #_logger.debug("")
+    arg1=stack.pop()
+    arg2=stack.pop()
+    res=int(arg1)-int(arg2)
+    _logger.debug("op_sub arg1: %s, arg2: %s, result back to stack:%s", arg1,arg2,res)
+    stack.push(str(res))
     
 OP=[('diff',op_diff),
     ('d',op_diff),
@@ -543,6 +573,8 @@ OP=[('diff',op_diff),
     ('json2dict', op_json2dict),
     ('json2pb', op_json2pb),
     ('pb2proto', op_pb2proto),
+    ('add', op_add),
+    ('sub', op_sub),
 ]
 OP_MAP=dict(OP)
 
