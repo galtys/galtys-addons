@@ -119,10 +119,6 @@ message Schema {
 message Magic {
    fixed32 magic=1;
    fixed32 magic_descriptor_size=2;
-   fixed32 schema_size=3;
-   fixed32 header_size=4;  
-   fixed32 version=5;
-   fixed64 timestamp = 6;
 }
 message MagicDescriptor {
    enum MESSAGE_TYPE {
@@ -131,7 +127,12 @@ message MagicDescriptor {
    }
    MESSAGE_TYPE message_type=1;
    bytes schema_sha256=2;
+   fixed32 schema_size=3;
+   fixed32 header_size=4;  
+   fixed32 version=5;
+   fixed64 timestamp = 6;   
 }
+
 enum OPERATION {
    NOTUSED=0;
    SNAPSHOT=1;

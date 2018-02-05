@@ -1,6 +1,6 @@
 from odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry,Magic,Header,Record
 import odoopb_pb2 as odoopb
-from odoopb_pb2 import MagicDescriptor
+from odoopb_pb2 import MagicDescriptor,Schema
 
 import optparse
 import os
@@ -18,9 +18,9 @@ DEFAULT_SERVER_TIME_FORMAT = "%H:%M:%S"
 DEFAULT_SERVER_DATETIME_FORMAT = "%s %s" % (
     DEFAULT_SERVER_DATE_FORMAT,
     DEFAULT_SERVER_TIME_FORMAT)
-#MAGIC_SIZE=10
-MAGIC_SIZE=2+4+4+4+4+4+8
-MAGIC_SIZE=24#2+4+4+4+4+4+8
+MAGIC_SIZE=10
+#MAGIC_SIZE=2+4+4+4+4+4+8
+#MAGIC_SIZE=24#2+4+4+4+4+4+8
 MAGIC_VERSION=1
 MAGIC_CONSTANT=437899321
 LEN_SHA256_DIGEST=32 # len( hashlib.sha256('').digest() )
@@ -204,6 +204,12 @@ def add_OdooPB_group(parser):
     return odoopb_group
 def add_StreamOPS_group(parser):
     odoopb_group = optparse.OptionGroup(parser, "StreamOPS")
+    odoopb_group.add_option("--argschema",
+                            dest='argschema',
+                            help="Expect schema segment as argument in stack. Alternatively, read it from file.... Default: [%default]",
+                            default='yes'
+    )
+    
     odoopb_group.add_option("--init",
                             dest='init',
                             help="Default: [%default]",
@@ -318,7 +324,7 @@ def stream2pb(opt,stream, appname):
     assert magic_descriptor.message_type==MagicDescriptor.DATA
     while not eof:        
         header = Header()
-        header.ParseFromString( stream.read(magic.header_size) )
+        header.ParseFromString( stream.read(magic_descriptor.header_size) )
         messages = []
         for record in header.record:
             msg_class = get_pb_class(opt, header._table, appname=appname )
@@ -334,7 +340,7 @@ def stream2schema(opt, stream):
     eof,magic,magic_descriptor = read_magic(stream)
     assert magic_descriptor.message_type==MagicDescriptor.SCHEMA
     schema=Schema()
-    schema.ParseFromString( stream.read(magic.schema_size) )
+    schema.ParseFromString( stream.read(magic_descriptor.schema_size) )
     return schema
     
 class Stack(object):
@@ -485,15 +491,34 @@ def get_magic(header):
     magic.magic=MAGIC_CONSTANT
     magic_descriptor=MagicDescriptor()
     magic_descriptor.message_type= MagicDescriptor.DATA
+
+    magic_descriptor.schema_size=0
+    magic_descriptor.version=MAGIC_VERSION
+    magic_descriptor.timestamp= long(str_to_seconds(datetime.datetime.now(), f=DEFAULT_SERVER_DATETIME_FORMAT))
+    magic_descriptor.header_size = len(header_str)
+
     magic.magic_descriptor_size = len( magic_descriptor.SerializeToString() )
-    magic.schema_size=0
-    magic.version=MAGIC_VERSION
-    magic.timestamp= long(str_to_seconds(datetime.datetime.now(), f=DEFAULT_SERVER_DATETIME_FORMAT))
-    magic.header_size = len(header_str)
+    #print MAGIC_SIZE ,len(magic.SerializeToString())
     assert MAGIC_SIZE == len(magic.SerializeToString())
 
     return magic, magic_descriptor
+def get_magic_schema(schema):
+    magic=Magic()# the size of magic msg is fixed to 10
+    magic.magic=MAGIC_CONSTANT
+    magic_descriptor=MagicDescriptor()
+    magic_descriptor.message_type= MagicDescriptor.SCHEMA
+    
+    magic_descriptor.schema_size= len(schema)
+    magic_descriptor.version=MAGIC_VERSION
+    magic_descriptor.timestamp= long(str_to_seconds(datetime.datetime.now(), f=DEFAULT_SERVER_DATETIME_FORMAT))
+    magic_descriptor.header_size = 0
 
+    magic.magic_descriptor_size = len( magic_descriptor.SerializeToString() )
+    #print MAGIC_SIZE ,len(magic.SerializeToString())
+    assert MAGIC_SIZE == len(magic.SerializeToString())
+
+    return magic, magic_descriptor
+    
 def segment2stream(s, segment):
     #print type(segment)
     #print segment[0]

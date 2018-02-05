@@ -270,9 +270,10 @@ def op_json(opt, stack):
     _logger.debug("  converted to json, bytes to stack: %s", len(ret) )
 def op_proto(opt, stack):
     _logger = logging.getLogger(__name__)
-    _logger.debug("op_proto")
+    
     dbname=stack.pop()
     appname=stack.pop()
+    _logger.debug("op_proto(dbname: %s, appname: %s)", dbname, appname)
     conn,tp=get_connection(opt, dbname)
     assert tp=='pg'
     #appname='pjbrefct'
@@ -352,18 +353,25 @@ def op_init(opt, stack):
 def op_snapshot(opt, stack):
     _logger = logging.getLogger(__name__)
     dbname=stack.pop()
+    schema_data = stack.pop()    
+    
     #pbr = stack.pop()    
-    DEPLOYMENT_NAME=opt.deployment_name
+    #DEPLOYMENT_NAME=opt.deployment_name
+    #schema = Schema()
+    #schema.ParseFromString(schema_data )
+    #print [schema_data]
+    schema = protolib.stream2schema(opt, StringIO.StringIO(schema_data) )
+    DEPLOYMENT_NAME=schema.schema_name
     
     _logger.debug("running op_snapshot dbname:%s, DEPLOYMENT_NAME: %s", dbname,DEPLOYMENT_NAME)
     
     conn,tp=get_connection(opt, dbname)
     cr=conn.cursor()
+    pbr = schema.registry
+    #pb_fn = os.path.join(opt.pbdir, DEPLOYMENT_NAME + '.pb' )
+    #pbr = Registry()
+    #pbr.ParseFromString( file(pb_fn).read() )
     
-    pb_fn = os.path.join(opt.pbdir, DEPLOYMENT_NAME + '.pb' )
-    pbr = Registry()
-    pbr.ParseFromString( file(pb_fn).read() )
-
     #fp=sys.stdout
     #if cmd=='is':
     #    fp.write( sys.stdin.read() )
@@ -397,6 +405,8 @@ def op_snapshot(opt, stack):
     conn.commit()
     ret=fp.getvalue()
     fp.close()
+    _logger.debug("pushing schema back to stack, %s bytes", len(schema_data) )
+    stack.push(schema_data)
     _logger.debug("pushing %s bytes onto stack", len(ret) )
     stack.push(ret)
     
@@ -539,6 +549,23 @@ def op_json2pb(opt, stack):
     #schema_json=stack.pop()
     #schema_dict = json.loads( schema_json )
     stack.push(pbmsg.SerializeToString() )
+
+def op_pb2schemaseg(opt, stack):
+    _logger = logging.getLogger(__name__)
+    _logger.debug("op_pb2schemaseg, read pb Schema() from stack, convert it into schemasegment and put it back to stack")
+    data=stack.pop()
+    schema = Schema()
+    schema.ParseFromString( data )
+
+    schema_data=schema.SerializeToString()
+    fp=StringIO.StringIO()
+    magic, magic_descriptor = protolib.get_magic_schema(schema_data)
+    fp.write( magic.SerializeToString() )
+    fp.write( magic_descriptor.SerializeToString() )
+    fp.write( schema_data )
+    ret=fp.getvalue()
+    _logger.debug("  putting schemasegment to stack, %s bytes", len(ret))
+    stack.push(ret)
     
 def op_pb2proto(opt, stack):
     _logger = logging.getLogger(__name__)
@@ -585,6 +612,7 @@ OP=[('diff',op_diff),
     ('json2dict', op_json2dict),
     ('json2pb', op_json2pb),
     ('pb2proto', op_pb2proto),
+    ('pb2schemaseg', op_pb2schemaseg),
     ('add', op_add),
     ('sub', op_sub),
 ]
@@ -622,3 +650,4 @@ def main():
             _logger.debug("Add argument %s to stack", a)
             arg_stack.push(a)
 
+#cat sale_actual_dict.py |hsync in dict2json json2pb pb2schemaseg out > sale_act.seg

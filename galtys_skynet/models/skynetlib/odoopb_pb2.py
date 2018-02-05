@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   name='odoopb.proto',
   package='odoopb',
   syntax='proto3',
-  serialized_pb=_b('\n\x0codoopb.proto\x12\x06odoopb\"*\n\tReference\x12\r\n\x05model\x18\x01 \x01(\t\x12\x0e\n\x06res_id\x18\x02 \x01(\x04\"6\n\x08Many2one\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x10\n\x08\x63nt_hash\x18\x03 \x01(\t\"\x7f\n\x06\x42inary\x12%\n\x06stored\x18\x01 \x01(\x0e\x32\x15.odoopb.Binary.Stored\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\x0c\x12\x14\n\x0c\x63ontent_hash\x18\x03 \x01(\t\"\'\n\x06Stored\x12\x0b\n\x07\x43ONTENT\x10\x00\x12\x10\n\x0c\x43ONTENT_HASH\x10\x01\"*\n\x06\x44igits\x12\x11\n\tprecision\x18\x01 \x01(\x0f\x12\r\n\x05scale\x18\x02 \x01(\x0f\".\n\x0fSelectionOption\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05label\x18\x02 \x01(\t\"\x85\x07\n\x08\x46ieldDef\x12\x0e\n\x06string\x18\x01 \x01(\t\x12(\n\x04type\x18\x02 \x01(\x0e\x32\x1a.odoopb.FieldDef.FieldType\x12\x0c\n\x04size\x18\x04 \x01(\x0f\x12\x1e\n\x06\x64igits\x18\x05 \x01(\x0b\x32\x0e.odoopb.Digits\x12*\n\tselection\x18\x06 \x03(\x0b\x32\x17.odoopb.SelectionOption\x12\x10\n\x08\x66unction\x18\x07 \x01(\t\x12\x10\n\x08\x66nct_inv\x18\x08 \x01(\t\x12\x14\n\x0c\x66nct_inv_arg\x18\t \x01(\t\x12\x13\n\x0b\x66nct_search\x18\n \x01(\t\x12\x10\n\x08relation\x18\x0b \x01(\t\x12\r\n\x05store\x18\x0c \x01(\x08\x12\x10\n\x08readonly\x18\r \x01(\x08\x12\x0f\n\x07\x63ontext\x18\x0e \x01(\t\x12\x0e\n\x06\x64omain\x18\x0f \x01(\t\x12\x0c\n\x04help\x18\x10 \x01(\t\x12\x16\n\x0erelation_field\x18\x11 \x01(\t\x12\x0e\n\x06select\x18\x12 \x01(\x0f\x12\x10\n\x08required\x18\x13 \x01(\x08\x12\x11\n\tinvisible\x18\x14 \x01(\x08\x12\x12\n\nselectable\x18\x15 \x01(\x08\x12\x16\n\x0e\x63hange_default\x18\x16 \x01(\x08\x12\x12\n\ndeprecated\x18\x17 \x01(\t\x12\x18\n\x10m2m_join_columns\x18\x18 \x01(\t\x12\x16\n\x0em2m_join_table\x18\x19 \x01(\t\x12\x11\n\ttranslate\x18\x1a \x01(\x08\x12\x12\n\nsearchable\x18\x1b \x01(\x08\x12\x0e\n\x06manual\x18\x1c \x01(\x08\x12\x0f\n\x07\x64\x65pends\x18\x1d \x01(\t\x12\x19\n\x11\x63ompany_dependent\x18\x1e \x01(\t\x12\x10\n\x08sortable\x18\x1f \x01(\x08\x12\x16\n\x0egroup_operator\x18  \x01(\t\"\xe7\x01\n\tFieldType\x12\x0b\n\x07\x42OOLEAN\x10\x00\x12\x0b\n\x07INTEGER\x10\x01\x12\r\n\tREFERENCE\x10\x02\x12\x08\n\x04\x43HAR\x10\x03\x12\x08\n\x04HTML\x10\x04\x12\t\n\x05\x46LOAT\x10\x05\x12\x08\n\x04\x44\x41TE\x10\x06\x12\x0c\n\x08\x44\x41TETIME\x10\x07\x12\n\n\x06\x42INARY\x10\x08\x12\r\n\tSELECTION\x10\t\x12\x0c\n\x08MANY2ONE\x10\n\x12\x0c\n\x08ONE2MANY\x10\x0b\x12\r\n\tMANY2MANY\x10\x0c\x12\x0c\n\x08\x46UNCTION\x10\r\x12\x0e\n\nSERIALIZED\x10\x0e\x12\x0c\n\x08PROPERTY\x10\x0f\x12\x08\n\x04TEXT\x10\x10\"H\n\x05\x46ield\x12#\n\tfield_def\x18\x01 \x01(\x0b\x32\x10.odoopb.FieldDef\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0c\n\x04indb\x18\x03 \x01(\x08\"\xa8\x01\n\x05Model\x12\r\n\x05_name\x18\x01 \x01(\t\x12\x14\n\x0c_description\x18\x02 \x01(\t\x12\x12\n\n_transient\x18\x03 \x01(\x08\x12\x10\n\x08_inherit\x18\x04 \x01(\t\x12\x11\n\t_inherits\x18\x05 \x01(\t\x12\x0e\n\x06_table\x18\x06 \x01(\t\x12\x11\n\t_sequence\x18\x07 \x01(\t\x12\x1e\n\x07_fields\x18\x08 \x03(\x0b\x32\r.odoopb.Field\">\n\x08Registry\x12\x1d\n\x06models\x18\x01 \x03(\x0b\x32\r.odoopb.Model\x12\x13\n\x0bschema_name\x18\x02 \x01(\t\"j\n\x06Schema\x12\"\n\x08registry\x18\x01 \x01(\x0b\x32\x10.odoopb.Registry\x12\x15\n\rschema_sha256\x18\x02 \x01(\t\x12\x13\n\x0bschema_name\x18\x03 \x01(\t\x12\x10\n\x08\x61pp_name\x18\x04 \x01(\t\"\x83\x01\n\x05Magic\x12\r\n\x05magic\x18\x01 \x01(\x07\x12\x1d\n\x15magic_descriptor_size\x18\x02 \x01(\x07\x12\x13\n\x0bschema_size\x18\x03 \x01(\x07\x12\x13\n\x0bheader_size\x18\x04 \x01(\x07\x12\x0f\n\x07version\x18\x05 \x01(\x07\x12\x11\n\ttimestamp\x18\x06 \x01(\x06\"\x8a\x01\n\x0fMagicDescriptor\x12:\n\x0cmessage_type\x18\x01 \x01(\x0e\x32$.odoopb.MagicDescriptor.MESSAGE_TYPE\x12\x15\n\rschema_sha256\x18\x02 \x01(\x0c\"$\n\x0cMESSAGE_TYPE\x12\x08\n\x04\x44\x41TA\x10\x00\x12\n\n\x06SCHEMA\x10\x01\"o\n\x06Record\x12\x0c\n\x04size\x18\x01 \x01(\x04\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0e\n\x06sha256\x18\x03 \x01(\x0c\x12\x13\n\x0bprev_sha256\x18\x04 \x01(\x0c\x12$\n\toperation\x18\x05 \x01(\x0e\x32\x11.odoopb.OPERATION\"\xbd\x01\n\x06Header\x12\r\n\x05model\x18\x01 \x01(\t\x12\x0e\n\x06_table\x18\x02 \x01(\t\x12\x0f\n\x07records\x18\x03 \x01(\x04\x12\x1e\n\x06record\x18\x04 \x03(\x0b\x32\x0e.odoopb.Record\x12$\n\toperation\x18\x05 \x01(\x0e\x32\x11.odoopb.OPERATION\x12\x11\n\t_sequence\x18\x06 \x01(\t\x12\x13\n\x0bschema_name\x18\x07 \x01(\t\x12\x15\n\rschema_sha256\x18\x08 \x01(\t*a\n\tOPERATION\x12\x0b\n\x07NOTUSED\x10\x00\x12\x0c\n\x08SNAPSHOT\x10\x01\x12\n\n\x06\x43REATE\x10\x02\x12\n\n\x06UPDATE\x10\x03\x12\n\n\x06\x44\x45LETE\x10\x04\x12\t\n\x05STACK\x10\x05\x12\n\n\x06SCHEMA\x10\x06\x62\x06proto3')
+  serialized_pb=_b('\n\x0codoopb.proto\x12\x06odoopb\"*\n\tReference\x12\r\n\x05model\x18\x01 \x01(\t\x12\x0e\n\x06res_id\x18\x02 \x01(\x04\"6\n\x08Many2one\x12\n\n\x02id\x18\x01 \x01(\x04\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x10\n\x08\x63nt_hash\x18\x03 \x01(\t\"\x7f\n\x06\x42inary\x12%\n\x06stored\x18\x01 \x01(\x0e\x32\x15.odoopb.Binary.Stored\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\x0c\x12\x14\n\x0c\x63ontent_hash\x18\x03 \x01(\t\"\'\n\x06Stored\x12\x0b\n\x07\x43ONTENT\x10\x00\x12\x10\n\x0c\x43ONTENT_HASH\x10\x01\"*\n\x06\x44igits\x12\x11\n\tprecision\x18\x01 \x01(\x0f\x12\r\n\x05scale\x18\x02 \x01(\x0f\".\n\x0fSelectionOption\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\r\n\x05label\x18\x02 \x01(\t\"\x85\x07\n\x08\x46ieldDef\x12\x0e\n\x06string\x18\x01 \x01(\t\x12(\n\x04type\x18\x02 \x01(\x0e\x32\x1a.odoopb.FieldDef.FieldType\x12\x0c\n\x04size\x18\x04 \x01(\x0f\x12\x1e\n\x06\x64igits\x18\x05 \x01(\x0b\x32\x0e.odoopb.Digits\x12*\n\tselection\x18\x06 \x03(\x0b\x32\x17.odoopb.SelectionOption\x12\x10\n\x08\x66unction\x18\x07 \x01(\t\x12\x10\n\x08\x66nct_inv\x18\x08 \x01(\t\x12\x14\n\x0c\x66nct_inv_arg\x18\t \x01(\t\x12\x13\n\x0b\x66nct_search\x18\n \x01(\t\x12\x10\n\x08relation\x18\x0b \x01(\t\x12\r\n\x05store\x18\x0c \x01(\x08\x12\x10\n\x08readonly\x18\r \x01(\x08\x12\x0f\n\x07\x63ontext\x18\x0e \x01(\t\x12\x0e\n\x06\x64omain\x18\x0f \x01(\t\x12\x0c\n\x04help\x18\x10 \x01(\t\x12\x16\n\x0erelation_field\x18\x11 \x01(\t\x12\x0e\n\x06select\x18\x12 \x01(\x0f\x12\x10\n\x08required\x18\x13 \x01(\x08\x12\x11\n\tinvisible\x18\x14 \x01(\x08\x12\x12\n\nselectable\x18\x15 \x01(\x08\x12\x16\n\x0e\x63hange_default\x18\x16 \x01(\x08\x12\x12\n\ndeprecated\x18\x17 \x01(\t\x12\x18\n\x10m2m_join_columns\x18\x18 \x01(\t\x12\x16\n\x0em2m_join_table\x18\x19 \x01(\t\x12\x11\n\ttranslate\x18\x1a \x01(\x08\x12\x12\n\nsearchable\x18\x1b \x01(\x08\x12\x0e\n\x06manual\x18\x1c \x01(\x08\x12\x0f\n\x07\x64\x65pends\x18\x1d \x01(\t\x12\x19\n\x11\x63ompany_dependent\x18\x1e \x01(\t\x12\x10\n\x08sortable\x18\x1f \x01(\x08\x12\x16\n\x0egroup_operator\x18  \x01(\t\"\xe7\x01\n\tFieldType\x12\x0b\n\x07\x42OOLEAN\x10\x00\x12\x0b\n\x07INTEGER\x10\x01\x12\r\n\tREFERENCE\x10\x02\x12\x08\n\x04\x43HAR\x10\x03\x12\x08\n\x04HTML\x10\x04\x12\t\n\x05\x46LOAT\x10\x05\x12\x08\n\x04\x44\x41TE\x10\x06\x12\x0c\n\x08\x44\x41TETIME\x10\x07\x12\n\n\x06\x42INARY\x10\x08\x12\r\n\tSELECTION\x10\t\x12\x0c\n\x08MANY2ONE\x10\n\x12\x0c\n\x08ONE2MANY\x10\x0b\x12\r\n\tMANY2MANY\x10\x0c\x12\x0c\n\x08\x46UNCTION\x10\r\x12\x0e\n\nSERIALIZED\x10\x0e\x12\x0c\n\x08PROPERTY\x10\x0f\x12\x08\n\x04TEXT\x10\x10\"H\n\x05\x46ield\x12#\n\tfield_def\x18\x01 \x01(\x0b\x32\x10.odoopb.FieldDef\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0c\n\x04indb\x18\x03 \x01(\x08\"\xa8\x01\n\x05Model\x12\r\n\x05_name\x18\x01 \x01(\t\x12\x14\n\x0c_description\x18\x02 \x01(\t\x12\x12\n\n_transient\x18\x03 \x01(\x08\x12\x10\n\x08_inherit\x18\x04 \x01(\t\x12\x11\n\t_inherits\x18\x05 \x01(\t\x12\x0e\n\x06_table\x18\x06 \x01(\t\x12\x11\n\t_sequence\x18\x07 \x01(\t\x12\x1e\n\x07_fields\x18\x08 \x03(\x0b\x32\r.odoopb.Field\">\n\x08Registry\x12\x1d\n\x06models\x18\x01 \x03(\x0b\x32\r.odoopb.Model\x12\x13\n\x0bschema_name\x18\x02 \x01(\t\"j\n\x06Schema\x12\"\n\x08registry\x18\x01 \x01(\x0b\x32\x10.odoopb.Registry\x12\x15\n\rschema_sha256\x18\x02 \x01(\t\x12\x13\n\x0bschema_name\x18\x03 \x01(\t\x12\x10\n\x08\x61pp_name\x18\x04 \x01(\t\"5\n\x05Magic\x12\r\n\x05magic\x18\x01 \x01(\x07\x12\x1d\n\x15magic_descriptor_size\x18\x02 \x01(\x07\"\xd8\x01\n\x0fMagicDescriptor\x12:\n\x0cmessage_type\x18\x01 \x01(\x0e\x32$.odoopb.MagicDescriptor.MESSAGE_TYPE\x12\x15\n\rschema_sha256\x18\x02 \x01(\x0c\x12\x13\n\x0bschema_size\x18\x03 \x01(\x07\x12\x13\n\x0bheader_size\x18\x04 \x01(\x07\x12\x0f\n\x07version\x18\x05 \x01(\x07\x12\x11\n\ttimestamp\x18\x06 \x01(\x06\"$\n\x0cMESSAGE_TYPE\x12\x08\n\x04\x44\x41TA\x10\x00\x12\n\n\x06SCHEMA\x10\x01\"o\n\x06Record\x12\x0c\n\x04size\x18\x01 \x01(\x04\x12\x0c\n\x04\x63ode\x18\x02 \x01(\t\x12\x0e\n\x06sha256\x18\x03 \x01(\x0c\x12\x13\n\x0bprev_sha256\x18\x04 \x01(\x0c\x12$\n\toperation\x18\x05 \x01(\x0e\x32\x11.odoopb.OPERATION\"\xbd\x01\n\x06Header\x12\r\n\x05model\x18\x01 \x01(\t\x12\x0e\n\x06_table\x18\x02 \x01(\t\x12\x0f\n\x07records\x18\x03 \x01(\x04\x12\x1e\n\x06record\x18\x04 \x03(\x0b\x32\x0e.odoopb.Record\x12$\n\toperation\x18\x05 \x01(\x0e\x32\x11.odoopb.OPERATION\x12\x11\n\t_sequence\x18\x06 \x01(\t\x12\x13\n\x0bschema_name\x18\x07 \x01(\t\x12\x15\n\rschema_sha256\x18\x08 \x01(\t*a\n\tOPERATION\x12\x0b\n\x07NOTUSED\x10\x00\x12\x0c\n\x08SNAPSHOT\x10\x01\x12\n\n\x06\x43REATE\x10\x02\x12\n\n\x06UPDATE\x10\x03\x12\n\n\x06\x44\x45LETE\x10\x04\x12\t\n\x05STACK\x10\x05\x12\n\n\x06SCHEMA\x10\x06\x62\x06proto3')
 )
 
 _OPERATION = _descriptor.EnumDescriptor(
@@ -60,8 +60,8 @@ _OPERATION = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=2246,
-  serialized_end=2343,
+  serialized_start=2245,
+  serialized_end=2342,
 )
 _sym_db.RegisterEnumDescriptor(_OPERATION)
 
@@ -196,8 +196,8 @@ _MAGICDESCRIPTOR_MESSAGE_TYPE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=1903,
-  serialized_end=1939,
+  serialized_start=1902,
+  serialized_end=1938,
 )
 _sym_db.RegisterEnumDescriptor(_MAGICDESCRIPTOR_MESSAGE_TYPE)
 
@@ -885,34 +885,6 @@ _MAGIC = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='schema_size', full_name='odoopb.Magic.schema_size', index=2,
-      number=3, type=7, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='header_size', full_name='odoopb.Magic.header_size', index=3,
-      number=4, type=7, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='version', full_name='odoopb.Magic.version', index=4,
-      number=5, type=7, cpp_type=3, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
-    _descriptor.FieldDescriptor(
-      name='timestamp', full_name='odoopb.Magic.timestamp', index=5,
-      number=6, type=6, cpp_type=4, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -925,8 +897,8 @@ _MAGIC = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1667,
-  serialized_end=1798,
+  serialized_start=1666,
+  serialized_end=1719,
 )
 
 
@@ -951,6 +923,34 @@ _MAGICDESCRIPTOR = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='schema_size', full_name='odoopb.MagicDescriptor.schema_size', index=2,
+      number=3, type=7, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='header_size', full_name='odoopb.MagicDescriptor.header_size', index=3,
+      number=4, type=7, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='version', full_name='odoopb.MagicDescriptor.version', index=4,
+      number=5, type=7, cpp_type=3, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='timestamp', full_name='odoopb.MagicDescriptor.timestamp', index=5,
+      number=6, type=6, cpp_type=4, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -964,8 +964,8 @@ _MAGICDESCRIPTOR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1801,
-  serialized_end=1939,
+  serialized_start=1722,
+  serialized_end=1938,
 )
 
 
@@ -1023,8 +1023,8 @@ _RECORD = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=1941,
-  serialized_end=2052,
+  serialized_start=1940,
+  serialized_end=2051,
 )
 
 
@@ -1103,8 +1103,8 @@ _HEADER = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=2055,
-  serialized_end=2244,
+  serialized_start=2054,
+  serialized_end=2243,
 )
 
 _BINARY.fields_by_name['stored'].enum_type = _BINARY_STORED
