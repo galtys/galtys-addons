@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!-- Demo menu item -->
+
+        <menuitem id='hashsync_demo' name='Demo' parent="hashsync_main" sequence="200"/>
+
+
+        <!-- SKYNET PERSON -->
+	
+        <record id="view_skynet_person_form" model="ir.ui.view">
+            <field name="name">skynet.person.form</field>
+            <field name="model">skynet.person</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Person">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+			    <field name="birth_date"/>
+                        </group>
+			<field name="address_ids"/>
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+        
+        <record id="view_skynet_person_tree" model="ir.ui.view">
+          <field name="name">analysis.tree</field>
+          <field name="model">skynet.person</field>
+          <field name="arch" type="xml">
+            <tree string="Person">
+                            <field name="name"/>
+			    <field name="birth_date"/>
+            </tree>
+          </field>
+        </record>
+
+	
+        <record model="ir.actions.act_window" id="action_hashsync_person_form">
+            <field name="name">Skynet Schema Model</field>
+            <field name="res_model">skynet.person</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Person" parent="hashsync_demo" id="menu_hashsync_persons_form" action="action_hashsync_person_form" />
+	
+
+        <!-- SKYNET ADDRESS -->
+	
+        <record id="view_skynet_address_form" model="ir.ui.view">
+            <field name="name">skynet.address.form</field>
+            <field name="model">skynet.address</field>
+            <field name="arch" type="xml">
+                <form version="7.0" string="Address">
+                    <sheet>
+		      
+                      <field name="street"/>
+		      <field name="street2"/>
+                      <field name="city"/>
+		      <field name="zip"/>
+		      
+		      
+                    </sheet>
+                </form>
+            </field>
+
+        </record>
+        
+        <record id="view_skynet_address_tree" model="ir.ui.view">
+          <field name="name">analysis.tree</field>
+          <field name="model">skynet.address</field>
+          <field name="arch" type="xml">
+            <tree string="Address">
+                      <field name="street"/>
+		      <field name="street2"/>
+                      <field name="city"/>
+		      <field name="zip"/>
+            </tree>
+          </field>
+        </record>
+
+	
+        <record model="ir.actions.act_window" id="action_hashsync_address_form">
+            <field name="name">Skynet Schema Model</field>
+            <field name="res_model">skynet.address</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<menuitem name="Address" parent="hashsync_demo" id="menu_hashsync_addresss_form" action="action_hashsync_address_form" />
+
+
+
+
+	
+    </data>
+</openerp>

@@ -20,6 +20,23 @@ if 1:
   from openerp.modules.module import get_module_resource
   from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict, erpmodel2dict
 
+class Person(osv.osv):
+  _name = "skynet.person"
+  _columns = {
+    'name':fields.char("Name"),
+    'birth_date':fields.date("Birth Date"),
+    'address_ids':fields.one2many("skynet.address", "person_id", "Addresses")
+    }
+class Address(osv.osv):
+  _name = "skynet.address"
+  _columns = {
+    'street':fields.char("Street"),
+    'street2':fields.char("Street 2"),
+    'city':fields.char("City"),
+    'zip':fields.char("Post Code"),
+    'person_id':fields.many2one("skynet.person", "Person"),
+    }
+  
 class SkynetSettings(osv.osv):
     _name = "skynet.settings"
     _description = "HashSync Settings"

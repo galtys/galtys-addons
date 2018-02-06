@@ -156,6 +156,24 @@
         </record>
 
 	<menuitem name="Settings" parent="hashsync_config" id="menu_skynet_settingss_form" action="action_skynet_settings_form" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
     </data>
 </openerp>
