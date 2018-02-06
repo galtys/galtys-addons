@@ -34,6 +34,25 @@ from odoo.modules.module import get_module_resource
 
 from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict10, erpmodel2dict10
 
+class Person(models.Model):
+    _name = "skynet.person"
+    code= fields.Char("code")
+    secret_key = fields.Char("secret_key")
+    name = fields.Char("Name")
+    birth_date = fields.Date("Birth Date")
+    address_ids = fields.One2many('skynet.address','person_id','Addresses')
+
+class Address(models.Model):
+    _name = "skynet.address"
+    code= fields.Char("code")
+    secret_key = fields.Char("secret_key")
+    street = fields.Char("street")
+    street2 = fields.Char("street2")
+    city= fields.Char("city")
+    zip = fields.Char("zip")
+    person_id = fields.Many2one("skynet.person")
+    
+
 class SkynetSettings(models.Model):
     _name = "skynet.settings"
     _description = "Skynet Settings"
@@ -60,13 +79,19 @@ class SkynetSchema(models.Model):
     _description = "skynet.schema"
 
     name = fields.Char("Name")
+    model_ids = fields.One2many("skynet.schema.model","schema_id","Schema Model")
+    
     settings_id = fields.Many2one("skynet.settings",string="Settings")
+    
     registry_json = fields.Text("Registry Json")
     registry_dict = fields.Text("Registry dict")
-    model_ids = fields.One2many("skynet.schema.model","schema_id","Schema Model")
     registry_pb = fields.Binary("Registry PB")
     registry_proto = fields.Text("Registry Proto")
 
+    schema_json = fields.Text("Schema Json")
+    schema_dict = fields.Text("Schema dict")
+    schema_pb = fields.Binary("Schema PB")
+    schema_proto = fields.Text("Schema Proto")
 
     def store_registry_json(self):
 
@@ -74,7 +99,7 @@ class SkynetSchema(models.Model):
             models = []
             for sm in schema.model_ids:
                 models.append( sm.model_id.model )
-            print models
+            #print models
             uid = 1
             registry_dict = odoo2proto.odoo2pbmsg_dict10(self.env, models)
             registry_json = json.dumps( registry_dict )
@@ -85,6 +110,19 @@ class SkynetSchema(models.Model):
             registry_dict_pprint=fp.getvalue()            
             schema.registry_json = registry_json
             schema.registry_dict = registry_dict_pprint
+
+            
+            schema_dict = {'registry':registry_dict,
+                           'schema_name': str(schema.name),
+                           'app_name': str(schema.settings_id.name)}
+
+            fp=StringIO.StringIO()
+            pprint.pprint(schema_dict, stream=fp)            
+            schema_dict_pprint=fp.getvalue()
+
+            schema_json = json.dumps( schema_dict )
+            schema.schema_dict = schema_dict_pprint
+            schema.schema_json = schema_json
         
     def store_pb(self):
         for schema in self:

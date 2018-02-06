@@ -75,6 +75,7 @@ class SkynetSchema(osv.osv):
         'model_ids':fields.one2many("skynet.schema.model","schema_id","Schema Model"),
 
         'settings_id':fields.many2one("skynet.settings",string="Settings"),
+      
         'registry_json':fields.text("Registry Json"),
         'registry_dict':fields.text("Registry dict"),
         'registry_pb':fields.binary("Registry PB"),
@@ -93,7 +94,7 @@ class SkynetSchema(osv.osv):
             models = []
             for sm in schema.model_ids:
                 models.append( sm.model_id.model )
-            print models
+            #print models
             registry_dict = odoo2proto.odoo2pbmsg_dict(self.pool, cr, uid, models)
 
             fp=StringIO.StringIO()
