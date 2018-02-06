@@ -205,31 +205,18 @@ def get_connection_mysql():
                                    database='pjb_no_tr_data')
     return conn
 
-def parse_argv(parser, argv):
-    opt, args = parser.parse_args(argv)
-
-    if 'DBNAME' in os.environ:
-        dbname = os.environ['DBNAME']
-    else:
-        dbname=''
-        
-    if len(args) == 2:
-        cmd = args[1]  
-    elif len(args) == 3:
-        cmd = args[1]
-        dbname = args[2]
-    else:
-        cmd = ''
-    return opt, cmd, dbname
 def next_id(cr, sequence):
     cr.execute("select nextval('%s') " % sequence)
     ret=[x[0] for x in cr.fetchall()]
     return ret[0]
 
 def op_diff(opt, stack):
-    DEPLOYMENT_NAME=opt.deployment_name
+    #DEPLOYMENT_NAME=opt.deployment_name
     _logger = logging.getLogger(__name__)
-    _logger.debug("op_diff, deployment name: %s", DEPLOYMENT_NAME)
+    schema = parse_schema_stack_arg(opt,stack)    
+    schema_name=schema.schema_name
+
+    _logger.debug("op_diff, schema_name: %s", schema_name)
     #fp=sys.stdin
     a1=stack.pop()
     _logger.debug("  read %s bytes from stack", len(a1) )
@@ -237,7 +224,7 @@ def op_diff(opt, stack):
     _logger.debug("  read %s bytes from stack", len(a2) )
     
     fp=StringIO.StringIO(a1+a2)   
-    segments = protolib.stream2pb(opt,fp, DEPLOYMENT_NAME)
+    segments = protolib.stream2pb(opt,fp, schema_name)
     fp.close()
     
     seg=protolib.pb2op(segments, opt)
@@ -248,30 +235,31 @@ def op_diff(opt, stack):
     _logger.debug("  push %s bytest to stack", len(ret) )
     stack.push(ret)
     fp.close()
+    push_schema_stack(opt, stack, schema)
     #sys.stdout.close()    
     
 def op_json(opt, stack):
     _logger = logging.getLogger(__name__)
 
     #DEPLOYMENT_NAME=opt.deployment_name
-    schema_data = stack.pop()    
+    schema = parse_schema_stack_arg(opt, stack)    
+    schema_name=schema.schema_name
+
     data_in = stack.pop()
-    
-    schema = protolib.stream2schema(opt, StringIO.StringIO(schema_data) )
-    DEPLOYMENT_NAME=schema.schema_name
 
 
     fp=StringIO.StringIO( data_in )
 
-    _logger.debug("running op_json with %s bytes in, DEPLOYMENT_NAME: %s", len(data_in), DEPLOYMENT_NAME)
+    _logger.debug("running op_json with %s bytes in, schema_name: %s", len(data_in), schema_name)
     
-    segments = protolib.stream2pb(opt,fp, DEPLOYMENT_NAME)
+    segments = protolib.stream2pb(opt,fp, schema_name)
     fp.close()
 
     fp=StringIO.StringIO()
     protolib.segments2json(segments, fp, opt)
     ret=fp.getvalue()
     stack.push( ret  )
+    #push_schema_stack(opt, stack, schema)
     _logger.debug("  converted to json, bytes to stack: %s", len(ret) )
 
 def op_proto(opt, stack):
@@ -332,13 +320,14 @@ def op_proto(opt, stack):
         file(fn,'wb').write(pbmsg)
     
 def op_init(opt, stack):
-    DEPLOYMENT_NAME=opt.deployment_name
+    #schema_name=opt.deployment_name
+    
     dbname=stack.pop()
     conn,tp=get_connection(opt, dbname)
     assert tp=='pg'
     cr=conn.cursor()
 
-    pb_fn = os.path.join(opt.pbdir, DEPLOYMENT_NAME + '.pb' )
+    pb_fn = os.path.join(opt.pbdir, schema_name + '.pb' )
     pbr = Registry()
     pbr.ParseFromString( file(pb_fn).read() )
     import bitcoin
@@ -355,31 +344,82 @@ def op_init(opt, stack):
     cr.close()
     conn.commit()
 
+def get_local_file_names(opt, schema_name ):
+    proto_path, odoopb_proto=get_odoopb_proto()
+    schema_proto = os.path.join(opt.protodir, schema_name + '.proto' )
+    local_odoopb_proto = os.path.join(opt.protodir, ODOOPB_PROTO )
+    schema_pb = os.path.join(opt.pbdir, schema_name + '.pbs' )    
+    return odoopb_proto, local_odoopb_proto, schema_proto, schema_pb
+
+def schemaseg2local(opt, schemaseg):
+    _logger = logging.getLogger(__name__)
+    schema = protolib.stream2schema(opt, StringIO.StringIO(schemaseg) )
+    schema_name = schema.schema_name
+    _logger.debug("schemaseg2local: schema_name: %s", schema_name )
+    
+    reg_proto = pbmsg2proto(schema.registry, schema_name)
+    odoopb_proto, local_odoopb_proto, schema_proto, schema_pb = get_local_file_names(opt, schema_name )
+    _logger.debug("  odoopb_proto: %s", odoopb_proto)
+    _logger.debug("  local_odoopb_proto (copy of odoopb_proto): %s", local_odoopb_proto)
+    _logger.debug("  schema_proto: %s", schema_proto)
+    _logger.debug("  schema_pb: %s", schema_pb)
+    #
+    arg=['cat', schema_pb,'|', 'protoc','--proto_path=%s'%opt.protodir,  '--decode=Schema', local_odoopb_proto]    
+    _logger.debug(" ".join(arg))
+             
+    file(local_odoopb_proto,'wb').write(  file(odoopb_proto).read() )
+
+    arg=['protoc', '--proto_path=%s'%opt.protodir, '--python_out=%s'%opt.pydir, local_odoopb_proto]
+    _logger.debug(" ".join(arg))
+    subprocess.call(arg)
+
+    arg=['protoc', '--proto_path=%s'%opt.protodir, '--python_out=%s'%opt.pydir, schema_proto]
+    _logger.debug(" ".join(arg))
+    subprocess.call(arg)
+
+    _logger.debug(" writing schema_pb")
+    file( schema_pb,'wb').write( schema.SerializeToString() )
+
+def parse_schema_stack_arg(opt,stack):
+    _logger = logging.getLogger(__name__)
+    if opt.localschema in ['no']:
+        _logger.debug("  expecting schema_segment on stack")
+        schema_seg = stack.pop()
+        schema = protolib.stream2schema(opt, StringIO.StringIO(schema_seg) )
+    else:
+        _logger.debug("  expecting schema_name on stack")
+        schema_name = stack.pop()
+        odoopb_proto, local_odoopb_proto, schema_proto, schema_pb = get_local_file_names(opt, schema_name )
+        if os.path.isfile(schema_pb):
+            schema_data = file(schema_pb).read()
+            schema= Schema()
+            schema.ParseFromString(schema_data)
+        else:
+            _logger.error("  could not read schema_pb: %s", schema_pb)
+            _logger.error("  can not continue, sys.exit(1)")
+            sys.exit(1)
+    return schema
+def push_schema_stack(opt, stack, schema):
+    _logger = logging.getLogger(__name__)
+    schema_data = schema.SerializeToString()
+    schema_name = schema.schema_name
+    if opt.localschema in ['no']:    
+        _logger.debug("pushing schema back to stack, %s bytes", len(schema_data) )
+        stack.push(schema_data)
+    else:
+        _logger.debug("pusching schema_name %s to stack", schema_name )
+        stack.push(schema_name)
+    
 def op_snapshot(opt, stack):
     _logger = logging.getLogger(__name__)
     dbname=stack.pop()
-    schema_data = stack.pop()    
-    
-    #pbr = stack.pop()    
-    #DEPLOYMENT_NAME=opt.deployment_name
-    #schema = Schema()
-    #schema.ParseFromString(schema_data )
-    #print [schema_data]
-    schema = protolib.stream2schema(opt, StringIO.StringIO(schema_data) )
-    DEPLOYMENT_NAME=schema.schema_name
-    
-    _logger.debug("running op_snapshot dbname:%s, DEPLOYMENT_NAME: %s", dbname,DEPLOYMENT_NAME)
+    _logger.debug("running op_snapshot dbname:%s", dbname)
+    schema = parse_schema_stack_arg(opt,stack)    
+    schema_name=schema.schema_name
     
     conn,tp=get_connection(opt, dbname)
     cr=conn.cursor()
     pbr = schema.registry
-    #pb_fn = os.path.join(opt.pbdir, DEPLOYMENT_NAME + '.pb' )
-    #pbr = Registry()
-    #pbr.ParseFromString( file(pb_fn).read() )
-    
-    #fp=sys.stdout
-    #if cmd=='is':
-    #    fp.write( sys.stdin.read() )
     hash_map = {}
     id2code_map = {}
     data=[]
@@ -399,12 +439,10 @@ def op_snapshot(opt, stack):
         #    #for pb_m2 in pb_messages2: 
         #print records[0]['parent_id']
         #sys.stderr.write( str(records) )
-        pb_messages=protolib.serialize_records(m, records,opt, hash_map, id2code_map, appname=DEPLOYMENT_NAME)
+        pb_messages=protolib.serialize_records(m, records,opt, hash_map, id2code_map, appname=schema_name)
         #data.append(pb_messages)
-        
-        pbstream = protolib.pb2stream(m, pb_messages)
-        fp.write( pbstream )
-    
+        pbstream = protolib.pb2stream(m, pb_messages, schema_name=schema_name)
+        fp.write( pbstream )   
     
     cr.close()
     conn.commit()
@@ -412,16 +450,15 @@ def op_snapshot(opt, stack):
     fp.close()
     _logger.debug("pushing data segments, %s bytes onto stack", len(ret) )
     stack.push(ret)
-    _logger.debug("pushing schema back to stack, %s bytes", len(schema_data) )
-    stack.push(schema_data)
+    push_schema_stack(opt, stack, schema)
     
 def op_deleteall(opt, stack):
     dbname=stack.pop()
-    DEPLOYMENT_NAME=opt.deployment_name
+    schema_name=opt.deployment_name
                 
     conn,tp=get_connection(opt, dbname)
     cr=conn.cursor()
-    pb_fn = os.path.join(opt.pbdir, DEPLOYMENT_NAME + '.pb' )
+    pb_fn = os.path.join(opt.pbdir, schema_name + '.pb' )
     pbr = Registry()
     pbr.ParseFromString( file(pb_fn).read() )
     #pbr_map = dict( [ (m._name, m) for m in pbr.models] )
@@ -436,11 +473,11 @@ def op_deleteall(opt, stack):
     
 def op_apply(opt, stack):
     dbname=stack.pop()
-    DEPLOYMENT_NAME=opt.deployment_name
+    schema_name=opt.deployment_name
                 
     conn,tp=get_connection(opt, dbname)
     cr=conn.cursor()
-    pb_fn = os.path.join(opt.pbdir, DEPLOYMENT_NAME + '.pb' )
+    pb_fn = os.path.join(opt.pbdir, schema_name + '.pb' )
     pbr = Registry()
     pbr.ParseFromString( file(pb_fn).read() )
     pbr_map = dict( [ (m._name, m) for m in pbr.models] )
@@ -448,7 +485,7 @@ def op_apply(opt, stack):
     field_relation_map = protolib.relation_map(pbr)
                 
     fp=StringIO.StringIO( stack.pop() )
-    segments = protolib.stream2pb(opt,fp, DEPLOYMENT_NAME)
+    segments = protolib.stream2pb(opt,fp, schema_name)
     fp.close()
     #print segments
     ret = protolib.segments2dict(segments)
@@ -514,9 +551,9 @@ def op_apply(opt, stack):
     conn.commit()
     
 def op_in(opt, stack):
-    #DEPLOYMENT_NAME=opt.deployment_name
+    #schema_name=opt.deployment_name
     fp=sys.stdin
-    #segments = protolib.stream2pb(opt,fp, DEPLOYMENT_NAME)
+    #segments = protolib.stream2pb(opt,fp, schema_name)
     #fp.close()
     stack.push( fp.read() )
     fp.close()
@@ -609,27 +646,12 @@ def get_odoopb_proto():
     odoopb_proto = os.path.join(proto_path,  ODOOPB_PROTO)
     return proto_path, odoopb_proto
 
-def op_test(opt, stack):
+def op_schemaseg2local(opt, stack):
     _logger = logging.getLogger(__name__)
-    proto_path, odoopb_proto=get_odoopb_proto()    
-    _logger.debug("op_test: %s", os.path.isfile(odoopb_proto))
+    _logger.debug("op_test")
+    schemaseg = stack.pop()
+    schemaseg2local(opt, schemaseg)    
     
-    arg=['protoc', '--proto_path=%s'%proto_path, '--python_out=%s'%opt.pydir, odoopb_proto]
-    _logger.debug(" ".join(arg) )
-    subprocess.call(arg)
-
-    seg = stack.pop()
-    schema = protolib.stream2schema(opt, StringIO.StringIO(seg) )
-    #print schema.schema_name
-    reg_proto = pbmsg2proto(schema.registry, schema.schema_name)
-
-    fn = os.path.join(opt.protodir, schema.schema_name + '.proto' )
-    fn_odoopb_proto = os.path.join(opt.protodir, ODOOPB_PROTO )
-    file(fn_odoopb_proto,'wb').write(  file(odoopb_proto).read() )
-    arg=['protoc', '--proto_path=%s'%opt.protodir, '--python_out=%s'%opt.pydir, fn]
-    subprocess.call(arg)
-    _logger.debug(" ".join(arg) )
-
 OP=[('diff',op_diff),
     ('d',op_diff),
     ('json',op_json),
@@ -650,7 +672,7 @@ OP=[('diff',op_diff),
     ('pb2schemaseg', op_pb2schemaseg),
     ('add', op_add),
     ('sub', op_sub),
-    ('test',op_test),
+    ('schemaseg2local',op_schemaseg2local),
 ]
 OP_MAP=dict(OP)
 
@@ -664,10 +686,9 @@ def main():
     streamops_group = protolib.add_StreamOPS_group(parser)
     parser.add_option_group(streamops_group)
     
-    #opt, cmd, dbname = parse_argv(parser, sys.argv)
     opt, args = parser.parse_args(sys.argv)
     
-    #DEPLOYMENT_NAME=opt.deployment_name
+    #schema_name=opt.deployment_name
     import logging
     _logger = logging.getLogger(__name__)
     logging.basicConfig()

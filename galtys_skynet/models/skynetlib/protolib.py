@@ -204,9 +204,9 @@ def add_OdooPB_group(parser):
     return odoopb_group
 def add_StreamOPS_group(parser):
     odoopb_group = optparse.OptionGroup(parser, "StreamOPS")
-    odoopb_group.add_option("--argschema",
-                            dest='argschema',
-                            help="Expect schema segment as argument in stack. Alternatively, read it from file.... Default: [%default]",
+    odoopb_group.add_option("--localschema",
+                            dest='localschema',
+                            help="Expect schema stored in opt.pbdir. Alternatively, expect it on stack.  Default: [%default]",
                             default='yes'
     )
     
@@ -466,11 +466,12 @@ def pb2op(segments, opt):
         assert type(m)==list
     return out #list of segments + stack segment
 
-def get_header(m, pb_messages): #including magic
+def get_header(m, pb_messages, schema_name): #including magic
     header = Header()
     header.model = m._name
     header._table = m._table
     header._sequence = m._sequence
+    header.schema_name = schema_name
     #header.message_type = Header.DATA
     for rp_msg in pb_messages:
         pb_msg = rp_msg.SerializeToString()
@@ -541,8 +542,10 @@ def segments2file(segments, fp):
     for seg in segments:
         segment2stream(fp, seg)
 
-def pb2stream(m, pb_messages):
-    header = get_header(m, pb_messages)
+def pb2stream(m, pb_messages, schema_name=None):
+    if schema_name is None:
+        schema_name = ''
+    header = get_header(m, pb_messages, schema_name)
     #magic = get_magic(header)
     #print 'magic size: ', [magic.SerializeToString(), len(magic.SerializeToString()) ]
     s=StringIO.StringIO()
