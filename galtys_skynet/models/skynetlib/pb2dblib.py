@@ -629,7 +629,7 @@ def op_test(opt, stack):
     arg=['protoc', '--proto_path=%s'%opt.protodir, '--python_out=%s'%opt.pydir, fn]
     subprocess.call(arg)
     _logger.debug(" ".join(arg) )
-    #print reg_proto
+
 OP=[('diff',op_diff),
     ('d',op_diff),
     ('json',op_json),
