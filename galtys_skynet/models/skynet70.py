@@ -179,3 +179,5 @@ class SkynetSchema(osv.osv):
                     code = bitcoin.pubtoaddr( pub_key )
                     sql_update="update %s set " % m._table
                     cr.execute( sql_update+"code=%s,secret_key=%s where id=%s", (code,secret_key,id_) )
+
+#note: https://pythonhosted.org/OdooRPC/

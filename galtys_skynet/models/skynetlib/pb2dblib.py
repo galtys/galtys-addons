@@ -600,6 +600,16 @@ def op_sub(opt, stack):
     res=int(arg1)-int(arg2)
     _logger.debug("op_sub arg1: %s, arg2: %s, result back to stack:%s", arg1,arg2,res)
     stack.push(str(res))
+
+def get_odoopb_proto():
+    
+    return os.path.split(__file__)
+
+def op_test(opt, stack):
+    _logger = logging.getLogger(__name__)
+    fn=get_odoopb_proto()
+    
+    _logger.debug("op_test: %s", fn)
     
 OP=[('diff',op_diff),
     ('d',op_diff),
@@ -621,6 +631,7 @@ OP=[('diff',op_diff),
     ('pb2schemaseg', op_pb2schemaseg),
     ('add', op_add),
     ('sub', op_sub),
+    ('test',op_test),
 ]
 OP_MAP=dict(OP)
 
