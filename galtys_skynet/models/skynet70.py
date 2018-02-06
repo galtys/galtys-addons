@@ -23,6 +23,8 @@ if 1:
 class Person(osv.osv):
   _name = "skynet.person"
   _columns = {
+    'code':fields.char("Code"),
+    'secret_key':fields.char("secret key"),
     'name':fields.char("Name"),
     'birth_date':fields.date("Birth Date"),
     'address_ids':fields.one2many("skynet.address", "person_id", "Addresses")
@@ -30,6 +32,8 @@ class Person(osv.osv):
 class Address(osv.osv):
   _name = "skynet.address"
   _columns = {
+    'code':fields.char("Code"),
+    'secret_key':fields.char("secret key"),
     'street':fields.char("Street"),
     'street2':fields.char("Street 2"),
     'city':fields.char("City"),
