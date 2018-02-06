@@ -14,6 +14,7 @@ if 1:
   from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
   from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
   import skynetlib.odoo2proto as odoo2proto
+  from skynetlib.protolib import get_odoopb_proto
 #from odoo2proto import odoo2pbmsg
 
 #for v8,v7
@@ -52,8 +53,9 @@ class SkynetSettings(osv.osv):
     def load_odoopb_proto(self, cr, uid, ids, context=None):
         
         for settings in self.browse(cr, uid, ids):
-            fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
-            settings.write( {'odoopb_proto': file(fn).read() } )
+            proto_path, odoopb_proto=get_odoopb_proto()    
+            #fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
+            settings.write( {'odoopb_proto': file(odoopb_proto).read() } )
             
 class SkynetModel(osv.osv):
     _name = "skynet.schema.model"

@@ -27,6 +27,7 @@ import pprint
 from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
 from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
 import skynetlib.odoo2proto as odoo2proto
+from skynetlib.protolib import get_odoopb_proto
 #from odoo2proto import odoo2pbmsg
 
 #for v8,v7
@@ -62,8 +63,9 @@ class SkynetSettings(models.Model):
 
     def load_odoopb_proto(self):        
         for settings in self:
-            fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
-            settings.odoopb_proto = file(fn).read()
+            #fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
+            proto_path, odoopb_proto=get_odoopb_proto()    
+            settings.odoopb_proto = file(odoopb_proto).read()
             
 class SkynetModel(models.Model):
     _name = "skynet.schema.model"

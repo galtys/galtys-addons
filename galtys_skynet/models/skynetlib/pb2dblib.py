@@ -295,7 +295,6 @@ def op_proto(opt, stack):
 
     odoo_proto_fn = os.path.join( opt.protodir, 'odoopb.proto' ) 
 
-
     cr.execute("select id,odoopb_proto from skynet_settings where name=%s",(appname,) )
     ret=[x for x in cr.fetchall()]
     _logger.debug("project name %s, number of skynet_settings records in db %s",appname,len(ret))
@@ -577,11 +576,12 @@ def op_pb2proto(opt, stack):
     _logger = logging.getLogger(__name__)
     _logger.debug("op_pb2proto, reading binary Schema() message from stack and writing proto definition back to stack")
     pbmsg = stack.pop()
-    pbr = Schema()
-    _logger.debug("  op_pb2proto, len(pbmsg): %s", len(pbmsg))
     
-    pbr.ParseFromString( pbmsg )
-    reg_proto = pbmsg2proto(pbr.registry, pbr.schema_name)
+    schema = Schema()
+    _logger.debug("  op_pb2proto, len(pbmsg): %s", len(pbmsg))
+    schema.ParseFromString( pbmsg )
+    reg_proto = pbmsg2proto(schema.registry, schema.schema_name)   
+
     stack.push( reg_proto )
     
 def op_add(opt, stack):
@@ -601,16 +601,35 @@ def op_sub(opt, stack):
     _logger.debug("op_sub arg1: %s, arg2: %s, result back to stack:%s", arg1,arg2,res)
     stack.push(str(res))
 
+ODOOPB_PROTO='odoopb.proto'
+
 def get_odoopb_proto():
-    
-    return os.path.split(__file__)
+    path, fnxxx = os.path.split(__file__)
+    proto_path = os.path.join(path, 'protodir')
+    odoopb_proto = os.path.join(proto_path,  ODOOPB_PROTO)
+    return proto_path, odoopb_proto
 
 def op_test(opt, stack):
     _logger = logging.getLogger(__name__)
-    fn=get_odoopb_proto()
+    proto_path, odoopb_proto=get_odoopb_proto()    
+    _logger.debug("op_test: %s", os.path.isfile(odoopb_proto))
     
-    _logger.debug("op_test: %s", fn)
-    
+    arg=['protoc', '--proto_path=%s'%proto_path, '--python_out=%s'%opt.pydir, odoopb_proto]
+    _logger.debug(" ".join(arg) )
+    subprocess.call(arg)
+
+    seg = stack.pop()
+    schema = protolib.stream2schema(opt, StringIO.StringIO(seg) )
+    #print schema.schema_name
+    reg_proto = pbmsg2proto(schema.registry, schema.schema_name)
+
+    fn = os.path.join(opt.protodir, schema.schema_name + '.proto' )
+    fn_odoopb_proto = os.path.join(opt.protodir, ODOOPB_PROTO )
+    file(fn_odoopb_proto,'wb').write(  file(odoopb_proto).read() )
+    arg=['protoc', '--proto_path=%s'%opt.protodir, '--python_out=%s'%opt.pydir, fn]
+    subprocess.call(arg)
+    _logger.debug(" ".join(arg) )
+    #print reg_proto
 OP=[('diff',op_diff),
     ('d',op_diff),
     ('json',op_json),
