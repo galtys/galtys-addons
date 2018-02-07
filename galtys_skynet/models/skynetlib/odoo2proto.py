@@ -177,3 +177,8 @@ import "odoopb.proto";
         out = out +  get_proto_for_model(m, cols_pb)
     return out
 
+def get_odoopb_proto():
+    path, fnxxx = os.path.split(__file__)
+    proto_path = os.path.join(path, 'protodir')
+    odoopb_proto = os.path.join(proto_path,  ODOOPB_PROTO)
+    return proto_path, odoopb_proto
