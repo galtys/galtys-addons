@@ -211,7 +211,8 @@ def next_id(cr, sequence):
     return ret[0]
 
 def op_diff(opt, stack):
-    #DEPLOYMENT_NAME=opt.deployment_name
+    "schema dataseg1 dataseg2, use schema and calculate diff between dataseg1 and dataseg2"
+    
     _logger = logging.getLogger(__name__)
     schema = parse_schema_stack_arg(opt,stack)    
     schema_name=schema.schema_name
@@ -239,6 +240,8 @@ def op_diff(opt, stack):
     #sys.stdout.close()    
     
 def op_json(opt, stack):
+    "schema dataseg, transform dataseg into json, put json to stack"
+    
     _logger = logging.getLogger(__name__)
 
     #DEPLOYMENT_NAME=opt.deployment_name
@@ -263,6 +266,8 @@ def op_json(opt, stack):
     _logger.debug("  converted to json, bytes to stack: %s", len(ret) )
 
 def op_proto(opt, stack):
+    "appname, dbname"
+    
     _logger = logging.getLogger(__name__)
     
     dbname=stack.pop()
@@ -320,6 +325,7 @@ def op_proto(opt, stack):
         file(fn,'wb').write(pbmsg)
     
 def op_init(opt, stack):
+    "dbname, init code,secret_key with new random keys"
     #schema_name=opt.deployment_name
     
     dbname=stack.pop()
@@ -411,6 +417,7 @@ def push_schema_stack(opt, stack, schema):
         stack.push(schema_name)
     
 def op_snapshot(opt, stack):
+    "schema dbname, take snapshot "
     _logger = logging.getLogger(__name__)
     dbname=stack.pop()
     _logger.debug("running op_snapshot dbname:%s", dbname)
@@ -453,6 +460,8 @@ def op_snapshot(opt, stack):
     push_schema_stack(opt, stack, schema)
     
 def op_deleteall(opt, stack):
+    "schema_name, dbname"
+    
     dbname=stack.pop()
     schema_name=opt.deployment_name
                 
@@ -472,6 +481,7 @@ def op_deleteall(opt, stack):
     conn.commit()
     
 def op_apply(opt, stack):
+    " "
     dbname=stack.pop()
     schema_name=opt.deployment_name
                 
@@ -551,6 +561,7 @@ def op_apply(opt, stack):
     conn.commit()
     
 def op_in(opt, stack):
+    "read stdin and put it to stack "
     #schema_name=opt.deployment_name
     fp=sys.stdin
     #segments = protolib.stream2pb(opt,fp, schema_name)
@@ -558,6 +569,7 @@ def op_in(opt, stack):
     stack.push( fp.read() )
     fp.close()
 def op_out(opt, stack):
+    "write all block in stack to stdout"
     _logger = logging.getLogger(__name__)
     
     fp=sys.stdout
@@ -672,7 +684,8 @@ OP=[('diff',op_diff),
 OP_MAP=dict(OP)
 
 def main():
-    usage = "usage: python %prog [options] dbname csv_fn\n"
+    OP_STR = "\n".join( ["%s: %s"%(str(x[0]), x[1].__doc__)  for x in OP] )
+    usage = "usage: python %prog [options] \n\n" + OP_STR
     parser = optparse.OptionParser(version='0.1', usage=usage)
 
     odoopb_group = add_OdooPB_group(parser)
