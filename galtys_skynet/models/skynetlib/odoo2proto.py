@@ -8,7 +8,7 @@ DEFAULT_SERVER_DATETIME_FORMAT = "%s %s" % (
     DEFAULT_SERVER_DATE_FORMAT,
     DEFAULT_SERVER_TIME_FORMAT)
 from protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
-
+SKIP_FIELDS=['create_uid','display_name','__last_update','write_uid','write_date','create_date']
 def convert_fields(fields7, columns7):
     if 'id' not in fields7:
         id_def = {'readonly': True, 'type': 'integer', 'string': 'Id'}
@@ -35,8 +35,8 @@ def convert_fields(fields7, columns7):
                 sel.append( {'label':s_label,'name':s_name} )
             fieldDef['selection']=sel
             fieldDef['selectable']=True
-        else:
-            fieldDef['selectable']=False
+        #else:
+        #    fieldDef['selectable']=False
         for fa,fv in fdef.items():
             if isinstance(fv, list) or isinstance(fv, dict) or isinstance(fv,tuple):
                 fv=str(fv)
@@ -62,9 +62,11 @@ def convert_fields(fields7, columns7):
                 else:
                     fv=False
             if fa not in ['store']: #TBD, store does not work
-                fieldDef[fa]=fv
+                if fv not in [False, '']:
+                    fieldDef[fa]=fv
         f['fieldDef'] = fieldDef #dict2pbdict(fieldDef)
-        fields.append(f)
+        if f_name not in SKIP_FIELDS:
+            fields.append(f)
     return fields
 
 def get_columns_from_db(cr, table):
