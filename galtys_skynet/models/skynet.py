@@ -37,6 +37,8 @@ from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields
 
 class Person(models.Model):
     _name = "skynet.person"
+    _description = "Person"
+    
     code= fields.Char("code")
     secret_key = fields.Char("secret_key")
     name = fields.Char("Name")
@@ -45,6 +47,8 @@ class Person(models.Model):
 
 class Address(models.Model):
     _name = "skynet.address"
+    _description = "Address"
+    
     code= fields.Char("code")
     secret_key = fields.Char("secret_key")
     street = fields.Char("street")

@@ -8,6 +8,7 @@ DEFAULT_SERVER_DATETIME_FORMAT = "%s %s" % (
     DEFAULT_SERVER_DATE_FORMAT,
     DEFAULT_SERVER_TIME_FORMAT)
 from protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
+import protolib
 SKIP_FIELDS=['create_uid','display_name','__last_update','write_uid','write_date','create_date']
 def convert_fields(fields7, columns7):
     if 'id' not in fields7:
@@ -178,6 +179,48 @@ import "odoopb.proto";
         cols_pb = get_pb_fields_to_store(m)
         out = out +  get_proto_for_model(m, cols_pb)
     return out
+
+def m2csv(m):
+    header = ['name', 'string','type','relation','relation_field','required']
+    data=[]
+    #data.append(header)
+    for f in m._fields:
+        fname, fd = f.name, f.field_def
+        row=[]
+        row.append(fname)
+        for h in header[1:]:
+            if h == 'type':
+                row.append( protolib.FieldDef_to_text[getattr( fd, h ) ] )
+            else:
+                row.append( getattr( fd, h )  )
+        data.append(row)
+    return header, data
+
+ADOC_CSV_TABLE=""".%s
+[%%header,format=csv]
+|===
+%s
+|===
+
+"""
+import csv
+import StringIO
+
+def pbmsg2adoc(pbmsg, appname):
+    out = StringIO.StringIO()
+    
+    for m in pbmsg.models:
+        #cols_pb = get_pb_fields_to_store(m)
+        #out = out +  get_proto_for_model(m, cols_pb)
+        header, csv_data = m2csv(m)
+        fp=StringIO.StringIO()
+        w=csv.writer(fp)
+        w.writerow(header)
+        w.writerows(csv_data)
+        val=fp.getvalue()
+        x=ADOC_CSV_TABLE%(m._description, val)
+        out.write(x)
+    return out.getvalue()
 
 def get_odoopb_proto():
     path, fnxxx = os.path.split(__file__)

@@ -116,6 +116,27 @@ erp_type_to_pb = {
     #FieldDef.PROPERTY,
     FieldDef.TEXT:'string',
 }
+
+FieldDef_to_text = {
+    FieldDef.BOOLEAN:'BOOLEAN',
+    FieldDef.INTEGER:'INTEGER',
+    FieldDef.REFERENCE:'REFERENCE',
+    FieldDef.CHAR:'CHAR',
+    FieldDef.HTML:'HTML',
+    FieldDef.FLOAT:'FLOAT',
+    FieldDef.DATE:'DATE',
+    FieldDef.DATETIME:'DATETIME',
+    FieldDef.BINARY:'BINARY',
+    FieldDef.SELECTION:'SELECTION',
+    FieldDef.MANY2ONE:'MANY2ONE',
+    FieldDef.ONE2MANY:'ONE2MANY',
+    FieldDef.MANY2MANY:'MANY2MANY',
+    #FieldDef.FUNCTION,
+    #FieldDef.SERIALIZED,
+    #FieldDef.PROPERTY,
+    FieldDef.TEXT:'TEXT',
+}
+
 odoo_custom_pbfields = [FieldDef.REFERENCE,FieldDef.BINARY,FieldDef.MANY2ONE]
 
 HOMEDIR=os.environ['HOME']

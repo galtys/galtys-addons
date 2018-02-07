@@ -29,7 +29,7 @@ import skynetlib.protolib as protolib
 from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry,Magic,Header, Schema
 import skynetlib.odoopb_pb2 as odoopb    
 
-from skynetlib.odoo2proto import pbmsg2proto
+from skynetlib.odoo2proto import pbmsg2proto, pbmsg2adoc
 
 def has_att_list(fd, att_list=None): #OR
     if att_list is None:
@@ -632,6 +632,20 @@ def op_pb2proto(opt, stack):
     reg_proto = pbmsg2proto(schema.registry, schema.schema_name)   
 
     stack.push( reg_proto )
+
+def op_pb2adoc(opt, stack):
+    _logger = logging.getLogger(__name__)
+    _logger.debug("op_pb2adoc, reading binary Schema() message from stack and writing adoc segment back to stack")
+    pbmsg = stack.pop()
+    
+    schema = Schema()
+    _logger.debug("  op_pb2adoc, len(pbmsg): %s", len(pbmsg))
+    schema.ParseFromString( pbmsg )
+    
+    reg_adoc = pbmsg2adoc(schema.registry, schema.schema_name)   
+    #print reg_adoc
+    stack.push( reg_adoc )
+
     
 def op_add(opt, stack):
     _logger = logging.getLogger(__name__)
@@ -676,6 +690,7 @@ OP=[('diff',op_diff),
     ('json2dict', op_json2dict),
     ('json2pb', op_json2pb),
     ('pb2proto', op_pb2proto),
+    ('pb2adoc', op_pb2adoc),
     ('pb2schemaseg', op_pb2schemaseg),
     ('add', op_add),
     ('sub', op_sub),
