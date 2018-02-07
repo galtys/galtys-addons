@@ -76,12 +76,12 @@
           <field name="model">skynet.address</field>
           <field name="arch" type="xml">
             <tree string="Address">
-	      
-                      <field name="street"/>
-		      <field name="street2"/>
-                      <field name="city"/>
-		      <field name="zip"/>
-		      <field name="code"/>
+	      <field name="person_id"/>
+              <field name="street"/>
+	      <field name="street2"/>
+              <field name="city"/>
+	      <field name="zip"/>
+	      <field name="code"/>
             </tree>
           </field>
         </record>
