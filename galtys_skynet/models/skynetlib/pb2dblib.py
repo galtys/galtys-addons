@@ -214,7 +214,8 @@ def op_diff(opt, stack):
     "schema dataseg1 dataseg2, use schema and calculate diff between dataseg1 and dataseg2"
     
     _logger = logging.getLogger(__name__)
-    schema = parse_schema_stack_arg(opt,stack)    
+    schema_seg = parse_schema_stack_arg(opt,stack)
+    schema = protolib.stream2schema(opt, StringIO.StringIO(schema_seg) )
     schema_name=schema.schema_name
 
     _logger.debug("op_diff, schema_name: %s", schema_name)
@@ -236,7 +237,7 @@ def op_diff(opt, stack):
     _logger.debug("  push %s bytest to stack", len(ret) )
     stack.push(ret)
     fp.close()
-    push_schema_stack(opt, stack, schema)
+    push_schema_stack(opt, stack, schema, schema_seg)
     #sys.stdout.close()    
     
 def op_json(opt, stack):
@@ -266,6 +267,45 @@ def op_json(opt, stack):
     stack.push( ret  )
     #push_schema_stack(opt, stack, schema)
     _logger.debug("  converted to json, bytes to stack: %s", len(ret) )
+
+def op_drop(opt, stack):
+    "<item> op_drop: pop last item from stack and drop it"
+    _logger = logging.getLogger(__name__)
+    _logger.debug("op_drop: dropping last item from stack")    
+    stack.pop()
+    
+def op_readf(opt, stack):
+    "fname op_readf: read content of a fname and put it on stack"
+    
+    _logger = logging.getLogger(__name__)
+    _logger.debug("fname op_readf: read content of a file and put it on stack")
+    fname = stack.pop()
+    data = file(fname).read()
+    stack.push( data )
+    _logger.debug("  fname: %s, size: %s", fname, len(data))
+    
+def op_writef(opt, stack):
+    "fname op_writef: take last item from stack and write it to fname"
+    
+    _logger = logging.getLogger(__name__)
+    _logger.debug("fname op_writef: take last item from stack and write it to fname")    
+    fname = stack.pop()
+    data = stack.pop()
+    _logger.debug("  fname: %s, size: %s", fname, len(data))
+    file(fname,'wb').write( data)
+    
+def op_cat(opt, stack):
+    "<item> <item> op_cat: take two items from stack and concatenate them"
+    
+    _logger = logging.getLogger(__name__)
+    _logger.debug(op_cat.__doc__)
+    
+    item1 = stack.pop()
+    item2 = stack.pop()
+    data=item1+item2
+    _logger.debug("  size of item1: %s, size of item2: %s, total size: %s",len(item1),len(item2),len(data))
+    stack.push(data)
+
     
 def op_adoc(opt, stack):
     "schema dataseg, transform dataseg into json, put json to stack"
@@ -712,6 +752,10 @@ def op_schemaseg2local(opt, stack):
 OP=[('diff',op_diff),
     ('d',op_diff),
     ('json',op_json),
+    ('drop',op_drop),
+    ('readf',op_readf),
+    ('cat',op_cat),
+    ('writef',op_writef),    
     ('adoc',op_adoc),
     ('j',op_json),
     ('proto',op_proto),
