@@ -1,6 +1,7 @@
 import json
 import csv
 import StringIO
+import os
 
 #from protolib import add_OdooPB_group
 #ssl._create_default_https_context = ssl._create_unverified_context
@@ -12,6 +13,7 @@ DEFAULT_SERVER_DATETIME_FORMAT = "%s %s" % (
     DEFAULT_SERVER_TIME_FORMAT)
 from protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
 import protolib
+ODOOPB_PROTO='odoopb.proto'
 SKIP_FIELDS=['create_uid','display_name','__last_update','write_uid','write_date','create_date']
 def convert_fields(fields7, columns7):
     if 'id' not in fields7:

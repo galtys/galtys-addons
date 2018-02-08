@@ -228,7 +228,7 @@ def add_StreamOPS_group(parser):
     odoopb_group.add_option("--localschema",
                             dest='localschema',
                             help="Expect schema stored in opt.pbdir. Alternatively, expect it on stack.  Default: [%default]",
-                            default='yes'
+                            default='no'
     )
     
     odoopb_group.add_option("--init",

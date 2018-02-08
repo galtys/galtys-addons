@@ -29,7 +29,7 @@ import skynetlib.protolib as protolib
 from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry,Magic,Header, Schema
 import skynetlib.odoopb_pb2 as odoopb    
 
-from skynetlib.odoo2proto import pbmsg2proto, pbmsg2adoc
+from skynetlib.odoo2proto import pbmsg2proto, pbmsg2adoc, get_odoopb_proto, ODOOPB_PROTO
 
 def has_att_list(fd, att_list=None): #OR
     if att_list is None:
@@ -245,7 +245,9 @@ def op_json(opt, stack):
     _logger = logging.getLogger(__name__)
 
     #DEPLOYMENT_NAME=opt.deployment_name
-    schema = parse_schema_stack_arg(opt, stack)    
+    schema_seg = parse_schema_stack_arg(opt,stack)
+    schema = protolib.stream2schema(opt, StringIO.StringIO(schema_seg) )
+    
     schema_name=schema.schema_name
 
     data_in = stack.pop()
@@ -369,7 +371,8 @@ def schemaseg2local(opt, schemaseg):
     _logger.debug("  local_odoopb_proto (copy of odoopb_proto): %s", local_odoopb_proto)
     _logger.debug("  schema_proto: %s", schema_proto)
     _logger.debug("  schema_pb: %s", schema_pb)
-    #
+
+    file(schema_proto, 'wb').write( reg_proto )
     arg=['cat', schema_pb,'|', 'protoc','--proto_path=%s'%opt.protodir,  '--decode=Schema', local_odoopb_proto]    
     _logger.debug(" ".join(arg))
              
@@ -391,27 +394,28 @@ def parse_schema_stack_arg(opt,stack):
     if opt.localschema in ['no']:
         _logger.debug("  expecting schema_segment on stack")
         schema_seg = stack.pop()
-        schema = protolib.stream2schema(opt, StringIO.StringIO(schema_seg) )
+        _logger.debug("  len(schema_segment):%s", len(schema_seg) )
+        #schema = protolib.stream2schema(opt, StringIO.StringIO(schema_seg) )
     else:
         _logger.debug("  expecting schema_name on stack")
         schema_name = stack.pop()
         odoopb_proto, local_odoopb_proto, schema_proto, schema_pb = get_local_file_names(opt, schema_name )
         if os.path.isfile(schema_pb):
-            schema_data = file(schema_pb).read()
+            schema_seg = file(schema_pb).read()
             schema= Schema()
-            schema.ParseFromString(schema_data)
+            schema.ParseFromString(schema_seg)
         else:
             _logger.error("  could not read schema_pb: %s", schema_pb)
             _logger.error("  can not continue, sys.exit(1)")
             sys.exit(1)
-    return schema
-def push_schema_stack(opt, stack, schema):
+    return schema_seg
+def push_schema_stack(opt, stack, schema, schema_seg):
     _logger = logging.getLogger(__name__)
-    schema_data = schema.SerializeToString()
+    #schema_data = schema.SerializeToString()
     schema_name = schema.schema_name
     if opt.localschema in ['no']:    
-        _logger.debug("pushing schema back to stack, %s bytes", len(schema_data) )
-        stack.push(schema_data)
+        _logger.debug("pushing schema back to stack, %s bytes", len(schema_seg) )
+        stack.push(schema_seg)
     else:
         _logger.debug("pusching schema_name %s to stack", schema_name )
         stack.push(schema_name)
@@ -419,10 +423,14 @@ def push_schema_stack(opt, stack, schema):
 def op_snapshot(opt, stack):
     "schema dbname, take snapshot "
     _logger = logging.getLogger(__name__)
+
     dbname=stack.pop()
     _logger.debug("running op_snapshot dbname:%s", dbname)
-    schema = parse_schema_stack_arg(opt,stack)    
+    
+    schema_seg = parse_schema_stack_arg(opt,stack)
+    schema = protolib.stream2schema(opt, StringIO.StringIO(schema_seg) )
     schema_name=schema.schema_name
+    
     
     conn,tp=get_connection(opt, dbname)
     cr=conn.cursor()
@@ -457,7 +465,7 @@ def op_snapshot(opt, stack):
     fp.close()
     _logger.debug("pushing data segments, %s bytes onto stack", len(ret) )
     stack.push(ret)
-    push_schema_stack(opt, stack, schema)
+    push_schema_stack(opt, stack, schema, schema_seg)
     
 def op_deleteall(opt, stack):
     "schema_name, dbname"
@@ -664,14 +672,13 @@ def op_sub(opt, stack):
     _logger.debug("op_sub arg1: %s, arg2: %s, result back to stack:%s", arg1,arg2,res)
     stack.push(str(res))
 
-ODOOPB_PROTO='odoopb.proto'
-
 
 def op_schemaseg2local(opt, stack):
     _logger = logging.getLogger(__name__)
     _logger.debug("op_test")
     schemaseg = stack.pop()
-    schemaseg2local(opt, schemaseg)    
+    schemaseg2local(opt, schemaseg)
+    stack.push(schemaseg)
     
 OP=[('diff',op_diff),
     ('d',op_diff),
