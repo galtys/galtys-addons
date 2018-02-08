@@ -13,6 +13,8 @@ DEFAULT_SERVER_DATETIME_FORMAT = "%s %s" % (
     DEFAULT_SERVER_TIME_FORMAT)
 from protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
 import protolib
+#import pydir.odoopb_pb2
+
 ODOOPB_PROTO='odoopb.proto'
 SKIP_FIELDS=['create_uid','display_name','__last_update','write_uid','write_date','create_date']
 def convert_fields(fields7, columns7):
@@ -206,19 +208,17 @@ def m2csv(m):
 ADOC_CSV_TABLE="""%s
 [%%header,format=csv]
 |===
-%s
-|===
-
+%s|===
 """
 
 def adoc_csv_table(csv_str,title=None, ref=None):
     def get_header(title,ref):
-        out=''
+        out=[]
         if ref is not None:
-            out+='[[%s]]\n' % ref
+            out.append('[[%s]]' % ref)
         elif title is not None:
-            out+='.%s\n'%title
-        return out
+            out.append('.%s'%title)
+        return '\n'.join(out)
     h=get_header(title,ref)
     return ADOC_CSV_TABLE%(h, csv_str)
 
@@ -230,6 +230,81 @@ def csv_to_str(header, data):
     val=fp.getvalue()
     fp.close()
     return val
+
+def dict2row(HEADER,rec):
+    out=[]
+    for p in HEADER:
+        #if p in rec:
+        out.append(rec[p])
+    return out
+
+def records2table(records, HEADER=None):
+    data=records
+    #print data
+    if len(data)>0:
+        if HEADER is None:
+            HEADER=data[0].keys()
+    out=[dict2row(HEADER, x) for x in data]
+    return HEADER,out
+
+#def segment2csv(data, schema)
+import google.protobuf.json_format
+import importlib
+import sys
+import base64
+def import_odoopb(opt):
+    if opt.pydir not in sys.path:
+        sys.path.append( opt.pydir )
+    odoopb_module=importlib.import_module('odoopb_pb2')
+    return odoopb_module
+    
+def segments2adoc(segments, fp, opt, schema):
+    field_relation_map = protolib.relation_map(schema.registry)
+    code2id_map={}
+    odoopb = import_odoopb(opt)
+    for (header, messages),model in zip(segments, schema.registry.models):
+        js=google.protobuf.json_format.MessageToJson(header, including_default_value_fields=True, preserving_proto_field_name=True)
+        #fp.write(js)
+        out=[]
+        operation=[]
+        for (segh,msg) in zip(header.record,messages):
+            
+            js=google.protobuf.json_format.MessageToDict(msg, including_default_value_fields=True, preserving_proto_field_name=True)
+            #d=google.protobuf.json_format.MessageToDict(msg, including_default_value_fields=True, preserving_proto_field_name=True)
+            #sys.stderr.write( str(d) )
+            #print js
+            #fp.write(js)
+            #print segh
+
+            ret = protolib.pbdict2dbdict(model, js, opt, code2id_map, field_relation_map,fkcode=True)
+            operation.append( segh.operation )
+            if segh.operation==odoopb.SNAPSHOT:
+                s256=base64.b64encode(segh.sha256)
+                #print [ret]
+                ret.update( {'sha256':s256} )
+            out.append( ret )
+        operation = list( set( operation ) )
+        #print operation
+        if len(operation)==1 and operation[0]==odoopb.SNAPSHOT:
+            header = get_pb_fields_to_store(model) + ['sha256']
+        else:
+            header = get_pb_fields_to_store(model)
+            
+        if 'id' in header:
+            header.pop( header.index('id') )
+        if 'secret_key' in header:
+            header.pop( header.index('secret_key') )
+            
+        header, data = records2table(out, HEADER=header)
+        csv_str = csv_to_str(header, data)
+        x = adoc_csv_table(csv_str, title='%s (%s)'%(model._description,model._name) )
+        fp.write(x)
+        fp.write('\n')
+        #print header
+        
+        #print header
+        #print out
+    
 
 def pbmsg2adoc(pbmsg, appname):
     out = StringIO.StringIO()

@@ -665,7 +665,7 @@ def relation_map(pbr):
             if fd.type in [FieldDef.MANY2ONE]:
                 v[fname] = fd.relation
     return out_map
-def pbdict2dbdict(m, rec, opt, code2id_map, field_relation_map):
+def pbdict2dbdict(m, rec, opt, code2id_map, field_relation_map, fkcode=False):
     field_map = dict( [ (f.name, f.field_def) for f in m._fields] )
     out=[]
     for k,v in rec.items():
@@ -676,7 +676,10 @@ def pbdict2dbdict(m, rec, opt, code2id_map, field_relation_map):
                 if v['code'] in code2id_map[relation]:
                     res_id = code2id_map[relation][v['code']]
                     out.append( (k,res_id)  )
-        
+            else:
+                if fkcode:
+                    out.append( (k,v['code']) )
+                    
         elif fd.type in [FieldDef.CHAR, FieldDef.TEXT]:
             if v == u'false': #TBD
                 vv = False
@@ -748,7 +751,7 @@ def segments2json(segments, fp, opt):
             #d=google.protobuf.json_format.MessageToDict(msg, including_default_value_fields=True, preserving_proto_field_name=True)
             #sys.stderr.write( str(d) )
             fp.write(js)
-
+    
 def segments2dict(segments):
     seg = []
     for header, messages in segments:

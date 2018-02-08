@@ -266,6 +266,35 @@ def op_json(opt, stack):
     stack.push( ret  )
     #push_schema_stack(opt, stack, schema)
     _logger.debug("  converted to json, bytes to stack: %s", len(ret) )
+    
+def op_adoc(opt, stack):
+    "schema dataseg, transform dataseg into json, put json to stack"
+    
+    _logger = logging.getLogger(__name__)
+
+    #DEPLOYMENT_NAME=opt.deployment_name
+    schema_seg = parse_schema_stack_arg(opt,stack)
+    schema = protolib.stream2schema(opt, StringIO.StringIO(schema_seg) )
+    
+    schema_name=schema.schema_name
+
+    data_in = stack.pop()
+
+
+    fp=StringIO.StringIO( data_in )
+
+    _logger.debug("running op_json with %s bytes in, schema_name: %s", len(data_in), schema_name)
+    
+    segments = protolib.stream2pb(opt,fp, schema_name)
+    fp.close()
+
+    fp=StringIO.StringIO()
+    import odoo2proto
+    odoo2proto.segments2adoc(segments, fp, opt, schema)
+    ret=fp.getvalue()
+    stack.push( ret  )
+    #push_schema_stack(opt, stack, schema)
+    _logger.debug("  converted to json, bytes to stack: %s", len(ret) )
 
 def op_proto(opt, stack):
     "appname, dbname"
@@ -683,6 +712,7 @@ def op_schemaseg2local(opt, stack):
 OP=[('diff',op_diff),
     ('d',op_diff),
     ('json',op_json),
+    ('adoc',op_adoc),
     ('j',op_json),
     ('proto',op_proto),
     ('init',op_init),
