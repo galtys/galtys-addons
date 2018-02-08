@@ -1,33 +1,4 @@
-<?xml version="1.0"?>
-<openerp>
-    <data>
-
-        <!-- Demo menu item -->
-
-        <menuitem id='hashsync_demo' name='Demo' parent="hashsync_main" sequence="200"/>
-
-
-        <!-- HASHSYNC.DEMO PERSON -->
-	
-        <record id="view_hashsync_demo_person_form" model="ir.ui.view">
-            <field name="name">hashsync.demo.person.form</field>
-            <field name="model">hashsync.demo.person</field>
-            <field name="arch" type="xml">
-                <form version="7.0" string="Person">
-                    <sheet>
-                        <group>
-                            <field name="name"/>
-			    <field name="birth_date"/>
-			    <field name="code" readonly="1"/>
-                        </group>
-			<field name="address_ids"/> 
-                    </sheet>
-                </form>
-            </field>
-
-        </record>
-        
-        <record id="view_hashsync_demo_person_tree" model="ir.ui.view">
+        <record id="view_hashsync.demo_person_tree" model="ir.ui.view">
           <field name="name">analysis.tree</field>
           <field name="model">hashsync.demo.person</field>
           <field name="arch" type="xml">
@@ -52,7 +23,7 @@
 
         <!-- HASHSYNC.DEMO ADDRESS -->
 	
-        <record id="view_hashsync_demo_address_form" model="ir.ui.view">
+        <record id="view_hashsync.demo_address_form" model="ir.ui.view">
             <field name="name">hashsync.demo.address.form</field>
             <field name="model">hashsync.demo.address</field>
             <field name="arch" type="xml">
@@ -63,7 +34,6 @@
 			<field name="street2"/>
 			<field name="city"/>
 			<field name="zip"/>
-			<field name="person_id"/>
 			<field name="code" readonly="1"/>
 		      </group>
                     </sheet>
@@ -72,7 +42,7 @@
 
         </record>
         
-        <record id="view_hashsync_demo_address_tree" model="ir.ui.view">
+        <record id="view_hashsync.demo_address_tree" model="ir.ui.view">
           <field name="name">analysis.tree</field>
           <field name="model">hashsync.demo.address</field>
           <field name="arch" type="xml">
@@ -100,6 +70,3 @@
 
 
 
-	
-    </data>
-</openerp>

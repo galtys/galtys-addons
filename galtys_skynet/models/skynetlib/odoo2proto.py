@@ -1,4 +1,7 @@
 import json
+import csv
+import StringIO
+
 #from protolib import add_OdooPB_group
 #ssl._create_default_https_context = ssl._create_unverified_context
 
@@ -191,20 +194,40 @@ def m2csv(m):
         for h in header[1:]:
             if h == 'type':
                 row.append( protolib.FieldDef_to_text[getattr( fd, h ) ] )
+            elif getattr( fd, h ) in [False]:
+                row.append( '' )
             else:
                 row.append( getattr( fd, h )  )
         data.append(row)
     return header, data
 
-ADOC_CSV_TABLE=""".%s
+ADOC_CSV_TABLE="""%s
 [%%header,format=csv]
 |===
 %s
 |===
 
 """
-import csv
-import StringIO
+
+def adoc_csv_table(csv_str,title=None, ref=None):
+    def get_header(title,ref):
+        out=''
+        if ref is not None:
+            out+='[[%s]]\n' % ref
+        elif title is not None:
+            out+='.%s\n'%title
+        return out
+    h=get_header(title,ref)
+    return ADOC_CSV_TABLE%(h, csv_str)
+
+def csv_to_str(header, data):
+    fp=StringIO.StringIO()
+    wr=csv.writer(fp)
+    wr.writerow(header)
+    wr.writerows(data)
+    val=fp.getvalue()
+    fp.close()
+    return val
 
 def pbmsg2adoc(pbmsg, appname):
     out = StringIO.StringIO()
@@ -212,13 +235,9 @@ def pbmsg2adoc(pbmsg, appname):
     for m in pbmsg.models:
         #cols_pb = get_pb_fields_to_store(m)
         #out = out +  get_proto_for_model(m, cols_pb)
-        header, csv_data = m2csv(m)
-        fp=StringIO.StringIO()
-        w=csv.writer(fp)
-        w.writerow(header)
-        w.writerows(csv_data)
-        val=fp.getvalue()
-        x=ADOC_CSV_TABLE%(m._description, val)
+        header, data = m2csv(m)
+        csv_str = csv_to_str(header, data)
+        x = adoc_csv_table(csv_str, title='%s (%s)'%(m._description,m._name) )
         out.write(x)
     return out.getvalue()
 

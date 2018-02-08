@@ -34,29 +34,7 @@ from skynetlib.odoo2proto import get_odoopb_proto
 from odoo.modules.module import get_module_resource
 
 from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict10, erpmodel2dict10
-
-class Person(models.Model):
-    _name = "skynet.person"
-    _description = "Person"
-    
-    code= fields.Char("code")
-    secret_key = fields.Char("secret_key")
-    name = fields.Char("Name")
-    birth_date = fields.Date("Birth Date")
-    address_ids = fields.One2many('skynet.address','person_id','Addresses')
-
-class Address(models.Model):
-    _name = "skynet.address"
-    _description = "Address"
-    
-    code= fields.Char("code")
-    secret_key = fields.Char("secret_key")
-    street = fields.Char("street")
-    street2 = fields.Char("street2")
-    city= fields.Char("city")
-    zip = fields.Char("zip")
-    person_id = fields.Many2one("skynet.person")
-    
+   
 
 class SkynetSettings(models.Model):
     _name = "skynet.settings"
