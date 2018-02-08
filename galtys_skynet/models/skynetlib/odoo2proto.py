@@ -262,6 +262,9 @@ def segments2adoc(segments, fp, opt, schema):
     field_relation_map = protolib.relation_map(schema.registry)
     code2id_map={}
     odoopb = import_odoopb(opt)
+    ODOO_OPS = [odoopb.UPDATE, odoopb.DELETE, odoopb.CREATE]
+    ODOO_OPS_str = ['UPDATE','DELETE','CREATE']
+    odoo_ops_map= dict( zip(ODOO_OPS,ODOO_OPS_str) )
     for (header, messages),model in zip(segments, schema.registry.models):
         js=google.protobuf.json_format.MessageToJson(header, including_default_value_fields=True, preserving_proto_field_name=True)
         #fp.write(js)
@@ -282,11 +285,20 @@ def segments2adoc(segments, fp, opt, schema):
                 s256=base64.b64encode(segh.sha256)
                 #print [ret]
                 ret.update( {'sha256':s256} )
+            elif segh.operation in ODOO_OPS:
+                s256=base64.b64encode(segh.sha256)
+                prev_s256=base64.b64encode(segh.prev_sha256)
+                #print [ret]
+                op_str=odoo_ops_map[segh.operation]
+                ret.update( {'sha256':s256, 'prevsha256':prev_s256, 'OP':op_str} )
+                
             out.append( ret )
-        operation = list( set( operation ) )
+        operation = set( operation )
         #print operation
-        if len(operation)==1 and operation[0]==odoopb.SNAPSHOT:
+        if len(operation)==1 and list(operation)[0]==odoopb.SNAPSHOT:
             header = get_pb_fields_to_store(model) + ['sha256']
+        elif set(ODOO_OPS).intersection( operation ):
+            header = get_pb_fields_to_store(model) + ['prevsha256','sha256','OP']
         else:
             header = get_pb_fields_to_store(model)
             
