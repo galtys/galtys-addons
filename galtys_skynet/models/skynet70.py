@@ -15,12 +15,13 @@ if 1:
   from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
   import skynetlib.odoo2proto as odoo2proto
   #from skynetlib.protolib import get_odoopb_proto
-  from skynetlib.odoo2proto import get_odoopb_proto
+  #from skynetlib.odoo2proto import get_odoopb_proto
 #from odoo2proto import odoo2pbmsg
 
 #for v8,v7
   from openerp.modules.module import get_module_resource
-  from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict, erpmodel2dict
+  #from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict, erpmodel2dict
+  from skynetlib.odoo2proto import odoo2pbmsg_dict
 
 class Person(osv.osv):
   _name = "skynet.person"
