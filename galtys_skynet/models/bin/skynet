@@ -1,4 +1,0 @@
-#!/usr/bin/python
-import skynetlib.pb2dblib    
-if __name__ == '__main__':
-    skynetlib.pb2dblib.main()
