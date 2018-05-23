@@ -9,7 +9,7 @@
     "description" : "Skynet Experiment :-)",
     "init_xml" : [],
     "demo_xml" : [],
-    "data" : ['views/galyts_skynet_view.xml','views/galyts_person_address_view.xml'],
+    "data" : ['views/galyts_skynet_view.xml'] ,#,'views/galyts_person_address_view.xml'],
     "update_xml" : [],
     "active": False,
     "installable": True
