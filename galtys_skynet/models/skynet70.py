@@ -9,7 +9,7 @@ import StringIO
 import base64
 import json
 import pprint
-if 1:
+if 0:
   import google.protobuf.json_format
   from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
   from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
