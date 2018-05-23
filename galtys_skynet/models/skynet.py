@@ -27,12 +27,14 @@ import pprint
 from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
 from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
 import skynetlib.odoo2proto as odoo2proto
+from skynetlib.odoo2proto import get_odoopb_proto
 #from odoo2proto import odoo2pbmsg
 
 #for v8,v7
 from odoo.modules.module import get_module_resource
 
 from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict10, erpmodel2dict10
+   
 
 class SkynetSettings(models.Model):
     _name = "skynet.settings"
@@ -43,8 +45,9 @@ class SkynetSettings(models.Model):
 
     def load_odoopb_proto(self):        
         for settings in self:
-            fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
-            settings.odoopb_proto = file(fn).read()
+            #fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
+            proto_path, odoopb_proto=get_odoopb_proto()    
+            settings.odoopb_proto = file(odoopb_proto).read()
             
 class SkynetModel(models.Model):
     _name = "skynet.schema.model"
@@ -60,13 +63,19 @@ class SkynetSchema(models.Model):
     _description = "skynet.schema"
 
     name = fields.Char("Name")
+    model_ids = fields.One2many("skynet.schema.model","schema_id","Schema Model")
+    
     settings_id = fields.Many2one("skynet.settings",string="Settings")
+    
     registry_json = fields.Text("Registry Json")
     registry_dict = fields.Text("Registry dict")
-    model_ids = fields.One2many("skynet.schema.model","schema_id","Schema Model")
     registry_pb = fields.Binary("Registry PB")
     registry_proto = fields.Text("Registry Proto")
 
+    schema_json = fields.Text("Schema Json")
+    schema_dict = fields.Text("Schema dict")
+    schema_pb = fields.Binary("Schema PB")
+    schema_proto = fields.Text("Schema Proto")
 
     def store_registry_json(self):
 
@@ -74,7 +83,7 @@ class SkynetSchema(models.Model):
             models = []
             for sm in schema.model_ids:
                 models.append( sm.model_id.model )
-            print models
+            #print models
             uid = 1
             registry_dict = odoo2proto.odoo2pbmsg_dict10(self.env, models)
             registry_json = json.dumps( registry_dict )
@@ -85,6 +94,19 @@ class SkynetSchema(models.Model):
             registry_dict_pprint=fp.getvalue()            
             schema.registry_json = registry_json
             schema.registry_dict = registry_dict_pprint
+
+            
+            schema_dict = {'registry':registry_dict,
+                           'schema_name': str(schema.name),
+                           'app_name': str(schema.settings_id.name)}
+
+            fp=StringIO.StringIO()
+            pprint.pprint(schema_dict, stream=fp)            
+            schema_dict_pprint=fp.getvalue()
+
+            schema_json = json.dumps( schema_dict )
+            schema.schema_dict = schema_dict_pprint
+            schema.schema_json = schema_json
         
     def store_pb(self):
         for schema in self:

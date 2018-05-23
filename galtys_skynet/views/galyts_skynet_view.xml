@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <openerp>
     <data>
-      <record id="skynet_access" model="res.groups">
+      <record id="hashsync_access" model="res.groups">
 	<field name="name">Skynet Sync</field>
-	<field name="comment">The user will have access to skynet sync configuration.</field>
+	<field name="comment">The user will have access to hashsync sync configuration.</field>
       </record>
 
         <!-- Top menu item -->
-        <menuitem id='skynet_main' name='Skynet' sequence="100"/>
-        <menuitem id='skynet' name='Skynet' parent="skynet_main" sequence="100"/>
+        <menuitem id='hashsync_main' name='Hashsync' sequence="100"/>
+        <menuitem id='hashsync' name='Hashsync' parent="hashsync_main" sequence="100"/>
 
-        <menuitem id='skynet_config' name='Configuration' parent="skynet_main" sequence="100"/>
+        <menuitem id='hashsync_config' name='Configuration' parent="hashsync_main" sequence="100"/>
 
 
         <!-- SKYNET SCHEMA MODEL -->
@@ -45,14 +45,14 @@
         </record>
 
 	
-        <record model="ir.actions.act_window" id="action_skynet_schema_model_form">
+        <record model="ir.actions.act_window" id="action_hashsync_schema_model_form">
             <field name="name">Skynet Schema Model</field>
             <field name="res_model">skynet.schema.model</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
 
-	<menuitem name="Schema Model" parent="skynet_config" id="menu_skynet_schema_models_form" action="action_skynet_schema_model_form" />
+	<menuitem name="Schema Model" parent="hashsync_config" id="menu_hashsync_schema_models_form" action="action_hashsync_schema_model_form" />
 	
 
 	
@@ -117,7 +117,7 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-	<menuitem name="Schema" parent="skynet_config" id="menu_skynet_schemas_form" action="action_skynet_schema_form" />
+	<menuitem name="Schema" parent="hashsync_config" id="menu_skynet_schemas_form" action="action_skynet_schema_form" />
 
 
 	<!-- SKYNET SETTINGS -->
@@ -155,7 +155,25 @@
             <field name="view_mode">tree,form</field>
         </record>
 
-	<menuitem name="Settings" parent="skynet_config" id="menu_skynet_settingss_form" action="action_skynet_settings_form" />
+	<menuitem name="Settings" parent="hashsync_config" id="menu_skynet_settingss_form" action="action_skynet_settings_form" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
     </data>
 </openerp>

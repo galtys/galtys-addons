@@ -14,15 +14,39 @@ if 0:
   from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
   from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
   import skynetlib.odoo2proto as odoo2proto
+  #from skynetlib.protolib import get_odoopb_proto
+  #from skynetlib.odoo2proto import get_odoopb_proto
 #from odoo2proto import odoo2pbmsg
 
 #for v8,v7
   from openerp.modules.module import get_module_resource
-  from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict, erpmodel2dict
+  #from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict, erpmodel2dict
+  from skynetlib.odoo2proto import odoo2pbmsg_dict
 
+class Person(osv.osv):
+  _name = "skynet.person"
+  _columns = {
+    'code':fields.char("Code"),
+    'secret_key':fields.char("secret key"),
+    'name':fields.char("Name"),
+    'birth_date':fields.date("Birth Date"),
+    'address_ids':fields.one2many("skynet.address", "person_id", "Addresses")
+    }
+class Address(osv.osv):
+  _name = "skynet.address"
+  _columns = {
+    'code':fields.char("Code"),
+    'secret_key':fields.char("secret key"),
+    'street':fields.char("Street"),
+    'street2':fields.char("Street 2"),
+    'city':fields.char("City"),
+    'zip':fields.char("Post Code"),
+    'person_id':fields.many2one("skynet.person", "Person"),
+    }
+  
 class SkynetSettings(osv.osv):
     _name = "skynet.settings"
-    _description = "Skynet Settings"
+    _description = "HashSync Settings"
     
     _columns={
         'name':fields.char("Name"),
@@ -31,11 +55,13 @@ class SkynetSettings(osv.osv):
     def load_odoopb_proto(self, cr, uid, ids, context=None):
         
         for settings in self.browse(cr, uid, ids):
-            fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
-            settings.write( {'odoopb_proto': file(fn).read() } )
+            proto_path, odoopb_proto=get_odoopb_proto()    
+            #fn=get_module_resource('galtys_skynet','models/protodir','odoopb.proto')
+            settings.write( {'odoopb_proto': file(odoopb_proto).read() } )
             
 class SkynetModel(osv.osv):
     _name = "skynet.schema.model"
+    _description = "hashsync schema model"
     _order = "sequence"
     _columns = {
         'name':fields.char("name"),
@@ -46,13 +72,14 @@ class SkynetModel(osv.osv):
     
 class SkynetSchema(osv.osv):
     _name = "skynet.schema"
-    _description = "skynet.schema"
+    _description = "hashsync schema"
 
     _columns={
         'name':fields.char("Name"),
         'model_ids':fields.one2many("skynet.schema.model","schema_id","Schema Model"),
 
         'settings_id':fields.many2one("skynet.settings",string="Settings"),
+      
         'registry_json':fields.text("Registry Json"),
         'registry_dict':fields.text("Registry dict"),
         'registry_pb':fields.binary("Registry PB"),
@@ -71,7 +98,7 @@ class SkynetSchema(osv.osv):
             models = []
             for sm in schema.model_ids:
                 models.append( sm.model_id.model )
-            print models
+            #print models
             registry_dict = odoo2proto.odoo2pbmsg_dict(self.pool, cr, uid, models)
 
             fp=StringIO.StringIO()
@@ -156,3 +183,5 @@ class SkynetSchema(osv.osv):
                     code = bitcoin.pubtoaddr( pub_key )
                     sql_update="update %s set " % m._table
                     cr.execute( sql_update+"code=%s,secret_key=%s where id=%s", (code,secret_key,id_) )
+
+#note: https://pythonhosted.org/OdooRPC/
