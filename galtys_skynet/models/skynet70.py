@@ -15,7 +15,7 @@ if 0:
   from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
   import skynetlib.odoo2proto as odoo2proto
   #from skynetlib.protolib import get_odoopb_proto
-  #from skynetlib.odoo2proto import get_odoopb_proto
+  from skynetlib.odoo2proto import get_odoopb_proto
 #from odoo2proto import odoo2pbmsg
 
 #for v8,v7
