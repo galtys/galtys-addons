@@ -14,6 +14,7 @@ if 1:
   from skynetlib.odoopb_pb2 import Digits, SelectionOption, FieldDef, Field, Model,Registry
   from skynetlib.protolib import FieldTypes, FieldTypesStr,erp_type_to_pb,odoo_custom_pbfields
   import skynetlib.odoo2proto as odoo2proto
+  
   #from skynetlib.protolib import get_odoopb_proto
   from skynetlib.odoo2proto import get_odoopb_proto
 #from odoo2proto import odoo2pbmsg
@@ -93,13 +94,15 @@ class SkynetSchema(osv.osv):
     }
 
     def store_registry_json(self, cr, uid, ids, context=None):
-
-        for schema in self.browse(cr, uid, ids):
+      mmf_map=odoo2proto.get_module_for_model_and_field()
+      print mmf_map
+      for schema in self.browse(cr, uid, ids):
             models = []
             for sm in schema.model_ids:
                 models.append( sm.model_id.model )
             #print models
-            registry_dict = odoo2proto.odoo2pbmsg_dict(self.pool, cr, uid, models)
+            registry_dict = odoo2proto.odoo2pbmsg_dict(self.pool, cr, uid, models, mmf_map)
+            
 
             fp=StringIO.StringIO()
             pprint.pprint(registry_dict, stream=fp)            
