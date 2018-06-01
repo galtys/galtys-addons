@@ -21,7 +21,7 @@ if 1:
 
 #for v8,v7
   from openerp.modules.module import get_module_resource
-  #from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict, erpmodel2dict
+  from skynetlib.odoo2proto import pbmsg2proto, get_proto_for_model, get_pb_fields_to_store, odoo2pbmsg_dict, erpmodel2dict
   from skynetlib.odoo2proto import odoo2pbmsg_dict
 
 class Person(osv.osv):
@@ -69,6 +69,7 @@ class SkynetModel(osv.osv):
         'sequence':fields.integer("sequence"),
         'model_id':fields.many2one("ir.model", "ERP MODEL"),
         'schema_id':fields.many2one("skynet.schema"),
+        'skip':fields.boolean("Skip"),
         }
     
 class SkynetSchema(osv.osv):
@@ -99,7 +100,8 @@ class SkynetSchema(osv.osv):
       for schema in self.browse(cr, uid, ids):
             models = []
             for sm in schema.model_ids:
-                models.append( sm.model_id.model )
+                if not sm.skip:
+                  models.append( sm.model_id.model )
             #print models
             registry_dict = odoo2proto.odoo2pbmsg_dict(self.pool, cr, uid, models, mmf_map)
             
