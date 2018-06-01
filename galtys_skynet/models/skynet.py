@@ -57,6 +57,7 @@ class SkynetModel(models.Model):
     sequence = fields.Integer("sequence")
     model_id = fields.Many2one("ir.model", "ERP MODEL")
     schema_id = fields.Many2one("skynet.schema")
+    skip = fields.Boolean("Skip")
     
 class SkynetSchema(models.Model):
     _name = "skynet.schema"
