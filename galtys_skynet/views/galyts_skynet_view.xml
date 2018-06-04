@@ -25,7 +25,7 @@
                             <field name="name"/>
 			    <field name="sequence"/>
 			    <field name="model_id"/>
-			    <field name="schema_id"/>
+			    <field name="schema_id" readonly="1"/>
 			    <field name="skip"/>
                         </group>
                     </sheet>
@@ -35,13 +35,15 @@
         </record>
         
         <record id="view_skynet_schema_model_tree" model="ir.ui.view">
-          <field name="name">analysis.tree</field>
+          <field name="name">skynet.schema.tree</field>
           <field name="model">skynet.schema.model</field>
           <field name="arch" type="xml">
             <tree string="Skynet Schema Model">
 <!--              <field name="name"/>   -->
 	      <field name="sequence"/>
 	      <field name="model_id"/>
+	      <field name="schema_id"/>
+	      <field name="skip"/>
             </tree>
           </field>
         </record>
@@ -67,15 +69,17 @@
                     <sheet>
                         <group>
                           <field name="name"/>
-			  <field name="settings_id"/>o
+			  <field name="settings_id"/>
 			  <button name="store_registry_json" string="Store Registry Json" type="object" />
 			  <button name="store_pb" string="Store PB" type="object"/>
 			  <button name="store_proto" string="Store proto" type="object"/>
 			  <button name="add_code_column" string="add code column" type="object"/>
 			  <button name="init_code"  string="init code" type="object"/>
                         </group>
+			
 			<separator string = "Models"/>
 			<field name="model_ids"/>
+			
 			<separator string = "Registry proto"/>
 			<field name="registry_proto"/>
 			

@@ -68,7 +68,7 @@ class SkynetModel(osv.osv):
         'name':fields.char("name"),
         'sequence':fields.integer("sequence"),
         'model_id':fields.many2one("ir.model", "ERP MODEL"),
-        'schema_id':fields.many2one("skynet.schema"),
+        'schema_id':fields.many2one("skynet.schema", "Schema"),
         'skip':fields.boolean("Skip"),
         }
     
@@ -96,7 +96,7 @@ class SkynetSchema(osv.osv):
 
     def store_registry_json(self, cr, uid, ids, context=None):
       mmf_map=odoo2proto.get_module_for_model_and_field()
-      print mmf_map
+      #print mmf_map
       for schema in self.browse(cr, uid, ids):
             models = []
             for sm in schema.model_ids:

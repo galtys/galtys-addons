@@ -56,7 +56,7 @@ class SkynetModel(models.Model):
     name = fields.Char("name")
     sequence = fields.Integer("sequence")
     model_id = fields.Many2one("ir.model", "ERP MODEL")
-    schema_id = fields.Many2one("skynet.schema")
+    schema_id = fields.Many2one("skynet.schema", "Schema")
     skip = fields.Boolean("Skip")
     
 class SkynetSchema(models.Model):
@@ -64,8 +64,8 @@ class SkynetSchema(models.Model):
     _description = "skynet.schema"
 
     name = fields.Char("Name")
-    model_ids = fields.One2many("skynet.schema.model","schema_id","Schema Model")
     
+    model_ids = fields.One2many("skynet.schema.model","schema_id","Schema Model")    
     settings_id = fields.Many2one("skynet.settings",string="Settings")
     
     registry_json = fields.Text("Registry Json")
@@ -79,14 +79,14 @@ class SkynetSchema(models.Model):
     schema_proto = fields.Text("Schema Proto")
 
     def store_registry_json(self):
-
+        mmf_map=odoo2proto.get_module_for_model_and_field()
         for schema in self:
             models = []
             for sm in schema.model_ids:
                 models.append( sm.model_id.model )
             #print models
             uid = 1
-            registry_dict = odoo2proto.odoo2pbmsg_dict10(self.env, models)
+            registry_dict = odoo2proto.odoo2pbmsg_dict10(self.env, models, mmf_map)
             registry_json = json.dumps( registry_dict )
 
             fp=StringIO.StringIO()

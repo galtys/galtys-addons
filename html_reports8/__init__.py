@@ -20,9 +20,7 @@
 #
 ##############################################################################
 import openerp.release
-if openerp.release.version in ['10.0']:
-    print 'WHAT TO DO HERE?'
-else:
+#print ['openerp.release', openerp.release.version]
+if openerp.release.version not in ['10.0', '11.0','11.0+e']:
     import controllers
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
