@@ -159,10 +159,19 @@ class SkynetSchema(models.Model):
             pbr.ParseFromString( pbmsg )
 
             for m in pbr.models:
+                self.env.cr.execute("select res_id,name from ir_model_data where model=%s", m._name)
+                ext_id_map=[x for x in self.env.cr.fetchall()]
+                
                 self.env.cr.execute("select id from %s where code is Null"%m._table)
                 for rec in self.env.cr.fetchall():
                     id_=rec[0]
-                    secret_key = bitcoin.random_key()
+                    
+                    if id_ in ext_id_map:
+                        xml_name=ext_id_map[id_]
+                        secret_key = hashlib.sha256(xml_name)
+                    else:
+                        secret_key = bitcoin.random_key()
+
                     pub_key = bitcoin.privtopub(secret_key)
                     code = bitcoin.pubtoaddr( pub_key )
                     sql_update="update %s set " % m._table
