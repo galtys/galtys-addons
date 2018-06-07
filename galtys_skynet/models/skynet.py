@@ -151,29 +151,33 @@ class SkynetSchema(models.Model):
         
     def init_code(self):
         import bitcoin
+        import hashlib
         for schema in self:
             x=schema.registry_pb
             pbmsg=base64.b64decode( x )
 
             pbr = Registry()
             pbr.ParseFromString( pbmsg )
+            if m._name not in ['res.country']:
+                for m in pbr.models:
+                    self.env.cr.execute("select res_id,name from ir_model_data where model=%s", (m._name,) )
+                    ext_id_map=dict([x for x in self.env.cr.fetchall()])
 
-            for m in pbr.models:
-                self.env.cr.execute("select res_id,name from ir_model_data where model=%s", m._name)
-                ext_id_map=[x for x in self.env.cr.fetchall()]
-                
-                self.env.cr.execute("select id from %s where code is Null"%m._table)
-                for rec in self.env.cr.fetchall():
-                    id_=rec[0]
-                    
-                    if id_ in ext_id_map:
-                        xml_name=ext_id_map[id_]
-                        secret_key = hashlib.sha256(xml_name)
-                    else:
-                        secret_key = bitcoin.random_key()
+                    self.env.cr.execute("select id from %s where code is Null"%m._table)
+                    for rec in self.env.cr.fetchall():
+                        id_=rec[0]
+                        print 44*'_'
+                        #print ext_id_map,[id_]
+                        print ext_id_map,[id_, id_ in ext_id_map ]
+                        if id_ in ext_id_map:
+                            xml_name=ext_id_map[id_]
+                            secret_key = hashlib.sha256(xml_name).hexdigest()
+                        else:
+                            secret_key = bitcoin.random_key()
 
-                    pub_key = bitcoin.privtopub(secret_key)
-                    code = bitcoin.pubtoaddr( pub_key )
-                    sql_update="update %s set " % m._table
-                    self.env.cr.execute( sql_update+"code=%s,secret_key=%s where id=%s", (code,secret_key,id_) )
+                        pub_key = bitcoin.privtopub(secret_key)
+                        code = bitcoin.pubtoaddr( pub_key )
+                        sql_update="update %s set " % m._table
 
+                        self.env.cr.execute( sql_update+"code=%s,secret_key=%s where id=%s", (code,secret_key,id_) )
+                        
