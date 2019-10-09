@@ -116,6 +116,7 @@
           <field name="arch" type="xml">
             <tree string="Chart">
 	      <field name="name"/>
+	      <field name="ref"/>
 	      <field name="type"/>
 
             </tree>
