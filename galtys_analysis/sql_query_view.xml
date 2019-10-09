@@ -27,6 +27,7 @@
 			<field name="year_today"/>
 			<field name="week_today"/>
 			<field name="month_today"/>
+			<field name="active"/>
 		      </group>
 
 		      <group string="Query Template">
@@ -37,7 +38,6 @@
 
 		      <group string="Query">
 			<field name="query"/>
-			<field name="active"/>
 			<field name="sql_columns"/>
 		      </group>
 
@@ -89,6 +89,7 @@
 			<field name="ref"/>
 			<field name="type"/>
 			<field name="image_file" readonly="1"/>
+			<field name="active"/>
 		      </group>
 		      <group string="Chart Parameters">
 			<field name="xdata"/>

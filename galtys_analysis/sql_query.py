@@ -134,7 +134,7 @@ class sql_query(osv.osv):
         "query_template_offset":fields.integer("OFFSET"),
         'query':fields.function(_query, type='text', multi='query',method=True,string='Rendered Query'),
         'query_before_limit_offset':fields.function(_query, type='text', multi='query',method=True,string='Rendered Query for UI', help="this is to help with limit and offset"),
-        "active":fields.boolean("Active"),
+        #"active":fields.boolean("Active"),
         'sql_columns':fields.function(_get, type='char', multi='get',method=True,string='SQL Columns'),
         'date_today':fields.function(_today, type='date', multi='today',method=True,string='Date Today'),
         'year_today':fields.function(_today, type='integer', multi='today',method=True,string='Year Today', size=44),
@@ -144,6 +144,7 @@ class sql_query(osv.osv):
         "name":fields.char("Title", size=444),
         "ref":fields.char("ref", size=444),
         "description":fields.char("Description", size=444),
+        'active':fields.boolean("Active"),
     }
     _defaults = {
         "active":True,
@@ -168,6 +169,7 @@ class analysis_chart(osv.osv):
 
     _columns = {
         'name':fields.char("Title", size=444),
+        'active':fields.boolean("Active"),
         'ref':fields.char("ref", size=444),
         'xlabel':fields.char("X Label", size=444),
         'ylabel':fields.char("Y Label", size=444),
@@ -236,11 +238,11 @@ class analysis_chart(osv.osv):
         q = image.query_ids[0]
         ctx=self.pool.get("analysis.sql.query").get_html_context(cr,uid,q.id)
         dd=np.array(ctx['data']).transpose()
-        print 'dd' ,dd, dd[0], dd[1]
+        #print 'dd' ,dd, dd[0], dd[1]
         reason=dd[0]
         count=[eval(x) for x in dd[1] ]
          
-        print reason, count
+        #print reason, count
 
         sizes = count #[100-actual_p, actual_p]
 
@@ -277,7 +279,7 @@ class analysis_chart(osv.osv):
         #plt.title( d.strftime(image.xtickstrftime ) )
         #image_path=get_module_path('html_reports')
         #image_file=os.path.join(image_path,fn)
-        print 'generate_pie3_chart', [image.image_file]
+        #print 'generate_pie3_chart', [image.image_file]
         plt.savefig(image.image_file, bbox_inches='tight',dpi=figdpi)
         plt.close(fig)
 
