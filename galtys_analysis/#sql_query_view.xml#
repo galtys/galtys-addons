@@ -57,7 +57,7 @@
 	      <field name="name"/>
 	      <field name="type"/>
 	      <field name="ref"/>
-	      <!--
+	      <!--  ai.date_invoice >= '${qt.date_start}' and ai.date_invoice <= '${qt.date_end}'
 	      <field name="description"/>
 
 	      <field name="date_start"/>

@@ -145,6 +145,7 @@ class sql_query(osv.osv):
         "ref":fields.char("ref", size=444),
         "description":fields.char("Description", size=444),
         'active':fields.boolean("Active"),
+        'chart_ids':fields.many2many('analysis.chart','sql_query_chart_rel','chart_id', 'query_id', string="Charts"),
     }
     _defaults = {
         "active":True,
@@ -183,7 +184,7 @@ class analysis_chart(osv.osv):
         'xdata':fields.selection([('week','Week'),('month','Month'),('day','Day')],'xdata'),
         'xtickstrftime':fields.char("xtickstrftime",size=44, help="see strftime.org"),
         'type':fields.selection([('bar','Bar Chart'),('pie','Pie Chart'),('pie2','Pie2'),('pie3','Pie3'),('line','Line Chart')],'Type'),
-        'query_ids':fields.many2many('analysis.sql.query','sql_query_chart_rel','query_id','chart_id'),
+        'query_ids':fields.many2many('analysis.sql.query','sql_query_chart_rel','query_id','chart_id', string="Query"),
         }
     _defaults = {
         'figxsize':9,
