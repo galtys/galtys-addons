@@ -14,7 +14,8 @@
                 </xpath>
 		<field name="email" position="after">
 		  <field name="helpscout"/>
-		  <field name="helpscout_state"/>		  
+		  <field name="helpscout_state"/>
+		  <field name="trustpilot" readonly="1" />
 		</field>
                 <xpath expr="//sheet/notebook/page[@string='Contacts']" position="replace">
                     <page string="Contacts" autofocus="autofocus">

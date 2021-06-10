@@ -33,8 +33,8 @@ class res_partner(osv.osv):
         'contract':fields.boolean("Contract",select=True),
         'customer_relationship':fields.selection([('trade','Trade'),('retail','Retail'),('contract','Contract')], 'Customer Relationship'),
         'helpscout':fields.char("Helpscout",size=444),
-        'helpscout_state':fields.char("Helpscout_state",size=444),        
-        
+        'helpscout_state':fields.char("Helpscout_state",size=444),
+        'trustpilot':fields.char("Trustpilot"),        
     }
 
     def _default_category(self, cr, uid, context=None):
